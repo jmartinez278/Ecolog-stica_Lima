@@ -4,7 +4,7 @@
 
 **Nombre del Proyecto:** EcoLogística Lima<br>
 **Líder del Proyecto:** Marco Jhair Martinez Llanos, según el acta de constitución.<br>
-**Versión documental:** V_1_0_0 · **Fecha de corte:** 24/10/2026 (Lima).
+**Versión documental:** V_1_0_1 · **Actualizado:** 25/10/2026 (Lima).
 
 ## ¿Qué aprendimos?
 
@@ -13,6 +13,8 @@ El alcance vigente se limita a localhost; la [adenda del 25/10/2026](<Alcance de
 Aprendimos a distinguir la primera línea base de SonarQube de una evaluación efectiva del código nuevo: el primer Quality Gate devolvía condiciones vacías y el reanálisis posterior sí evaluó sus umbrales. La ausencia de alertas estáticas tampoco cubría toda la seguridad: una prueba negativa detectó la aceptación de tokens sin expiración y permitió corregirla.
 
 La evaluación de interfaz mostró otra diferencia útil: axe no notificó infracciones automáticas, pero las comprobaciones dirigidas detectaron seis fallas de foco relacionadas con una causa común. La revisión de la interacción y de las capturas complementó las métricas.
+
+El cierre técnico mostró que el contraste indeterminado podía resolverse eliminando fondos superpuestos al texto, sin inventar un porcentaje global de conformidad. Las 437 comprobaciones de texto pasan. Cuatro pruebas de cancelación de edición elevaron los formularios a 100 % de líneas y comprobaron un comportamiento relevante: descartar cambios no debe enviar una escritura al servidor.
 
 ## ¿Qué estamos haciendo bien?
 
@@ -39,17 +41,17 @@ Actualizar Jira con el avance sustentado y corregir la discrepancia de los calen
 
 ### Herramientas
 
-Ejecutar CI, CodeQL y auditorías sobre `main` y la rama de entrega. Mantener un scanner reproducible, reportes de cobertura y un entorno aislado para la auditoría web. Los resultados incompletos de contraste y las limitaciones de un navegador deben permanecer visibles para su revisión.
+Ejecutar CI, CodeQL y auditorías sobre `main` y la rama de entrega. Mantener un scanner reproducible, reportes de cobertura y un entorno aislado para la auditoría web. Los resultados decorativos no evaluables y los límites del navegador deben conservarse explícitos; no convertirlos en una aprobación universal de accesibilidad.
 
 ### Acciones a realizar
 
 | Acción verificable | Responsable propuesto | Plazo de referencia | Evidencia de cumplimiento |
 |---|---|---|---|
 | Revisar el PR y las correcciones sin cambiar umbrales para ocultar hallazgos | Par técnico distinto del autor | Antes de integrar | Revisión registrada y CI aprobado |
-| Completar contraste, lector de pantalla y navegadores del alcance | Calidad/UX | Antes de declarar conformidad AA | Matriz de criterios y resultados por entorno |
-| Definir limitación de intentos, auditoría de login y mantener la seguridad del despliegue local | Backend/infraestructura | Antes del cierre de la validación local | Pruebas y configuración verificadas |
+| Conservar la evidencia del contraste resuelto y completar lector de pantalla/navegadores del DoD | Calidad/UX | Antes de declarar conformidad AA completa | [Evaluación vigente](evidencias/accesibilidad-entrega-edge.json); validación humana aún pendiente |
+| Priorizar limitación de intentos y auditoría/alertas de login; mantener seguridad local | Backend/infraestructura | Backlog de mejora, según riesgo | Nuevas tareas y pruebas cuando se implemente; no es un requisito adicional de la consigna |
 | Conciliar responsables, fechas y estados de Jira | Líder del proyecto y equipo | Antes del cierre administrativo | Tablero y acuerdos con fechas reales |
-| Priorizar escenarios no cubiertos de los formularios | Desarrollo frontend | Próxima iteración técnica | Cobertura por módulo y nuevas pruebas pertinentes |
+| Mantener las regresiones de cancelación y priorizar escenarios restantes según riesgo | Desarrollo frontend | En cada cambio afectado | 11 pruebas aprobadas y [cobertura por módulo](evidencias/frontend-cobertura-entrega.json); formularios 100 % de líneas |
 | Conservar los cinco informes y validar enlaces tras cada cambio | Responsable documental | En cada entrega | Comprobador de enlaces aprobado |
 
 Las acciones representan el plan de mejora derivado del trabajo observado. Los responsables concretos y fechas de calendario requieren confirmación del equipo; no se registran como compromisos personales ya aceptados.
@@ -59,5 +61,6 @@ Las acciones representan el plan de mejora derivado del trabajo observado. Los r
 | Versión | Fecha | Cambio |
 |---|---|---|
 | V_1_0_0 | 24/10/2026 | Aprendizajes sustentados, cuatro dimensiones de mejora y acciones verificables. |
+| V_1_0_1 | 25/10/2026 | Resultados del contraste y cobertura, acciones realizadas y mejoras futuras diferenciadas. |
 
 [← Volver al README](../../../README.md)

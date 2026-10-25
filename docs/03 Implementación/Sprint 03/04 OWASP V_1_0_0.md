@@ -4,7 +4,7 @@
 
 **Nombre del Proyecto:** EcoLogística Lima<br>
 **Herramienta de Escaneo:** SonarQube Community Build 26.10.0.133078; complementos Pytest, pip-audit y npm audit.<br>
-**Versión documental:** V_1_0_0.<br>
+**Versión documental:** V_1_0_1 · **Actualizado:** 25/10/2026 (Lima).<br>
 **Alcance:** API FastAPI, persistencia y frontend de las funcionalidades US-001 a US-015, en la rama `Sprint-3`.
 
 ## 1. Matriz de Cumplimiento OWASP Top 10 2025
@@ -22,7 +22,7 @@ Se utiliza la [lista oficial OWASP 2025](https://top10.owasp.org/2025/). La tabl
 | A05 — Injection | Bajo revisión; caso negativo probado | SQLAlchemy construye las consultas mediante parámetros. El intento de entrada SQL en el login devuelve 401 sin token. React presenta los valores como texto; no se considera probada toda variante de inyección mediante un único caso. |
 | A06 — Insecure Design | Bajo revisión | Las pruebas existentes verifican restricciones de estados y transacciones. Faltan análisis de abuso, límites de recursos y reglas de futuras rutas. No se atribuye implementación de US-016 a US-023. |
 | A07 — Authentication Failures | Bajo revisión; defecto corregido | Se reprodujo la aceptación de un JWT firmado sin `exp` y se corrigió exigiendo `exp` y `sub`. Se verifican token vencido, sin firma y sin expiración. Quedan limitación de intentos, política de sesión y demás controles de autenticación por definir. |
-| A08 — Software or Data Integrity Failures | Bajo revisión; controles probados | Hay migraciones explícitas, índice único de correo y pruebas de rollback junto con auditoría. Se verificaron las 36 pruebas y las migraciones en PostgreSQL 16 aislado. Falta acreditar el proceso de despliegue; la auditoría web utiliza SQLite propio. |
+| A08 — Software or Data Integrity Failures | Bajo revisión; controles probados | Hay migraciones explícitas, índice único de correo y pruebas de rollback junto con auditoría. Las 36 pruebas y migraciones se verificaron en PostgreSQL 16 aislado. El [despliegue local](evidencias/staging-local.json) acredita frontend, salud, login, lectura protegida y TLS; el procedimiento Compose es reproducible. La auditoría de interfaz utiliza SQLite propio. |
 | A09 — Security Logging and Alerting Failures | Bajo revisión | Se registran escrituras críticas y sus rechazos. No se acreditan alertas operativas, retención centralizada ni registro completo de los intentos de login. |
 | A10 — Mishandling of Exceptional Conditions | Bajo revisión; pruebas parciales | Se ejecutan casos 401/403/404/409/422 y rollback. Las pruebas negativas de JWT evitan aceptar credenciales incompletas. Quedan fallos de infraestructura, agotamiento de recursos y recuperación del servicio. |
 
@@ -30,7 +30,7 @@ Se utiliza la [lista oficial OWASP 2025](https://top10.owasp.org/2025/). La tabl
 
 ## 2. Detalles de Security Hotspots y Vulnerabilidades Críticas
 
-SonarQube no generó security hotspots ni vulnerabilidades en el [corte final registrado](evidencias/sonar-final.json). Por ello no se inventan hotspot #1 ni hotspot #2. El análisis usa los perfiles activos `Sonar way core`; no sustituye una prueba de penetración ni todos los controles de OWASP.
+SonarQube no generó security hotspots ni vulnerabilidades en el [análisis de entrega](evidencias/sonar-entrega.json), revisión `3c1b45d`, con Quality Gate aprobado. **Hotspot #1 y Hotspot #2: no aplican; se detectaron cero.** El análisis usa los perfiles activos `Sonar way core`; no sustituye una prueba de penetración ni todos los controles de OWASP. Los cuatro problemas corregidos S9011 son de fiabilidad, no se presentan como vulnerabilidades.
 
 ### SEC-01 — Token firmado sin fecha de expiración
 
@@ -45,6 +45,8 @@ SonarQube no generó security hotspots ni vulnerabilidades en el [corte final re
 
 ## 3. Evidencias, límites y seguimiento
 
+La matriz distingue el resultado estático común (cero vulnerabilidades y hotspots dentro de los perfiles activos) de las comprobaciones complementarias por categoría. Sonar no acredita por sí solo las diez categorías completas. Los estados bajo revisión explicitan cobertura pendiente; no equivalen a vulnerabilidades confirmadas. Limitación de intentos, alertas, retención y recuperación son acciones de mejora que se priorizan en el backlog, no requisitos adicionales atribuidos a esta consigna.
+
 | Control | Evidencia | Resultado |
 |---|---|---|
 | Análisis estático Sonar | [informe de calidad](<03 Calidad de código V_1_0_0.md>) y JSON referenciados | Consultar el corte identificado; repetir si cambia el código |
@@ -52,6 +54,7 @@ SonarQube no generó security hotspots ni vulnerabilidades en el [corte final re
 | Dependencias frontend | [npm-audit.json](evidencias/npm-audit.json) | 0 avisos en todas las severidades |
 | Pruebas negativas y control de acceso | [test_security_assessment.py](../../../src/backend/tests/test_security_assessment.py), [JUnit PostgreSQL](evidencias/backend-postgres.xml) | 9 casos nuevos; suite completa 36/36 en cada base |
 | Integridad y auditoría | Tests existentes de rollback, duplicados y restricciones | Verificación automatizada; no aceptación humana |
+| Comunicación y configuración local | [staging-local.json](evidencias/staging-local.json) y [guía de despliegue](<../../Despliegue/Guía de staging.md>) | TLS 1.3, certificado verificado, cabeceras y puertos limitados a loopback |
 
 El informe registra resultados técnicos sobre datos de pruebas. Antes del cierre se requiere revisar los pendientes con responsable, conservar la validación de la revisión final y acreditar la aceptación aplicable del DoD dentro del alcance localhost. Las auditorías reflejan avisos conocidos al ejecutarse; no garantizan ausencia de vulnerabilidades futuras.
 
@@ -60,5 +63,6 @@ El informe registra resultados técnicos sobre datos de pruebas. Antes del cierr
 | Versión | Fecha | Cambio |
 |---|---|---|
 | V_1_0_0 | 24/10/2026 | Matriz OWASP 2025, auditorías reales y remediación de JWT sin expiración. |
+| V_1_0_1 | 25/10/2026 | Evidencia del commit de entrega, cero hotspots y despliegue localhost ya acreditado; límites y backlog explícitos. |
 
 [← Volver al README](../../../README.md)

@@ -1,6 +1,6 @@
 # EcoLogística Lima
 
-**Versión de este README:** 1.2.6 · **Actualizado:** 25/10/2026
+**Versión de este README:** 1.2.7 · **Actualizado:** 25/10/2026
 
 **EcoLogística Lima** es un proyecto de software orientado a la optimización sostenible de rutas de distribución de última milla para el escenario empresarial de **DistriRápido S.A.C.**
 
@@ -312,9 +312,9 @@ La [matriz de trazabilidad BDD](docs/Calidad/01 Matriz de pruebas BDD.md) relaci
 
 ## Estado
 
-### Preparación local de calidad del Sprint 3
+### Entrega consolidada del Sprint 3
 
-La [guía de SonarQube local](<docs/Calidad/03 SonarQube local.md>) describe el scanner y la cobertura backend/frontend. La [entrega técnica del Sprint 3](<docs/Versiones/Sprint 3 V_1_0_0.md>) se presenta en la rama `Sprint-3` para revisión mediante PR; no acredita por sí sola el cierre de ECO-53 o del Sprint 3.
+La [entrega técnica del Sprint 3](<docs/Versiones/Sprint 3 V_1_0_0.md>) se concentra en el [PR #4](https://github.com/jmartinez278/Ecolog-stica_Lima/pull/4), desde `Sprint-3` del fork hacia `main` del propietario. La [guía Sonar](<docs/Calidad/03 SonarQube local.md>) describe la ejecución local; la evidencia del commit `3c1b45d` acredita Quality Gate aprobado, cobertura global 92,4 %, nueva 100 % y cero problemas abiertos. La publicación no acredita aceptación ni cierre del sprint.
 
 ### Entregables del Sprint 3
 
@@ -326,7 +326,9 @@ La [guía de SonarQube local](<docs/Calidad/03 SonarQube local.md>) describe el 
 | Seguridad OWASP 2025 | [04 OWASP V_1_0_0](<docs/03 Implementación/Sprint 03/04 OWASP V_1_0_0.md>) |
 | Accesibilidad WCAG | [05 WCAG V_1_0_0](<docs/03 Implementación/Sprint 03/05 WCAG V_1_0_0.md>) |
 
-La [adenda de planificación del Sprint 3](<docs/02 Planificación/Anexos/Planificación Sprint 3 V_1_0_0.md>) incorpora EP-06 y relaciona los ocho criterios con RF/RNF y DoD. El [alcance vigente](<docs/03 Implementación/Sprint 03/Alcance de validación local V_1_0_0.md>) se limita a localhost. La [guía de staging local](<docs/Despliegue/Guía de staging.md>) describe HTTP local en 8080 y verificación TLS en 8443. No se requiere servidor ni dominio público. Revisión independiente, aceptación y comprobaciones WCAG pendientes se verifican por separado.
+La [matriz de entrega y rúbrica](<docs/03 Implementación/Sprint 03/Matriz de entrega y rúbrica V_1_0_0.md>) permite revisar los ocho criterios, sus evidencias y límites. La [adenda de planificación](<docs/02 Planificación/Anexos/Planificación Sprint 3 V_1_0_0.md>) relaciona EP-06 con RF/RNF y DoD. Los cinco informes conservan los nombres de archivo solicitados; sus versiones internas e historiales identifican las actualizaciones.
+
+El [alcance vigente](<docs/03 Implementación/Sprint 03/Alcance de validación local V_1_0_0.md>) se limita a localhost. La [guía de staging local](<docs/Despliegue/Guía de staging.md>) describe HTTP en 8080 y TLS en 8443. La evaluación de interfaz acredita 437 comprobaciones de contraste y 16 de interacción sobre 13 estados; quedan demostración/aceptación con interesados, revisión independiente y límites de tecnología de asistencia/navegadores. No se requiere infraestructura remota.
 
 **Checklist acumulado:** [seguimiento de correcciones en Jira y GitHub](docs/Calidad/02 Checklist de validación.md), con evidencias técnicas y pendientes que requieren decisión humana.
 
@@ -353,6 +355,7 @@ Los documentos de definición inicial se encuentran en `docs/01 Inicio/`, la pla
 | 1.2.4 | 24/10/2026 | Preparación Pre-Sprint 3: planificación completa, evidencias y arquitectura técnica, pruebas de integridad, CI, accesibilidad y modularización de interfaz. |
 | 1.2.5 | 24/10/2026 | Cinco informes del Sprint 3, evidencias de calidad/seguridad/accesibilidad, adenda EP-06 y aclaración del estado posterior al merge. |
 | 1.2.6 | 25/10/2026 | Alcance localhost, staging local y verificación TLS sin infraestructura remota. |
+| 1.2.7 | 25/10/2026 | PR único, matriz de ocho criterios, contraste medido, cobertura por formulario y análisis Sonar del código consolidado. |
 
 ---
 

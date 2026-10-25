@@ -2,11 +2,11 @@
 
 # Preparación del análisis local con SonarQube
 
-**Versión documental:** 1.0.2 · **Fecha:** 24/10/2026 (Lima).
+**Versión documental:** 1.0.3 · **Actualizado:** 25/10/2026 (Lima).
 
 ## Alcance
 
-Preparación local de ECO-53 sobre la base integrada 1.2.4, commit `da3eef2`, con cambios de configuración todavía sin publicar. El análisis comprende Python del backend y TypeScript/React del frontend. No acredita aceptación del Sprint 3, evaluación OWASP completa, revisión manual WCAG ni un despliegue de staging.
+Análisis local de ECO-53 sobre la base integrada 1.2.4 y el incremento de `Sprint-3`, consolidado en el [PR #4](https://github.com/jmartinez278/Ecolog-stica_Lima/pull/4). Comprende Python, TypeScript/React y CSS del alcance configurado. El análisis vigente identifica el código del commit `3c1b45d` y un árbol limpio al comenzar; las secciones iniciales conservan sus cortes históricos. Sonar no acredita aceptación humana ni todas las categorías OWASP. El despliegue localhost se verifica [por separado](<../03 Implementación/Sprint 03/evidencias/staging-local.json>).
 
 ## Herramientas y configuración
 
@@ -121,14 +121,18 @@ La [evidencia final](<../03 Implementación/Sprint 03/evidencias/sonar-final.jso
 
 La [evaluación de accesibilidad](<../03 Implementación/Sprint 03/05 WCAG V_1_0_0.md>) conserva resultados automáticos y pendientes humanos. La rama de entrega es `Sprint-3`; los resultados de los dos cortes anteriores se mantienen como antecedentes.
 
-### Pendientes de entrega
+### Corte consolidado para revisión — 25/10/2026
 
-- Conservar identificador y fecha del análisis, revisión Git de base y cambios locales incluidos.
-- Documentar Quality Gate, métricas globales y de código nuevo, duplicación, problemas, deuda técnica y hotspots.
-- Elaborar el plan de remediación y el informe oficial de ECO-53 después de revisar los resultados.
-- Realizar las validaciones adicionales de seguridad, accesibilidad y Definition of Done por separado.
-- El servidor local no es accesible mediante `localhost` desde un runner alojado en GitHub. Para automatizar el análisis remoto se necesita un servidor alcanzable o SonarQube Cloud.
-- Cambiar la contraseña inicial de administración desde la interfaz del servidor local.
+La [evidencia vigente](<../03 Implementación/Sprint 03/evidencias/sonar-entrega.json>) corresponde al análisis `7e922f0a-7e3c-467e-ab4a-1052f14d1855`, procesado a las 01:15:24 de Lima sobre `3c1b45d2f98011a0c355f9343b10928aed5c7269`. Quality Gate `OK`, tres condiciones evaluadas, cobertura global 92,4 %, código nuevo 100 %, duplicación 0 %, cero problemas abiertos y deuda Sonar 0 minutos. No se cambiaron umbrales, perfiles ni exclusiones. Se revocó el token temporal al terminar.
+
+La ejecución previa del commit publicado `cde28d7`, análisis `dfc82560-3601-494b-9ee7-6182c662f80b`, aprobó con cobertura global 89,9 % y nueva 95,8 %. La nueva suite de 11 pruebas frontend alcanza 92,19 % de líneas y 100 % en los cuatro formularios; el backend conserva 36 pruebas y 93,43 % de líneas. Consultar el [informe oficial actualizado](<../03 Implementación/Sprint 03/03 Calidad de código V_1_0_0.md>).
+
+### Operación y límites
+
+- Las evidencias y el plan de remediación ya están preparados en el informe oficial; no son entregables pendientes de creación.
+- Revisión independiente, demostración/aceptación y límites de WCAG se comprueban por separado.
+- Sonar se ejecuta en esta PC. Un runner alojado en GitHub no puede acceder a este localhost; el análisis remoto no es requisito de esta entrega.
+- La cuenta de administración local debe gestionar su contraseña desde la interfaz del servidor. No se incorpora ninguna credencial al repositorio.
 
 ## Historial documental
 
@@ -137,3 +141,4 @@ La [evaluación de accesibilidad](<../03 Implementación/Sprint 03/05 WCAG V_1_0
 | 1.0.0 | 24/10/2026 | Preparación del entorno y primer análisis local con cuatro hallazgos. |
 | 1.0.1 | 24/10/2026 | Corrección de los cuatro botones, pruebas frontend y segundo análisis con condiciones de Quality Gate aprobadas. |
 | 1.0.2 | 24/10/2026 | Corte completo del Sprint 3, seguridad, accesibilidad y enlace a los cinco informes oficiales. |
+| 1.0.3 | 25/10/2026 | Análisis sobre commit limpio, resultados actuales y antecedentes de la revisión publicada. |

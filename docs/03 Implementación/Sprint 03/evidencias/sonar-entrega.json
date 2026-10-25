@@ -1,0 +1,171 @@
+{
+  "executed_at": "2026-10-25T06:15:29.3613243Z",
+  "project": "ecologistica-lima",
+  "project_version": "1.2.4-sprint3-final",
+  "git_revision": "3c1b45d2f98011a0c355f9343b10928aed5c7269",
+  "uncommitted_changes_at_start": false,
+  "task": {
+    "id": "d4068c9e-34e9-4a22-b36e-522e9c6fed05",
+    "type": "REPORT",
+    "componentId": "6d9d44ca-3ad9-4cb5-9a92-3185af29af14",
+    "componentKey": "ecologistica-lima",
+    "componentName": "EcoLogistica Lima",
+    "componentQualifier": "TRK",
+    "analysisId": "7e922f0a-7e3c-467e-ab4a-1052f14d1855",
+    "status": "SUCCESS",
+    "submittedAt": "2026-10-25T01:15:16-05:00",
+    "submitterLogin": "admin",
+    "startedAt": "2026-10-25T01:15:17-05:00",
+    "executedAt": "2026-10-25T01:15:24-05:00",
+    "executionTimeMs": 6798,
+    "hasScannerContext": true,
+    "warningCount": 1,
+    "warnings": [
+      "The token used for this analysis will expire on: octubre 28, 2026\nAfter this date, the token can no longer be used to execute the analysis. Please consider generating a new token and updating it in the locations where it is in use."
+    ],
+    "infoMessages": []
+  },
+  "quality_gate": {
+    "status": "OK",
+    "conditions": [
+      {
+        "status": "OK",
+        "metricKey": "new_coverage",
+        "comparator": "LT",
+        "errorThreshold": "80",
+        "actualValue": "100.0"
+      },
+      {
+        "status": "OK",
+        "metricKey": "new_duplicated_lines_density",
+        "comparator": "GT",
+        "errorThreshold": "3",
+        "actualValue": "0.0"
+      },
+      {
+        "status": "OK",
+        "metricKey": "new_violations",
+        "comparator": "GT",
+        "errorThreshold": "0",
+        "actualValue": "0"
+      }
+    ],
+    "ignoredConditions": false,
+    "period": {
+      "mode": "PREVIOUS_VERSION",
+      "date": "2026-10-24T23:19:13-05:00",
+      "parameter": "1.2.4-sprint3-remediacion"
+    },
+    "caycStatus": "compliant"
+  },
+  "measures": [
+    {
+      "metric": "coverage",
+      "value": "92.4",
+      "bestValue": false
+    },
+    {
+      "metric": "bugs",
+      "value": "0",
+      "bestValue": true
+    },
+    {
+      "metric": "code_smells",
+      "value": "0",
+      "bestValue": true
+    },
+    {
+      "metric": "duplicated_lines_density",
+      "value": "0.0",
+      "bestValue": true
+    },
+    {
+      "metric": "branch_coverage",
+      "value": "88.1",
+      "bestValue": false
+    },
+    {
+      "metric": "ncloc",
+      "value": "1529"
+    },
+    {
+      "metric": "vulnerabilities",
+      "value": "0",
+      "bestValue": true
+    },
+    {
+      "metric": "line_coverage",
+      "value": "93.2",
+      "bestValue": false
+    },
+    {
+      "metric": "security_hotspots",
+      "value": "0",
+      "bestValue": true
+    },
+    {
+      "metric": "sqale_index",
+      "value": "0",
+      "bestValue": true
+    }
+  ],
+  "open_issue_count": 0,
+  "resolved_issues": [
+    {
+      "key": "90c8a5b4-cd4a-4588-b247-0775d955f510",
+      "rule": "typescript:S9011",
+      "severity": "MAJOR",
+      "status": "CLOSED",
+      "resolution": "FIXED",
+      "impacts": [
+        {
+          "softwareQuality": "RELIABILITY",
+          "severity": "MEDIUM"
+        }
+      ]
+    },
+    {
+      "key": "e3e495c9-4a28-4bdf-8a79-9c341c111654",
+      "rule": "typescript:S9011",
+      "severity": "MAJOR",
+      "status": "CLOSED",
+      "resolution": "FIXED",
+      "impacts": [
+        {
+          "softwareQuality": "RELIABILITY",
+          "severity": "MEDIUM"
+        }
+      ]
+    },
+    {
+      "key": "aee3499b-829f-4062-8a6c-00db003805da",
+      "rule": "typescript:S9011",
+      "severity": "MAJOR",
+      "status": "CLOSED",
+      "resolution": "FIXED",
+      "impacts": [
+        {
+          "softwareQuality": "RELIABILITY",
+          "severity": "MEDIUM"
+        }
+      ]
+    },
+    {
+      "key": "9f838256-33c7-44fa-871d-2e74f650b44a",
+      "rule": "typescript:S9011",
+      "severity": "MAJOR",
+      "status": "CLOSED",
+      "resolution": "FIXED",
+      "impacts": [
+        {
+          "softwareQuality": "RELIABILITY",
+          "severity": "MEDIUM"
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "Perfiles Sonar way core; SCA se evalúa mediante auditorías separadas.",
+    "No sustituye revisión humana ni aceptación de interesados."
+  ]
+}

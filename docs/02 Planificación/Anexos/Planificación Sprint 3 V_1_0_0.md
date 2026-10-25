@@ -2,7 +2,7 @@
 
 # Adenda de planificación — Sprint 3
 
-**Versión documental:** V_1_0_1 · **Actualizado:** 25/10/2026 (Lima).<br>
+**Versión documental:** V_1_0_2 · **Actualizado:** 25/10/2026 (Lima).<br>
 **Base:** [Transformando a ágil V_1_0_1](<../01 Transformando a ágil V_1_0_1.md>) y [seguimiento de Sprint 2](<Seguimiento Jira Sprint 2 V_1_0_3.md>).<br>
 **Rama de entrega:** `Sprint-3` del fork `RodrigoAC12/Ecolog-stica_Lima`.
 
@@ -33,7 +33,7 @@ En Jira, Sprint 1 figuraba activo y Sprint 2/Sprint 3 futuros con fechas vencida
 
 | Documento o grupo | Tratamiento |
 |---|---|
-| README | Versión documental 1.2.6, enlaces oficiales de Sprint 03 y alcance localhost |
+| README | Versión documental 1.2.7, informes oficiales, alcance localhost y matriz de entrega |
 | Notas 1.2.4 y guía Sonar | Aclaración de integración y evidencia del incremento posterior |
 | Planificación inicial de cinco épicas | Se conserva como línea base histórica; EP-06 se añade mediante esta adenda versionada |
 | Informes de Sprints 1 y 2 | Se conservan cortes del 29/09 y 06/10; el estado posterior se registra por separado |
@@ -47,3 +47,6 @@ En Jira, Sprint 1 figuraba activo y Sprint 2/Sprint 3 futuros con fechas vencida
 |---|---|---|
 | V_1_0_0 | 24/10/2026 | Adenda EP-06, trazabilidad de los ocho criterios y tratamiento de documentos afectados. |
 | V_1_0_1 | 25/10/2026 | Alcance localhost y evidencia de validación del entorno local. |
+| V_1_0_2 | 25/10/2026 | Entrega única mediante PR #4, evidencias vigentes y matriz explícita de la rúbrica. |
+
+La [matriz de entrega](<../../03 Implementación/Sprint 03/Matriz de entrega y rúbrica V_1_0_0.md>) conserva los ocho criterios de la consigna sin convertir toda mejora del backlog en obligación de esta entrega. Las limitaciones de evaluación y la demostración pendiente se declaran expresamente para revisión del propietario.
