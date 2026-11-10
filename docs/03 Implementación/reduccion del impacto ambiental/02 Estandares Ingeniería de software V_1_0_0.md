@@ -21,7 +21,7 @@ La consigna se redactó para el stack MERN. EcoLogística Lima no usa MongoDB, E
 
 | Característica | Subcaracterística | Cómo se evidencia en EcoLogística Lima |
 |---|---|---|
-| Eficiencia de desempeño | Comportamiento temporal | La primera página de pedidos pasa de *Seq Scan + Sort* (0,609 ms) a *Index Scan* (0,028 ms) en PostgreSQL. El FCP móvil se reduce según la tabla comparativa del informe. |
+| Eficiencia de desempeño | Comportamiento temporal | La primera página de pedidos pasa de *Seq Scan + Sort* (0,265 ms, 30 bloques) a *Index Scan* (0,043 ms, 3 bloques) en PostgreSQL. El FCP móvil se reduce según la tabla comparativa del informe. |
 | Eficiencia de desempeño | Utilización de recursos | Hay menos bytes por sesión gracias a la paginación, la compresión y el 304. No se crean objetos ORM en los listados. La imagen de ejecución lleva 10 paquetes Python menos. |
 | Eficiencia de desempeño | Capacidad | El tamaño de respuesta queda acotado (máximo 50 registros por página), con independencia del volumen de pedidos almacenado. |
 | Mantenibilidad | Modularidad | `app/api/pagination.py` y `app/core/http_cache.py` son módulos únicos reutilizados por los cuatro listados. El frontend se divide en fragmentos cargados bajo demanda. |
@@ -106,10 +106,18 @@ El workflow [`green-audit.yml`](../../../.github/workflows/green-audit.yml) se e
 - La intensidad de carbono usa el promedio mundial de SWDM v4 (494 gCO2e/kWh). Un cálculo con la intensidad de la red peruana o de un proveedor verde verificado cambiaría el valor absoluto, pero no el porcentaje de reducción.
 - La conciencia de carbono (ejecutar procesos diferibles en horas de energía más limpia) aplicará cuando existan procesos por lotes, como la optimización de rutas de US-016.
 
+## Referencias
+
+- ISO/IEC 25010:2023, *Systems and software engineering — Product quality model*. https://www.iso.org/standard/78176.html
+- Green Software Foundation, *Green Software Principles* y *Software Carbon Intensity (SCI)*. https://learn.greensoftware.foundation/ · https://sci.greensoftware.foundation/
+- W3C, *Web Sustainability Guidelines (WSG)*, borrador vigente. https://w3c.github.io/sustainableweb-wsg/
+- R. C. Martin, *Clean Code* (2008) y principios SOLID; A. Hunt y D. Thomas, *The Pragmatic Programmer* (DRY).
+
 ## Control documental
 
 | Versión | Fecha | Cambio |
 |---|---|---|
 | V_1_0_0 | 10/11/2026 | Versión inicial para la Inspección 04: estándares, matriz de mapeo y guía de desarrollo verde. |
+| V_1_0_0 (rev. 2) | 10/11/2026 | Cifras de PostgreSQL actualizadas con `EXPLAIN (ANALYZE, BUFFERS)` y sección de referencias. |
 
 [← Volver al README](../../../README.md)

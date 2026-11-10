@@ -6,7 +6,7 @@
 **Líder del Proyecto:** Marco Jhair Martinez Llanos<br>
 **Entrega:** Inspección 04 — Reducción del impacto ambiental y estándares de ingeniería de software<br>
 **Versión del documento:** V_1_0_0 · **Versión semántica de la entrega:** v1.0.0<br>
-**Rama:** `inspeccion-04-green-it` · **Línea base medida:** `main` en `cfcd53f`<br>
+**Integración:** `main` vía PR #7 (merge `888bb0a`) · **ANTES medido en:** `cfcd53f` · **DESPUÉS medido en:** `888bb0a`<br>
 **Fecha de actualización:** 10/11/2026
 
 ## 1.1 Introducción y propósito
@@ -29,9 +29,14 @@ Propósitos:
 | Servidor web | Caddy 2.10.2 sirviendo el build de producción de Vite (configuración `Caddyfile.staging`, sin TLS, puerto 8080) |
 | API y base de datos | FastAPI con uvicorn (1 worker) y PostgreSQL 16, en localhost |
 | Datos de carga | `seed_carga.py` con semilla 2026: 50 vehículos, 60 conductores, 200 clientes y 1 000 pedidos (volumen de RNF-004) |
-| Lighthouse | 12.8.2, Chromium *headless*, 5 corridas por modo (mediana), preset de escritorio y móvil por defecto (4G simulado con CPU ×4) |
-| Recorrido autenticado | *User flow* de Lighthouse: inicio de sesión y apertura de Pedidos, Vehículos, Conductores y Clientes |
+| Lighthouse | 12.8.2 sobre Node.js 22.23.4, Chromium *headless*, 5 corridas por modo (se publican todas y la mediana), preset de escritorio y móvil por defecto (4G simulado con CPU ×4) |
+| Recorrido autenticado | *User flow* de Lighthouse, 3 corridas con un navegador nuevo cada una (mediana). **Caché fría:** inicio de sesión y primera visita a Pedidos, Vehículos, Conductores y Clientes. **Caché caliente:** segunda visita a los cuatro listados en la misma sesión |
 | API | 30 peticiones por recurso; mediana y p95 del tiempo de respuesta y bytes transferidos con `Accept-Encoding: br, gzip` |
+| PostgreSQL | `EXPLAIN (ANALYZE, BUFFERS)` sobre la misma semilla; mediana del tiempo de ejecución en 7 ejecuciones |
+| Hardware | Contenedor Linux 6.18, Intel Xeon 2,10 GHz, 2 núcleos, 8 GB de RAM; red local sin latencia real |
+| Unidades | Bytes; **1 KB = 1 000 bytes** y 1 GB = 10⁹ bytes (decimal). Se reportan los **bytes transferidos** (`transferSize`, ya comprimidos), no el tamaño descomprimido, salvo que se indique |
+
+**Regla de aceptación.** Se aplican los umbrales de la rúbrica, configurados en `lighthouserc.json` antes de la medición final, sobre el preset de escritorio. Los resultados móviles se informan aparte. Todo incumplimiento se registra como defecto abierto en la sección 1.10 y no se oculta.
 
 **Unidad funcional (sesión de operador):** cargar la pantalla de acceso, iniciar sesión y consultar los cuatro listados. Los bytes de la sesión son la suma del peso de la página y de los bytes transferidos durante el recorrido.
 
@@ -41,7 +46,7 @@ Reproducción:
 # Desde src/backend, con la base local migrada y el operador de prueba creado
 python ../../scripts/green_it/seed_carga.py
 # Con el backend en :8000 y Caddy en :8080
-cd scripts/green_it && npm install && node measure.mjs despues "../../docs/03 Implementación/reduccion del impacto ambiental/evidencias"
+cd scripts/green_it && npm install && CHROME_PATH=/ruta/a/chrome node measure.mjs despues "../../docs/03 Implementación/reduccion del impacto ambiental/evidencias"
 python swdm.py ../../docs/.../evidencias/metricas-antes.json ../../docs/.../evidencias/metricas-despues.json
 ```
 
@@ -50,26 +55,27 @@ python swdm.py ../../docs/.../evidencias/metricas-antes.json ../../docs/.../evid
 | Indicador | Escritorio | Móvil |
 |---|---:|---:|
 | Score de rendimiento Lighthouse | 100 / 100 | 96 / 100 |
-| First Contentful Paint (FCP) | 0,50 s | 2,17 s |
-| Largest Contentful Paint (LCP) | 0,50 s | 2,32 s |
+| First Contentful Paint (FCP) | 0,50 s | 2,19 s |
+| Largest Contentful Paint (LCP) | 0,50 s | 2,34 s |
 | Total Blocking Time (TBT) | 0 ms | 0 ms |
 | Cumulative Layout Shift (CLS) | 0 | 0 |
 | Peso de la página de acceso | 267,9 KB (4 peticiones) | 267,9 KB |
 
 | Recorrido autenticado y API | ANTES |
 |---|---:|
-| Bytes transferidos en el recorrido | 785,9 KB (7 peticiones) |
-| `GET /pedidos` | 1 000 registros, 592,0 KB, sin compresión, mediana 30,7 ms |
+| Bytes del recorrido, caché fría | 785,9 KB (7 peticiones) |
+| Bytes del recorrido, caché caliente | 785,5 KB (5 peticiones): `cache: 'no-store'` obliga a descargar todo de nuevo |
+| `GET /pedidos` | 1 000 registros, 592,0 KB, sin compresión, mediana 33,3 ms |
 | `GET /clientes` | 201 registros, 77,9 KB, sin compresión |
 | `GET /vehiculos` / `GET /conductores` | 16,8 KB / 19,7 KB, sin compresión |
-| TBT del recorrido | 88 ms |
+| TBT del recorrido (caché fría) | 81 ms |
 
 **Hallazgos.**
 
 1. La pantalla de acceso ya era liviana en escritorio. El problema no estaba en el *render* inicial.
 2. El desperdicio estaba en los **datos**. Cada visita a Pedidos descargaba los 1 000 registros (592 KB) aunque la vista muestra unos pocos, sin compresión y sin posibilidad de reutilizar la respuesta (`cache: 'no-store'`).
-3. PostgreSQL resolvía el listado con *Seq Scan + Sort* de toda la tabla.
-4. El JavaScript (252 KB) y el CSS se servían sin comprimir y sin política de caché, lo que explica el FCP de 2,17 s en móvil.
+3. PostgreSQL resolvía el listado con *Seq Scan + Sort* de toda la tabla: 1 000 filas y 30 bloques leídos en cada petición.
+4. El JavaScript (252 KB) y el CSS se servían sin comprimir y sin política de caché, lo que explica el FCP de 2,19 s en móvil.
 5. La imagen Docker del backend instalaba pytest, coverage, httpx y sus dependencias, que no se usan en ejecución.
 
 ## 1.4 Correspondencia MERN → EcoLogística Lima
@@ -118,12 +124,16 @@ Index("idx_pedidos_listado", "creado_en", "pedido_id"),
 Index("idx_pedidos_estado_listado", "estado", "creado_en", "pedido_id"),
 ```
 
-**Evidencia (`EXPLAIN ANALYZE`, primera página de 12 pedidos):**
+**Evidencia** (`EXPLAIN (ANALYZE, BUFFERS)`, mediana de 7 ejecuciones; planes completos en [`explain-antes.txt`](evidencias/explain-antes.txt) y [`explain-despues.txt`](evidencias/explain-despues.txt)):
 
-| Estado | Plan | Tiempo de ejecución |
-|---|---|---:|
-| ANTES | `Seq Scan` + `Sort` (top-N heapsort sobre 1 000 filas) | 0,609 ms |
-| DESPUÉS | `Index Scan using idx_pedidos_listado` (lee 12 filas) | 0,028 ms |
+| Consulta | Plan | Bloques leídos | Tiempo |
+|---|---|---:|---:|
+| ANTES: lista completa (lo que pedía la interfaz) | `Seq Scan` + `Sort` de 1 000 filas | 30 | 0,466 ms |
+| ANTES: primera página equivalente, sin índice | `Seq Scan` + `Sort` top-N | 30 | 0,265 ms |
+| DESPUÉS: primera página (12 filas, columnas proyectadas) | `Index Scan using idx_pedidos_listado` | 3 | 0,043 ms |
+| DESPUÉS: `count(*)` para el total de páginas | `Seq Scan` | 30 | 0,209 ms |
+
+La página se obtiene 6 veces más rápido y lee 10 veces menos bloques. El conteo del total sigue recorriendo la tabla; se registra como defecto menor (DEF-02).
 
 ### 2. Paginación en backend y frontend
 
@@ -183,7 +193,7 @@ export function pagedPath(path: string, page: number, limit = PAGE_SIZE): string
 }
 ```
 
-**Resultado.** Una página de 12 pedidos pesa **1 557 bytes** comprimida (7,1 KB de JSON), frente a los 592,0 KB de la lista completa (−99,7 %). Responde con una mediana de 7,2 ms, medida con `curl` en 30 peticiones.
+**Resultado.** Una página de 12 pedidos pesa **1 561 bytes** transferidos (7,1 KB de JSON sin comprimir), frente a los 592,0 KB de la lista completa (−99,7 %). Responde con una mediana de 7,1 ms en 30 peticiones.
 
 ### 3. Imágenes en formatos de nueva generación
 
@@ -335,7 +345,7 @@ handle {
 }
 ```
 
-**Resultado.** Una consulta repetida sin cambios devuelve `304 Not Modified` con **0 bytes** de cuerpo (prueba `test_etag_returns_304_when_content_is_unchanged` y verificación con `curl` sobre Caddy).
+**Resultado.** Una consulta repetida sin cambios devuelve `304 Not Modified` con **0 bytes** de cuerpo (prueba `test_etag_returns_304_when_content_is_unchanged`). En el recorrido con caché caliente, las 5 peticiones a la API de la segunda visita se revalidan con 304; el registro de acceso del backend contiene 15 respuestas 304 en las 3 corridas. Ese tramo transfiere **1,5 KB**, frente a 785,5 KB ANTES (−99,8 %).
 
 ### 8. Compresión de respuestas
 
@@ -360,28 +370,29 @@ app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=6)
 
 - JavaScript inicial: 252,2 KB → **62,5 KB** con Brotli.
 - `GET /pedidos` completo: 592,0 KB → **87,5 KB** con gzip.
-- Página de acceso: 267,9 KB → **68,1 KB** (incluye el efecto de `React.lazy` y del ícono inline).
+- Página de acceso: 267,9 KB → **68,2 KB** (incluye el efecto de `React.lazy` y del ícono inline).
 
 ## 1.6 Tabla comparativa ANTES vs DESPUÉS
 
-Fuente: [`metricas-antes.json`](evidencias/metricas-antes.json) y [`metricas-despues.json`](evidencias/metricas-despues.json), con la mediana de 5 corridas por modo.
+Fuente: [`metricas-antes.json`](evidencias/metricas-antes.json) y [`metricas-despues.json`](evidencias/metricas-despues.json), con la mediana de 5 corridas por modo de Lighthouse y de 3 recorridos autenticados.
 
 | Métrica / indicador | ANTES (`cfcd53f`) | DESPUÉS | Variación absoluta | Mejora |
 |---|---:|---:|---:|---:|
 | Score de rendimiento, escritorio | 100 / 100 | 100 / 100 | 0 | — |
 | Score de rendimiento, móvil | 96 / 100 | 100 / 100 | +4 pts | +4,2 % |
-| FCP escritorio | 0,50 s | 0,34 s | −0,17 s | −33,1 % |
-| LCP escritorio | 0,50 s | 0,34 s | −0,17 s | −33,1 % |
-| FCP móvil (4G simulado) | 2,17 s | 1,27 s | −0,90 s | −41,3 % |
-| LCP móvil (4G simulado) | 2,32 s | 1,27 s | −1,05 s | −45,1 % |
+| FCP escritorio | 0,50 s | 0,34 s | −0,15 s | −30,8 % |
+| LCP escritorio | 0,50 s | 0,34 s | −0,15 s | −30,8 % |
+| FCP móvil (4G simulado) | 2,19 s | 1,25 s | −0,94 s | −43,0 % |
+| LCP móvil (4G simulado) | 2,34 s | 1,25 s | −1,09 s | −46,7 % |
 | TBT de la pantalla de acceso | 0 ms | 0 ms | 0 | — |
-| TBT del recorrido autenticado | 88 ms | 0 ms | −88 ms | −100 % |
+| TBT del recorrido autenticado (caché fría) | 81 ms | 0 ms | −81 ms | −100 % |
 | CLS | 0 | 0 | 0 | — |
-| Peso de la pantalla de acceso | 267,9 KB (4 peticiones) | 68,1 KB (3 peticiones) | −199,8 KB | −74,6 % |
-| Bytes del recorrido autenticado | 785,9 KB | 25,7 KB | −760,2 KB | −96,7 % |
-| **Bytes por sesión (acceso + recorrido)** | **1 053,9 KB** | **93,8 KB** | **−960,0 KB** | **−91,1 %** |
+| Peso de la pantalla de acceso | 267,9 KB (4 peticiones) | 68,2 KB (3 peticiones) | −199,8 KB | −74,6 % |
+| Bytes del recorrido, caché fría | 785,9 KB | 25,8 KB | −760,2 KB | −96,7 % |
+| Bytes del recorrido, caché caliente | 785,5 KB | 1,5 KB | −783,9 KB | −99,8 % |
+| **Bytes por sesión (acceso + recorrido en frío)** | **1 053,9 KB** | **93,9 KB** | **−959,9 KB** | **−91,1 %** |
 | Respuesta de pedidos que pide la interfaz | 592,0 KB (1 000 registros) | 1,6 KB (12 registros) | −590,4 KB | −99,7 % |
-| Primera página de pedidos en PostgreSQL | 0,609 ms | 0,028 ms | −0,581 ms | −95,4 % |
+| Primera página de pedidos en PostgreSQL | 0,265 ms (30 bloques) | 0,043 ms (3 bloques) | −0,222 ms | −83,8 % |
 | JavaScript inicial (transferido) | 252,2 KB | 62,5 KB (Brotli) | −189,7 KB | −75,2 % |
 | Paquetes Python en la imagen | 38 (83,1 MB) | 28 (74,8 MB) | −10 (−8,3 MB) | −10,0 % |
 
@@ -394,9 +405,9 @@ Fuente: [`metricas-antes.json`](evidencias/metricas-antes.json) y [`metricas-des
 | LCP ≤ 1,4 s | 0,34 s | Cumple |
 | TBT ≤ 85 ms | 0 ms | Cumple |
 | CLS ≤ 0,02 | 0 | Cumple |
-| Peso ≤ 1,1 MB | 68,1 KB (página) / 93,8 KB (sesión completa) | Cumple |
+| Peso ≤ 1,1 MB | 68,2 KB (página) / 93,9 KB (sesión completa) | Cumple |
 
-En móvil con 4G simulado, el LCP (1,27 s) cumple el umbral de 1,4 s y el FCP (1,27 s) queda por encima de 1,0 s, condicionado por la latencia de red simulada. Se reporta tal cual.
+En móvil con 4G simulado, el LCP (1,25 s) cumple el umbral de 1,4 s y el FCP (1,25 s) queda por encima de 1,0 s, condicionado por la latencia de red simulada. Se registra como defecto abierto DEF-01.
 
 ## 1.7 Análisis de impacto ambiental (SWDM v4)
 
@@ -425,12 +436,12 @@ Se asumen las siguientes condiciones:
 | Escenario | Bytes/sesión | GB/sesión | kWh/sesión | g CO2e/sesión |
 |---|---:|---:|---:|---:|
 | ANTES | 1 053 854 | 0,001054 | 0,0003162 | 0,1562 |
-| DESPUÉS | 93 830 | 0,000094 | 0,0000281 | 0,0139 |
+| DESPUÉS | 93 923 | 0,000094 | 0,0000282 | 0,0139 |
 
 Verificación:
 
 - ANTES: 0,001054 GB × 0,300 = 0,0003162 kWh; 0,0003162 kWh × 494 = 0,1562 g CO2e.
-- DESPUÉS: 0,0000938 GB × 0,300 = 0,0000281 kWh; 0,0000281 kWh × 494 = 0,0139 g CO2e.
+- DESPUÉS: 0,0000939 GB × 0,300 = 0,0000282 kWh; 0,0000282 kWh × 494 = 0,0139 g CO2e.
 - Reducción: 0,1423 g CO2e por sesión (−91,1 %).
 
 **Proyección anual.** Supuesto declarado: 10 operadores × 20 sesiones/día × 300 días = **60 000 sesiones/año**.
@@ -438,10 +449,12 @@ Verificación:
 | Escenario | kWh/año | kg CO2e/año |
 |---|---:|---:|
 | ANTES | 18,969 | 9,371 |
-| DESPUÉS | 1,689 | 0,834 |
-| **Ahorro** | **17,280 kWh** | **8,537 kg CO2e (−91,1 %)** |
+| DESPUÉS | 1,691 | 0,835 |
+| **Ahorro** | **17,279 kWh** | **8,536 kg CO2e (−91,1 %)** |
 
 El valor absoluto es pequeño porque EcoLogística es una aplicación interna con pocos usuarios. Lo relevante es que la reducción es proporcional: el ahorro por sesión se mantiene si crecen los operadores o el volumen de pedidos. Además, con paginación el tamaño de cada respuesta ya no depende del número de pedidos almacenados.
+
+**Escenario de visitante recurrente (informativo).** Con la caché caliente, un operador que vuelve a los listados en la misma sesión transfiere 1,5 KB en lugar de 785,5 KB. El cálculo anual no aplica ese descuento (proporción de visitantes nuevos igual a 1), así que el ahorro real esperado es mayor que el declarado.
 
 ## 1.8 Evidencias de validación
 
@@ -451,6 +464,7 @@ El valor absoluto es pequeño porque EcoLogística es una aplicación interna co
 | Métricas DESPUÉS (JSON) | [`evidencias/metricas-despues.json`](evidencias/metricas-despues.json) |
 | Reportes Lighthouse ANTES (escritorio, móvil y recorrido) | [`lighthouse-antes-desktop.html`](evidencias/lighthouse-antes-desktop.html), [`lighthouse-antes-mobile.html`](evidencias/lighthouse-antes-mobile.html), [`flow-antes.html`](evidencias/flow-antes.html) |
 | Reportes Lighthouse DESPUÉS | [`lighthouse-despues-desktop.html`](evidencias/lighthouse-despues-desktop.html), [`lighthouse-despues-mobile.html`](evidencias/lighthouse-despues-mobile.html), [`flow-despues.html`](evidencias/flow-despues.html) |
+| Planes de PostgreSQL | [`explain-antes.txt`](evidencias/explain-antes.txt), [`explain-despues.txt`](evidencias/explain-despues.txt) |
 | Pruebas automatizadas | `src/backend/tests/test_green_it.py` (13 pruebas), `src/frontend/src/hooks/usePagedList.test.ts` y la prueba de paginación en `App.test.tsx` |
 | Auditoría continua | [`.github/workflows/green-audit.yml`](../../../.github/workflows/green-audit.yml) y [`lighthouserc.json`](../../../lighthouserc.json) |
 
@@ -458,28 +472,79 @@ El valor absoluto es pequeño porque EcoLogística es una aplicación interna co
 
 - Las mediciones son locales (localhost, sin latencia real de red). Lighthouse móvil simula 4G, pero no reemplaza una medición de campo.
 - La pantalla de acceso ya cumplía los umbrales de escritorio en el estado ANTES. Por eso la mejora principal está en los datos del recorrido autenticado, no en el score.
-- El recorrido mide la primera visita a cada listado. Las visitas repetidas se benefician además del 304 y de la caché inmutable de assets, que este cálculo conservador no descuenta.
-- La compresión gzip añade CPU en el servidor cuando alguien pide la lista completa sin `page`: la mediana de `GET /pedidos` completo sube de 30,7 a 46,1 ms. La interfaz ya no hace esa petición; pide páginas de 12 registros, que responden en 7,2 ms (`curl`, mediana de 30).
+- La sesión para SWDM usa la caché fría. La caché caliente se mide y se informa, pero no se descuenta.
+- La compresión gzip añade CPU en el servidor cuando alguien pide la lista completa sin `page`: la mediana de `GET /pedidos` completo sube de 33,3 a 39,7 ms. La interfaz ya no hace esa petición; pide páginas de 12 registros, que responden en 7,1 ms.
+- Las emisiones son estimaciones del modelo SWDM v4, no mediciones físicas de consumo eléctrico.
 - Las emisiones usan la intensidad mundial de SWDM v4. Con datos de la red peruana el valor absoluto cambiaría, pero no el porcentaje.
+
+## 1.10 Defectos abiertos y verificaciones pendientes
+
+| ID | Descripción | Impacto | Estado |
+|---|---|---|---|
+| DEF-01 | FCP móvil (4G simulado) de 1,25 s, sobre el umbral de 1,0 s. El LCP (1,25 s) sí cumple. Causa principal: latencia simulada más el bundle de React (62,5 KB con Brotli). | Bajo: el umbral de la rúbrica se cumple en escritorio | Abierto. Mejora candidata: precarga del CSS crítico y revisión del tamaño de React |
+| DEF-02 | `count(*)` de la paginación recorre la tabla (0,209 ms, 30 bloques) | Bajo con 1 000 pedidos; crece con el volumen | Abierto. Alternativa: conteo estimado o paginación por cursor |
+| VER-01 | El build de staging con Docker no se pudo construir en el entorno de medición, porque el registro de imágenes no era accesible. Se probó con los mismos binarios fuera de Docker. | Verificación | Pendiente: `docker compose -f docker-compose.staging.yml up` en local |
+| VER-02 | Accesibilidad a 360 px de la paginación nueva | Verificación | Pendiente de revisión manual |
+
+## 1.11 Matriz de trazabilidad (rúbrica → Jira → código → evidencia)
+
+Commits en `main`, integrados por el PR #7 (merge `888bb0a`):
+
+- `771cf6f`: backend, Caddy y CI.
+- `f85f0c8`: frontend.
+- `e7ac3ff`: documentación.
+- `4954e9b`: corrección de CodeQL en el script de medición.
+
+| Criterio de la rúbrica | Área | Jira | Commit | Código principal | Evidencia |
+|---|---|---|---|---|---|
+| 1. Refactorización e impacto (11) | 1. Consultas magras e índices | ECO-60 | `771cf6f` | `app/repositories/*.py`, `alembic/versions/0003_green_list_indexes.py` | `explain-*.txt`, `test_green_it.py` |
+| 1 | 2. Paginación (API) | ECO-61 | `771cf6f` | `app/api/pagination.py` | `api_paginada` en `metricas-despues.json` |
+| 1 | 2. Paginación (React) | ECO-62 | `f85f0c8` | `src/hooks/usePagedList.ts`, `Pagination.tsx` | `usePagedList.test.ts`, `flow-despues.html` |
+| 1 | 3. Imágenes AVIF/WebP | ECO-63 | `f85f0c8` | `ResponsiveImage.tsx`, `scripts/check-images.mjs` | Paso del build `check-images` |
+| 1 | 4. Code splitting | ECO-64 | `f85f0c8` | `src/App.tsx` | Fragmentos del build; `lighthouse-despues-*.html` |
+| 1 | 5. Dependencias | ECO-65 | `771cf6f` | `requirements.lock`, `requirements-dev.lock` | Sección 5 (38 → 28 paquetes) |
+| 1 | 6. Peticiones HTTP | ECO-66 | `f85f0c8` | `index.html` | Peticiones 4 → 3 en `metricas-*.json` |
+| 1 | 7. Caché | ECO-67 | `771cf6f`, `f85f0c8` | `app/core/http_cache.py`, `Caddyfile.staging`, `api.ts` | `mediana_cache_caliente` y log con 304 |
+| 1 | 8. Compresión | ECO-68 | `771cf6f` | `app/main.py`, `Caddyfile.staging`, `scripts/precompress.mjs` | `content_encoding` en `metricas-despues.json` |
+| 1 | Impacto SWDM v4 | ECO-69 | `e7ac3ff` | `scripts/green_it/swdm.py` | Sección 1.7 |
+| 2. Estándares y guía verde (4) | ISO 25010, GSF, WSG, matriz 8/8 | ECO-70 | `e7ac3ff` | [Documento 02](<02 Estandares Ingeniería de software V_1_0_0.md>) | Secciones 2–4 del documento 02 |
+| 3. CI/CD y Git (3) | `green-audit.yml` + LHCI | ECO-71 | `771cf6f` | `.github/workflows/green-audit.yml`, `lighthouserc.json` | Ejecución en GitHub Actions sobre `main` |
+| 4. Estructura documental (2) | Informes en la ruta exigida | ECO-69, ECO-70 | `e7ac3ff` | `docs/03 Implementación/reduccion del impacto ambiental/` | Revisión de enlaces (`check_markdown_links.py`) |
 
 ## 3. Gestión de versiones con Git
 
-Secuencia aplicada para publicar la entrega (v1.0.0):
+Secuencia aplicada:
 
 ```bash
 git status
-git checkout -b inspeccion-04-green-it
+git checkout -b respaldo-frontend
 mkdir -p "docs/03 Implementación/reduccion del impacto ambiental/evidencias"
-git add "docs/03 Implementación/reduccion del impacto ambiental/" .github/workflows/green-audit.yml lighthouserc.json scripts/green_it/
+git add "docs/03 Implementación/reduccion del impacto ambiental/" .github/workflows/green-audit.yml lighthouserc.json scripts/green_it/ src/
 git commit -m "docs(green-it): add environmental impact report and software engineering standards v1.0.0"
-git tag -a v1.0.0-green-it -m "Inspección 04: reducción del impacto ambiental"
-git push -u origin inspeccion-04-green-it --follow-tags
+git push -u origin respaldo-frontend
+# Pull request #7 → main, revisado con CI en verde y fusionado como merge 888bb0a
 ```
+
+Etiqueta de versión semántica de la entrega, creada sobre el merge:
+
+```bash
+git tag -a v1.0.0-green-it 888bb0a -m "Inspección 04: reducción del impacto ambiental"
+git push origin v1.0.0-green-it
+```
+
+## Referencias
+
+- ISO/IEC 25010:2023, *Systems and software engineering — Product quality model*. https://www.iso.org/standard/78176.html
+- Green Software Foundation, *Green Software Principles* y especificación SCI. https://learn.greensoftware.foundation/ · https://sci.greensoftware.foundation/
+- W3C, *Web Sustainability Guidelines (WSG)*. https://w3c.github.io/sustainableweb-wsg/
+- Sustainable Web Design, *Estimating Digital Emissions* (SWDM v4). https://sustainablewebdesign.org/estimating-digital-emissions/
+- Google, *Lighthouse* y *Lighthouse CI*. https://developer.chrome.com/docs/lighthouse · https://github.com/GoogleChrome/lighthouse-ci
 
 ## Control documental
 
 | Versión | Fecha | Cambio |
 |---|---|---|
 | V_1_0_0 | 10/11/2026 | Versión inicial: diagnóstico, ocho optimizaciones, comparativa medida y cálculo SWDM v4. |
+| V_1_0_0 (rev. 2) | 10/11/2026 | Protocolo ampliado (ECO-73/ECO-74): nueva medición de ANTES y DESPUÉS sobre `888bb0a` con 3 recorridos y caché fría/caliente, `EXPLAIN (ANALYZE, BUFFERS)`, unidades y hardware, defectos abiertos, matriz de trazabilidad y referencias. |
 
 [← Volver al README](../../../README.md)

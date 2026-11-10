@@ -1,0 +1,29 @@
+-- EXPLAIN (ANALYZE, BUFFERS) — DESPUÉS (main 888bb0a), base eco_despues con la misma carga
+-- Consulta de GET /api/v1/pedidos?page=1&limit=12: columnas proyectadas, 12 filas, índice idx_pedidos_listado
+ANALYZE
+                                                                QUERY PLAN                                                                 
+-------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=0.28..1.64 rows=12 width=199) (actual time=0.011..0.014 rows=12 loops=1)
+   Buffers: shared hit=3
+   ->  Index Scan using idx_pedidos_listado on pedidos  (cost=0.28..114.44 rows=1000 width=199) (actual time=0.009..0.011 rows=12 loops=1)
+         Buffers: shared hit=3
+ Planning:
+   Buffers: shared hit=110
+ Planning Time: 0.307 ms
+ Execution Time: 0.034 ms
+(8 rows)
+
+-- Conteo para el total de la paginación
+                                                  QUERY PLAN                                                  
+--------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=42.50..42.51 rows=1 width=8) (actual time=0.193..0.193 rows=1 loops=1)
+   Buffers: shared hit=30
+   ->  Seq Scan on pedidos  (cost=0.00..40.00 rows=1000 width=0) (actual time=0.009..0.135 rows=1000 loops=1)
+         Buffers: shared hit=30
+ Planning:
+   Buffers: shared hit=244
+ Planning Time: 0.483 ms
+ Execution Time: 0.248 ms
+(8 rows)
+
+-- Mediana de Execution Time en 7 ejecuciones (ms): primera página=0.043 ; conteo=0.209

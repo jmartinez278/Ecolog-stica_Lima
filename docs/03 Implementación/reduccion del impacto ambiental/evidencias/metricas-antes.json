@@ -1,16 +1,28 @@
 {
   "etiqueta": "antes",
-  "fecha": "2026-11-10T03:49:31.384Z",
-  "entorno": "localhost: Caddy 2.10.2 (build Vite) + FastAPI/uvicorn + PostgreSQL 16; carga 50 vehículos, 60 conductores, 200 clientes, 1000 pedidos; Chromium headless",
+  "fecha": "2026-11-10T17:58:37.040Z",
+  "entorno": "localhost: Caddy 2.10.2 (build Vite) + FastAPI/uvicorn (1 worker) + PostgreSQL 16; carga 50 vehículos, 60 conductores, 200 clientes, 1000 pedidos; Chromium headless",
+  "hardware": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "nucleos": 2,
+    "memoria_gb": 8,
+    "so": "Linux 6.18.44-fc-v338"
+  },
+  "herramientas": {
+    "node": "v22.23.4",
+    "lighthouse": "12.8.2"
+  },
+  "unidades": "bytes; 1 KB = 1000 bytes; transferSize = bytes en el cable (comprimidos)",
   "corridas_por_modo": 5,
+  "corridas_recorrido": 3,
   "lighthouse_desktop": {
     "median": {
       "score": 100,
-      "fcp_ms": 504.9597,
-      "lcp_ms": 504.9597,
+      "fcp_ms": 495.1211,
+      "lcp_ms": 495.1211,
       "tbt_ms": 0,
       "cls": 0,
-      "si_ms": 504.9597,
+      "si_ms": 495.1211,
       "bytes": 267918,
       "requests": 4,
       "accessibility": 100,
@@ -19,11 +31,11 @@
     "runs": [
       {
         "score": 100,
-        "fcp_ms": 504.9597,
-        "lcp_ms": 504.9597,
+        "fcp_ms": 501.7972,
+        "lcp_ms": 501.7972,
         "tbt_ms": 0,
         "cls": 0,
-        "si_ms": 504.9597,
+        "si_ms": 501.7972,
         "bytes": 267918,
         "requests": 4,
         "accessibility": 100,
@@ -31,11 +43,11 @@
       },
       {
         "score": 100,
-        "fcp_ms": 552,
-        "lcp_ms": 552,
+        "fcp_ms": 483.9425,
+        "lcp_ms": 483.9425,
         "tbt_ms": 0,
         "cls": 0,
-        "si_ms": 552,
+        "si_ms": 483.9425,
         "bytes": 267918,
         "requests": 4,
         "accessibility": 100,
@@ -43,23 +55,11 @@
       },
       {
         "score": 100,
-        "fcp_ms": 497.6795,
-        "lcp_ms": 497.6795,
+        "fcp_ms": 495.1211,
+        "lcp_ms": 495.1211,
         "tbt_ms": 0,
         "cls": 0,
-        "si_ms": 497.6795,
-        "bytes": 267918,
-        "requests": 4,
-        "accessibility": 100,
-        "best_practices": 100
-      },
-      {
-        "score": 100,
-        "fcp_ms": 500.8181,
-        "lcp_ms": 500.8181,
-        "tbt_ms": 0,
-        "cls": 0,
-        "si_ms": 500.8181,
+        "si_ms": 495.1211,
         "bytes": 267918,
         "requests": 4,
         "accessibility": 100,
@@ -76,17 +76,29 @@
         "requests": 4,
         "accessibility": 100,
         "best_practices": 100
+      },
+      {
+        "score": 100,
+        "fcp_ms": 493.40745,
+        "lcp_ms": 493.40745,
+        "tbt_ms": 0,
+        "cls": 0,
+        "si_ms": 493.40745,
+        "bytes": 267918,
+        "requests": 4,
+        "accessibility": 100,
+        "best_practices": 100
       }
     ]
   },
   "lighthouse_mobile": {
     "median": {
       "score": 96,
-      "fcp_ms": 2166.7526,
-      "lcp_ms": 2316.7526,
+      "fcp_ms": 2190.8258,
+      "lcp_ms": 2340.8258,
       "tbt_ms": 0,
       "cls": 0,
-      "si_ms": 2166.7526,
+      "si_ms": 2190.8258,
       "bytes": 267918,
       "requests": 4,
       "accessibility": 100,
@@ -95,23 +107,11 @@
     "runs": [
       {
         "score": 96,
-        "fcp_ms": 2166.7526,
-        "lcp_ms": 2316.7526,
+        "fcp_ms": 2224,
+        "lcp_ms": 2374,
         "tbt_ms": 0,
         "cls": 0,
-        "si_ms": 2166.7526,
-        "bytes": 267918,
-        "requests": 4,
-        "accessibility": 100,
-        "best_practices": 100
-      },
-      {
-        "score": 96,
-        "fcp_ms": 2161.1175000000003,
-        "lcp_ms": 2311.1175000000003,
-        "tbt_ms": 0,
-        "cls": 0,
-        "si_ms": 2161.1175000000003,
+        "si_ms": 2224,
         "bytes": 267918,
         "requests": 4,
         "accessibility": 100,
@@ -119,11 +119,23 @@
       },
       {
         "score": 97,
-        "fcp_ms": 2100.4963,
-        "lcp_ms": 2250.4963,
+        "fcp_ms": 2100.9440999999997,
+        "lcp_ms": 2250.9440999999997,
         "tbt_ms": 0,
         "cls": 0,
-        "si_ms": 2100.4963,
+        "si_ms": 2100.9440999999997,
+        "bytes": 267918,
+        "requests": 4,
+        "accessibility": 100,
+        "best_practices": 100
+      },
+      {
+        "score": 97,
+        "fcp_ms": 2163.07805,
+        "lcp_ms": 2163.07805,
+        "tbt_ms": 0,
+        "cls": 0,
+        "si_ms": 2163.07805,
         "bytes": 267918,
         "requests": 4,
         "accessibility": 100,
@@ -131,11 +143,11 @@
       },
       {
         "score": 96,
-        "fcp_ms": 2203,
-        "lcp_ms": 2353,
+        "fcp_ms": 2190.8258,
+        "lcp_ms": 2340.8258,
         "tbt_ms": 0,
         "cls": 0,
-        "si_ms": 2203,
+        "si_ms": 2190.8258,
         "bytes": 267918,
         "requests": 4,
         "accessibility": 100,
@@ -143,11 +155,11 @@
       },
       {
         "score": 96,
-        "fcp_ms": 2181.274,
-        "lcp_ms": 2331.274,
-        "tbt_ms": 0.5,
+        "fcp_ms": 2214.9211999999998,
+        "lcp_ms": 2364.9211999999998,
+        "tbt_ms": 0,
         "cls": 0,
-        "si_ms": 2181.274,
+        "si_ms": 2214.9211999999998,
         "bytes": 267918,
         "requests": 4,
         "accessibility": 100,
@@ -156,10 +168,90 @@
     ]
   },
   "flujo_autenticado": {
-    "timespan_tbt_ms": 88.43999999999994,
-    "timespan_cls": 0,
+    "corridas": [
+      {
+        "fria": {
+          "tbt_ms": 107.97800000000001,
+          "cls": 0,
+          "bytes": 785936,
+          "requests": 7,
+          "api_requests": 6,
+          "api_bytes": 785936,
+          "api_304": 0
+        },
+        "caliente": {
+          "tbt_ms": 103.588,
+          "cls": 0,
+          "bytes": 785474,
+          "requests": 5,
+          "api_requests": 5,
+          "api_bytes": 785474,
+          "api_304": 0
+        }
+      },
+      {
+        "fria": {
+          "tbt_ms": 80.71400000000006,
+          "cls": 0,
+          "bytes": 785936,
+          "requests": 7,
+          "api_requests": 6,
+          "api_bytes": 785936,
+          "api_304": 0
+        },
+        "caliente": {
+          "tbt_ms": 51.309999999999974,
+          "cls": 0,
+          "bytes": 785474,
+          "requests": 5,
+          "api_requests": 5,
+          "api_bytes": 785474,
+          "api_304": 0
+        }
+      },
+      {
+        "fria": {
+          "tbt_ms": 75.40099999999995,
+          "cls": 0,
+          "bytes": 785936,
+          "requests": 7,
+          "api_requests": 6,
+          "api_bytes": 785936,
+          "api_304": 0
+        },
+        "caliente": {
+          "tbt_ms": 57.14099999999999,
+          "cls": 0,
+          "bytes": 785474,
+          "requests": 5,
+          "api_requests": 5,
+          "api_bytes": 785474,
+          "api_304": 0
+        }
+      }
+    ],
+    "mediana_cache_fria": {
+      "tbt_ms": 80.71400000000006,
+      "cls": 0,
+      "bytes": 785936,
+      "requests": 7,
+      "api_requests": 6,
+      "api_bytes": 785936,
+      "api_304": 0
+    },
+    "mediana_cache_caliente": {
+      "tbt_ms": 57.14099999999999,
+      "cls": 0,
+      "bytes": 785474,
+      "requests": 5,
+      "api_requests": 5,
+      "api_bytes": 785474,
+      "api_304": 0
+    },
     "timespan_bytes": 785936,
     "timespan_requests": 7,
+    "timespan_tbt_ms": 80.71400000000006,
+    "timespan_cls": 0,
     "api_requests": 6,
     "api_bytes": 785936
   },
@@ -169,32 +261,32 @@
       "bytes_json": 591958,
       "bytes_transferidos": 591958,
       "content_encoding": "none",
-      "mediana_ms": 30.7,
-      "p95_ms": 57.9
+      "mediana_ms": 33.3,
+      "p95_ms": 43.6
     },
     "vehiculos": {
       "registros_devueltos": 50,
       "bytes_json": 16811,
       "bytes_transferidos": 16811,
       "content_encoding": "none",
-      "mediana_ms": 6.2,
-      "p95_ms": 8.2
+      "mediana_ms": 7.1,
+      "p95_ms": 8.7
     },
     "conductores": {
       "registros_devueltos": 60,
       "bytes_json": 19718,
       "bytes_transferidos": 19718,
       "content_encoding": "none",
-      "mediana_ms": 5.7,
-      "p95_ms": 7.1
+      "mediana_ms": 6.4,
+      "p95_ms": 6.8
     },
     "clientes": {
       "registros_devueltos": 201,
       "bytes_json": 77918,
       "bytes_transferidos": 77918,
       "content_encoding": "none",
-      "mediana_ms": 7.9,
-      "p95_ms": 10.3
+      "mediana_ms": 8.9,
+      "p95_ms": 9.8
     }
   }
 }

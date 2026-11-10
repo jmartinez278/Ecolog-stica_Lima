@@ -1,0 +1,35 @@
+-- EXPLAIN (ANALYZE, BUFFERS) — ANTES (cfcd53f), base eco_antes con la carga de seed_carga.py
+-- Consulta que ejecuta GET /api/v1/pedidos: entidad completa, sin límite
+ANALYZE
+                                                   QUERY PLAN                                                   
+----------------------------------------------------------------------------------------------------------------
+ Sort  (cost=89.83..92.33 rows=1000 width=199) (actual time=0.277..0.321 rows=1000 loops=1)
+   Sort Key: creado_en, pedido_id
+   Sort Method: quicksort  Memory: 254kB
+   Buffers: shared hit=30
+   ->  Seq Scan on pedidos  (cost=0.00..40.00 rows=1000 width=199) (actual time=0.004..0.094 rows=1000 loops=1)
+         Buffers: shared hit=30
+ Planning:
+   Buffers: shared hit=108
+ Planning Time: 0.263 ms
+ Execution Time: 0.374 ms
+(10 rows)
+
+-- Primera página equivalente (12 filas) sin índice de listado
+                                                      QUERY PLAN                                                      
+----------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=62.92..62.95 rows=12 width=199) (actual time=0.233..0.235 rows=12 loops=1)
+   Buffers: shared hit=36
+   ->  Sort  (cost=62.92..65.42 rows=1000 width=199) (actual time=0.232..0.232 rows=12 loops=1)
+         Sort Key: creado_en, pedido_id
+         Sort Method: top-N heapsort  Memory: 28kB
+         Buffers: shared hit=36
+         ->  Seq Scan on pedidos  (cost=0.00..40.00 rows=1000 width=199) (actual time=0.005..0.100 rows=1000 loops=1)
+               Buffers: shared hit=30
+ Planning:
+   Buffers: shared hit=260
+ Planning Time: 0.394 ms
+ Execution Time: 0.261 ms
+(12 rows)
+
+-- Mediana de Execution Time en 7 ejecuciones (ms): lista completa=0.466 ; primera página=0.265

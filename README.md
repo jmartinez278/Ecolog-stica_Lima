@@ -333,7 +333,7 @@ La carpeta de Sprint 3 contiene únicamente los cinco documentos solicitados por
 | Estándares de ingeniería de software | [02 Estandares Ingeniería de software V_1_0_0](<docs/03 Implementación/reduccion del impacto ambiental/02 Estandares Ingeniería de software V_1_0_0.md>) |
 | Auditoría continua | [`.github/workflows/green-audit.yml`](.github/workflows/green-audit.yml) y [`lighthouserc.json`](lighthouserc.json) |
 
-Las mediciones son reales y reproducibles con `scripts/green_it/`. La sesión de operador baja de 1 053,9 KB a 93,8 KB (−91,1 %) y de 0,1562 a 0,0139 g CO2e según SWDM v4.
+Las mediciones son reales y reproducibles con `scripts/green_it/`. La sesión de operador baja de 1 053,9 KB a 93,9 KB (−91,1 %) y de 0,1562 a 0,0139 g CO2e según SWDM v4.
 
 **Fase del incremento técnico al 06/10/2026:** incremento técnico del Sprint 2 publicado en `sprint-2` e integrado en `main`. Incorpora US-011 a US-015 sobre la base técnica del Sprint 1; la aceptación formal y el estado de Jira siguen pendientes de conciliación.
 
