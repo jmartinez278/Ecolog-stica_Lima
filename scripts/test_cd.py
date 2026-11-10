@@ -3,6 +3,7 @@ import json
 import os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import threading
+import subprocess
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
@@ -169,6 +170,27 @@ class VercelTests(unittest.TestCase):
             file.write_text('https://evil.test/\nurl=override')
             with self.assertRaises(ValueError):
                 cd.deployment_url(file)
+
+    def test_protected_smoke_uses_vercel_auth_without_an_extra_bypass_secret(self):
+        responses = [(200, b'<div id="root">Bienvenido</div>', {}),
+                     (200, b'{"status":"ok"}', {}), (401, b'{"detail":"Sin sesion"}', {})]
+        with patch('cd.vercel_request', side_effect=responses) as get, patch('cd.request') as raw:
+            cd.smoke('https://ecolog-deployment.vercel.app', via_cli=True)
+            self.assertEqual(get.call_count, 3)
+            raw.assert_not_called()
+
+    def test_vercel_curl_preserves_status_body_and_hides_cli_error_output(self):
+        def complete(command, **kwargs):
+            Path(command[command.index('--output') + 1]).write_bytes(b'{"status":"ok"}')
+            self.assertNotIn('--token', command)
+            return subprocess.CompletedProcess(command, 0, '200', '')
+        with patch.dict(os.environ, {'VERCEL_RELEASE_WORKSPACE':'/tmp/release'}), patch('cd.subprocess.run', side_effect=complete):
+            status, body, _ = cd.vercel_request('https://ecolog-deployment.vercel.app/health')
+            self.assertEqual((status, body), (200, b'{"status":"ok"}'))
+        with patch.dict(os.environ, {'VERCEL_RELEASE_WORKSPACE':'/tmp/release'}), \
+                patch('cd.subprocess.run', return_value=subprocess.CompletedProcess([], 1, '', 'dummy-secret')), self.assertRaises(RuntimeError) as raised:
+            cd.vercel_request('https://ecolog-deployment.vercel.app/health')
+        self.assertNotIn('dummy-secret', str(raised.exception))
 
 
 class TransportAndGateTests(unittest.TestCase):

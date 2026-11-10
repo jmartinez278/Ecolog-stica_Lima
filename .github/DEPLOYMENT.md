@@ -118,9 +118,9 @@ como secreto del repositorio en GitHub Actions.
    las publicaciones para que una integración paralela no omita el CI.
 4. Anotar **Project ID** y **Team ID / Org ID** desde la configuración del proyecto.
    Crear un token de Vercel para el equipo elegido y guardarlo en GitHub.
-5. Si Deployment Protection protege las URL de deployment, crear un secreto de
-   **Protection Bypass for Automation** y guardarlo también en GitHub. Sin él el smoke
-   no podrá acceder al deployment protegido y detendrá la promoción.
+5. Mantener Deployment Protection. El smoke utiliza `vercel curl` con el mismo
+   `VERCEL_TOKEN`: la CLI gestiona el acceso al deployment protegido. No se necesita
+   crear ni compartir un tercer secreto de bypass para el pipeline.
 
 El CD usa la CLI Vercel **65.14.0**, fijada en el workflow. Recupera el `dist` compilado
 por CI y lo empaqueta en Build Output API v3. No reconstruye el frontend con otro
@@ -151,7 +151,6 @@ un administrador puede trasladarlos a `production` si habilita restricciones adi
 |---|---|
 | `RENDER_API_KEY` | Token Render autorizado para desplegar el backend |
 | `VERCEL_TOKEN` | Token del equipo/cuenta Vercel |
-| `VERCEL_AUTOMATION_BYPASS_SECRET` | Solo cuando se utilice Deployment Protection |
 
 `DATABASE_URL`, `JWT_SECRET` y las credenciales del operador permanecen en Render.
 No son necesarios en GitHub ni en Vercel para este pipeline.
@@ -194,7 +193,7 @@ flowchart TD
   PostgreSQL realmente, no solo el proceso HTTP.
 - Vercel recibe un deployment **de producción** con `--skip-domain`. El smoke comprueba
   HTML prerenderizado, `/health` y JSON `401` de una consulta sin sesión a través del
-  proxy; después se promueve exactamente ese deployment.
+  proxy mediante `vercel curl`; después se promueve exactamente ese deployment.
 - Tokens del repositorio solo en los pasos de release que los necesitan. No se suben `.env`, `.vercel`, tokens,
   estado de sesión ni trazas autenticadas como artefactos.
 

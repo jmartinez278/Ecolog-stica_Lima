@@ -8,6 +8,8 @@ import os
 from pathlib import Path
 import re
 import shutil
+import subprocess
+import tempfile
 import time
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode, urlsplit
@@ -199,8 +201,8 @@ def package(dist, workspace):
     print('Artefacto de CI preparado para Vercel; rutas API enviadas a Render.')
 
 
-def health(base, headers=None):
-    status, body, _ = request(base + '/health', headers=headers)
+def health(base, headers=None, requester=None):
+    status, body, _ = (requester or request)(base + '/health', headers=headers)
     if status != 200 or json.loads(body).get('status') != 'ok':
         raise RuntimeError('El health check no confirma API y PostgreSQL disponibles')
 
@@ -220,17 +222,31 @@ def deployment_url(file):
     return value
 
 
-def smoke(value):
+def vercel_request(url, headers=None):
+    """La CLI usa la sesión Vercel para acceder al deployment protegido."""
+    with tempfile.TemporaryDirectory(prefix='ecolog-cd-smoke-') as directory:
+        body = Path(directory) / 'body'
+        command = ['vercel', 'curl', url, '--cwd', os.environ['VERCEL_RELEASE_WORKSPACE'],
+                   '--', '--silent', '--show-error', '--max-time', '30',
+                   '--output', str(body), '--write-out', '%{http_code}']
+        result = subprocess.run(command, capture_output=True, text=True)
+        if result.returncode or not re.fullmatch(r'[0-9]{3}', result.stdout.strip()):
+            raise RuntimeError('No se pudo verificar el deployment protegido mediante Vercel CLI')
+        return int(result.stdout.strip()), body.read_bytes(), {}
+
+
+def smoke(value, via_cli=False):
     base = origin(value)
     if not urlsplit(base).hostname.endswith('.vercel.app'):
         raise ValueError('El smoke con bypass solo acepta deployments de Vercel')
-    bypass = os.environ.get('VERCEL_AUTOMATION_BYPASS_SECRET')
+    bypass = os.environ.get('VERCEL_AUTOMATION_BYPASS_SECRET') if not via_cli else None
     headers = {'x-vercel-protection-bypass': bypass} if bypass else {}
-    status, html, _ = request(base + '/', headers=headers)
+    get = vercel_request if via_cli else request
+    status, html, _ = get(base + '/', headers=headers)
     if status != 200 or b'id="root"' not in html or 'Bienvenido' not in html.decode():
         raise RuntimeError('Vercel no sirve la interfaz prerenderizada esperada')
-    health(base, headers)
-    status, body, _ = request(base + '/api/v1/vehiculos?page=1&limit=12', headers=headers)
+    health(base, headers, get)
+    status, body, _ = get(base + '/api/v1/vehiculos?page=1&limit=12', headers=headers)
     if status != 401 or not isinstance(json.loads(body).get('detail'), str):
         raise RuntimeError('La API debe responder JSON 401 sin sesión, a través de Vercel')
     print('Smoke aprobado: interfaz, proxy API, autenticación requerida y PostgreSQL.')
@@ -249,6 +265,7 @@ def main():
     url.add_argument('--file', type=Path, required=True)
     check = sub.add_parser('smoke')
     check.add_argument('--url', required=True)
+    check.add_argument('--via-vercel-cli', action='store_true')
     args = parser.parse_args()
     if args.command in ('gate', 'guard'):
         gate(required=args.command == 'guard')
@@ -259,7 +276,7 @@ def main():
     elif args.command == 'url':
         deployment_url(args.file)
     else:
-        smoke(args.url)
+        smoke(args.url, args.via_vercel_cli)
 
 
 if __name__ == '__main__':

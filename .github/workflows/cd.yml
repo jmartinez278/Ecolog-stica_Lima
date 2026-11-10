@@ -101,8 +101,9 @@ jobs:
       - name: Verificar interfaz, proxy, autenticación y PostgreSQL antes de promover
         env:
           DEPLOYMENT_URL: ${{ steps.stage.outputs.url }}
-          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
-        run: python3 scripts/cd.py smoke --url "$DEPLOYMENT_URL"
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_RELEASE_WORKSPACE: ${{ runner.temp }}/vercel-release
+        run: python3 scripts/cd.py smoke --url "$DEPLOYMENT_URL" --via-vercel-cli
       - name: Promover el mismo deployment comprobado
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
