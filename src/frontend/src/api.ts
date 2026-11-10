@@ -49,6 +49,19 @@ export type Client = {
   creado_en: string
 }
 
+export function orderListPath(state: string): string {
+  switch (state) {
+    case '': return '/pedidos'
+    case 'PENDIENTE': return '/pedidos?estado=PENDIENTE'
+    case 'PLANIFICADO': return '/pedidos?estado=PLANIFICADO'
+    case 'EN_RUTA': return '/pedidos?estado=EN_RUTA'
+    case 'ENTREGADO': return '/pedidos?estado=ENTREGADO'
+    case 'CANCELADO': return '/pedidos?estado=CANCELADO'
+    case 'NO_ASIGNADO': return '/pedidos?estado=NO_ASIGNADO'
+    default: throw new Error('Estado de pedido inválido')
+  }
+}
+
 export async function api<T>(path: string, token: string, init: RequestInit = {}): Promise<T> {
   const response = await fetch(`/api/v1${path}`, {
     ...init,

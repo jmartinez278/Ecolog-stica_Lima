@@ -13,7 +13,14 @@ const chrome = requireTools('selenium-webdriver/chrome')
 const edge = requireTools('selenium-webdriver/edge')
 const firefox = requireTools('selenium-webdriver/firefox')
 const browsingContext = requireTools('selenium-webdriver/bidi/browsingContext')
-const config = JSON.parse(await readFile(process.argv[2], 'utf8'))
+let configurationPath
+switch (process.argv[2]) {
+  case undefined:
+  case 'tmp/browser-matrix.json': configurationPath = path.join(root, 'tmp/browser-matrix.json'); break
+  case 'tmp/compatibilidad-conjunto-final.json': configurationPath = path.join(root, 'tmp/compatibilidad-conjunto-final.json'); break
+  default: throw new Error('Seleccione una de las dos matrices locales documentadas.')
+}
+const config = JSON.parse(await readFile(configurationPath, 'utf8'))
 const evidence = path.join(root, 'docs/03 Implementación/Sprint 03/evidencias')
 const temporary = path.join(root, 'tmp', `compat-${Date.now()}`)
 await mkdir(temporary, { recursive: true })
@@ -50,7 +57,11 @@ async function find(selector) {
 async function text(selector) { return (await find(selector)).getText() }
 async function button(name, within = '') {
   const buttons = within === 'main li:last-child' ? await (await find(within)).findElements(By.css('button')) : await driver.findElements(By.css(`${within} button`.trim()))
-  for (const item of buttons) if ((await item.getText()).trim().replace(/\s*→$/, '') === name) { await item.click(); return }
+  for (const item of buttons) {
+    const label = (await item.getText()).trim()
+    const withoutArrow = label.endsWith('→') ? label.slice(0, -1).trimEnd() : label
+    if (withoutArrow === name) { await item.click(); return }
+  }
   throw new Error(`Botón no localizado: ${name}`)
 }
 async function field(name, value) {

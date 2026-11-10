@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { api, type Order, type Client } from '../api'
+import { api, orderListPath, type Order, type Client } from '../api'
 import type { Notice } from '../types'
 import { NoticeBox } from '../components/common/StatusMessage'
 import { PageIntro } from '../components/common/PageIntro'
@@ -27,7 +27,7 @@ export function OrdersPage({ token }: { token: string }) {
   const [notice, setNotice] = useState<Notice>(null)
   const [busy, setBusy] = useState(false)
   async function load() {
-    try { setItems(await api<Order[]>(`/pedidos${filter ? `?estado=${filter}` : ''}`, token)) }
+    try { setItems(await api<Order[]>(orderListPath(filter), token)) }
     catch (error) { setNotice({ text: (error as Error).message, error: true }) }
   }
   useEffect(() => { void load() }, [token, filter])

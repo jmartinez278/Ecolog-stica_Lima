@@ -214,7 +214,7 @@ Para ejecutar el proyecto, consultar las instrucciones técnicas del [backend](s
 
 La verificación técnica del 29/09/2026 pasó con Docker Compose, PostgreSQL aislado, API y frontend: 9 pruebas backend (91,35 % de cobertura), 4 pruebas frontend, build y un recorrido HTTP de US-001 a US-010. La interfaz cargó y navegó sin desbordamiento horizontal a 360 px en el navegador probado. A las 15:04 (hora de Lima) se repitieron el arranque, las pruebas y el build en otro proyecto Compose aislado. La demostración ante interesados y la reunión de retrospectiva del equipo siguen sin evidencia de realización.
 
-Para Sprint 2, la revisión del 06/10/2026 ejecutó 14 pruebas backend con 92,41 % de cobertura total sobre SQLite y PostgreSQL aislado, 5 pruebas frontend, build y arranque de Compose. Los módulos backend afectados por conductores y clientes obtuvieron 96–100 % de cobertura. API, OpenAPI, inicio de sesión, listas y proxy respondieron en `localhost`; los detalles están en el [informe técnico de implementación](<docs/03 Implementación/Sprint 2/05 Informe de implementación del Sprint 2 V_1_0_0.md>). En el corte histórico del 06/10/2026, ECO-17 a ECO-21 estaban en `In Review / QA` y sin responsable; ese estado no representa el corte actual del tablero. La [conciliación de Sprints 1 y 2](<docs/03 Implementación/Sprint 03/Antecedentes 1.2.4/04 Estado de Sprints 1 y 2 V_1_0_0.md>) registra por separado la consulta del 24/10/2026 y los DoD aún pendientes de validación.
+Para Sprint 2, la revisión del 06/10/2026 ejecutó 14 pruebas backend con 92,41 % de cobertura total sobre SQLite y PostgreSQL aislado, 5 pruebas frontend, build y arranque de Compose. Los módulos backend afectados por conductores y clientes obtuvieron 96–100 % de cobertura. API, OpenAPI, inicio de sesión, listas y proxy respondieron en `localhost`; los detalles están en el [informe técnico de implementación](<docs/03 Implementación/Sprint 2/05 Informe de implementación del Sprint 2 V_1_0_0.md>). En el corte histórico del 06/10/2026, ECO-17 a ECO-21 estaban en `In Review / QA` y sin responsable; ese estado no representa el corte actual del tablero.
 
 ---
 
@@ -289,11 +289,6 @@ Los principales criterios de evaluación serán:
 ---
 
 
-[Revisión técnica, responsables y plan de cierre del Sprint 3](<docs/03 Implementación/Sprint 03/Revisión técnica y plan de cierre V_1_0_0.md>) · [Compatibilidad de navegadores](<docs/Calidad/04 Compatibilidad de navegadores.md>) · [Seguridad de herramientas locales](<docs/Calidad/05 Seguridad de herramientas locales.md>).
-
-
-[Registro preparado para la revisión del cliente o del usuario: 30 escenarios](<docs/03 Implementación/Sprint 03/Registro de revisión del cliente o del usuario V_1_0_0.md>).
-
 ## Equipo
 
 - Luis Antony Gonzalo Guerrero
@@ -306,21 +301,17 @@ La lista actual de cinco integrantes fue confirmada por el usuario mediante una 
 
 ---
 
-## Antecedentes técnicos de la versión 1.2.4
-
-El [registro de preparación técnica de seguridad](<docs/03 Implementación/Sprint 03/Antecedentes 1.2.4/02 Informe de seguridad V_1_0_0.md>) contiene los informes de CodeQL y auditoría de dependencias del 24/10/2026, los cambios de versión y las limitaciones de cada evidencia. La [validación de integridad y auditoría DoD-09](<docs/03 Implementación/Sprint 03/Antecedentes 1.2.4/03 Informe de integridad y auditoría V_1_0_0.md>) documenta las pruebas automatizadas del backend ejecutadas sobre SQLite y PostgreSQL 16 aislado, con cobertura del 92,85 %. Estos resultados históricos se complementan con la revisión técnica y el entorno localhost de Sprint 3; la revisión del cliente o del usuario y la aceptación BDD permanecen pendientes.
-
 ## Validación técnica del Sprint 3
 
-**Versión del proyecto:** [1.3.0 — Sprint 3 en revisión previa](docs/Versiones/1.3.0.md). La [versión 1.2.4](docs/Versiones/1.2.4.md) se conserva como base histórica.
+**Entrega del proyecto:** Sprint 3 en revisión previa. La documentación exigida está centralizada en [`docs/03 Implementación/Sprint 03`](<docs/03 Implementación/Sprint 03/>).
 
-La [matriz de trazabilidad BDD](docs/Calidad/01 Matriz de pruebas BDD.md) relaciona las historias US-001 a US-015 con pruebas y pendientes de aceptación. La [guía de staging local](docs/Despliegue/Guía de staging.md) documenta el entorno HTTP/HTTPS de localhost, verificado con sus evidencias en Sprint 3. La actualización del esquema utiliza migraciones Alembic explícitas y un índice que impide correos duplicados de clientes. El [seguimiento de correcciones](docs/Calidad/02 Checklist de validación.md) distingue entregables técnicos de aprobación humana.
+La actualización del esquema utiliza migraciones Alembic explícitas y un índice que impide correos duplicados de clientes.
 
 ## Estado
 
 ### Entrega consolidada del Sprint 3
 
-La [versión 1.3.0 del Sprint 3](docs/Versiones/1.3.0.md) reúne implementación, calidad de código y evaluación en localhost. La [evidencia SonarQube 1.3.0](<docs/03 Implementación/Sprint 03/evidencias/sonar-1.3.0.json>) acredita Quality Gate aprobado, cobertura global 92,6 %, código nuevo 100 %, duplicación 0 % y cero problemas abiertos. La [guía de ejecución](<docs/Calidad/03 SonarQube local.md>) permite reproducir el análisis.
+El [informe oficial de calidad](<docs/03 Implementación/Sprint 03/03 Calidad de código V_1_0_0.md>) reúne la evaluación del Sprint 3. El análisis real de SonarCloud sobre la revisión `fd9ede18` registra Quality Gate aprobado, cobertura global de 81,6 %, cobertura de código nuevo de 92,9 %, duplicación de 0,0 % y cero problemas abiertos.
 
 ### Entregables del Sprint 3
 
@@ -332,17 +323,7 @@ La [versión 1.3.0 del Sprint 3](docs/Versiones/1.3.0.md) reúne implementación
 | Seguridad OWASP 2025 | [04 OWASP V_1_0_0](<docs/03 Implementación/Sprint 03/04 OWASP V_1_0_0.md>) |
 | Accesibilidad WCAG | [05 WCAG V_1_0_0](<docs/03 Implementación/Sprint 03/05 WCAG V_1_0_0.md>) |
 
-Los [cuatro informes de la base histórica 1.2.4](<docs/03 Implementación/Sprint 03/Antecedentes 1.2.4/>) están integrados como antecedentes dentro del Sprint 3, con sus fechas y resultados originales.
-
-La [matriz de entrega y rúbrica](<docs/03 Implementación/Sprint 03/Matriz de entrega y rúbrica V_1_0_0.md>) permite revisar los ocho criterios, sus evidencias y límites. La [adenda de planificación](<docs/02 Planificación/Anexos/Planificación Sprint 3 V_1_0_0.md>) relaciona EP-06 con RF/RNF y DoD. Los cinco informes conservan los nombres de archivo solicitados; sus versiones internas e historiales identifican las actualizaciones.
-
-El [alcance vigente](<docs/03 Implementación/Sprint 03/Alcance de validación local V_1_0_0.md>) se limita a localhost. La [guía de staging local](<docs/Despliegue/Guía de staging.md>) describe HTTP en 8080 y TLS en 8443. La evaluación de interfaz acredita 437 comprobaciones de contraste y 16 de interacción sobre 13 estados; quedan demostración/aceptación con interesados, revisión independiente y límites de tecnología de asistencia/navegadores. No se requiere infraestructura remota.
-
-La [prueba técnica con lector de pantalla](<docs/Calidad/06 Prueba con lector de pantalla.md>) aprobó **53/53 comprobaciones con NVDA 2026.2 y Edge 156**: acceso, cuatro módulos, formularios, registro de cliente y cierre de sesión. Se conservan transcripción, intentos anteriores y correcciones. La comprensión y aceptación en la revisión del cliente o del usuario permanecen pendientes.
-
-**Checklist acumulado:** [seguimiento de correcciones en Jira y GitHub](docs/Calidad/02 Checklist de validación.md), con evidencias técnicas y pendientes que requieren decisión humana.
-
-**Estado de la base, 24/10/2026:** la versión 1.2.4 corresponde al commit `da3eef2`. El Sprint 3 continúa esa base como versión 1.3.0. La [conciliación de Sprints 1 y 2](<docs/03 Implementación/Sprint 03/Antecedentes 1.2.4/04 Estado de Sprints 1 y 2 V_1_0_0.md>) conserva el corte anterior: cuatro historias de Sprint 2 finalizadas y ECO-18 en QA. Los resultados técnicos se distinguen de la aceptación funcional y las decisiones de calendario.
+La carpeta de Sprint 3 contiene únicamente los cinco documentos solicitados por la consigna y dos capturas de SonarCloud utilizadas dentro de los informes. El informe de calidad distingue las métricas demostradas por SonarCloud de requisitos operativos todavía no comprobados, como disponibilidad mensual, recuperación, CPU y latencia P95.
 
 **Fase del incremento técnico al 06/10/2026:** incremento técnico del Sprint 2 publicado en `sprint-2` e integrado en `main`. Incorpora US-011 a US-015 sobre la base técnica del Sprint 1; la aceptación formal y el estado de Jira siguen pendientes de conciliación.
 

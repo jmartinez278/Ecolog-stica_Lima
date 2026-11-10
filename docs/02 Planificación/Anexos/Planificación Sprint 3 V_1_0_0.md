@@ -23,12 +23,12 @@ La línea base conserva 23 historias funcionales y 10 enablers. Esta adenda inco
 
 ## Criterios de cierre
 
-El despliegue se comprueba exclusivamente en localhost conforme a la [adenda de alcance del 25/10/2026](<../../03 Implementación/Sprint 03/Alcance de validación local V_1_0_0.md>). La [evidencia local](<../../03 Implementación/Sprint 03/evidencias/staging-local.json>) acredita HTTP/HTTPS, login y recursos protegidos; no se requiere infraestructura remota.
+El despliegue técnico se comprobó en localhost. El alcance y los pendientes de aceptación se resumen en la [Revisión del Sprint](<../../03 Implementación/Sprint 03/01 Revisión del Sprint V_1_0_0.md>).
 
 Las evidencias técnicas permiten revisar el trabajo; el cierre exige los puntos aplicables del DoD y su evidencia de aceptación.
 
 
-El 25/10/2026 se asignaron las tareas y fechas de seguimiento a los cinco integrantes. La regularización administrativa verificó las diez tarjetas finalizadas de Sprint 1 y registró su cierre el 25/10/2026 a las 16:06:57 (Lima). Sprint 3 (ID 38) se abrió efectivamente el 25/10/2026 a las 16:07:13 (Lima), estado `active`, con fin planificado 08/11/2026 a las 18:00. Los cortes anterior/posterior se conservan en el [plan nominal](<../../03 Implementación/Sprint 03/Revisión técnica y plan de cierre V_1_0_0.md>). Sprint 2 conserva su programación histórica y ECO-18 en QA, pendiente de revisión del cliente o usuario. No se trasladan historias ni se atribuyen reuniones o aprobaciones nuevas.
+El 25/10/2026 se asignaron tareas y fechas de seguimiento a los cinco integrantes. La regularización administrativa verificó las diez tarjetas finalizadas de Sprint 1 y registró su cierre. Sprint 3 se abrió con fin planificado para el 08/11/2026. Sprint 2 conserva ECO-18 en QA, pendiente de revisión del cliente o usuario. No se trasladan historias ni se atribuyen reuniones o aprobaciones nuevas.
 
 ## Impacto documental
 
@@ -54,4 +54,4 @@ El 25/10/2026 se asignaron las tareas y fechas de seguimiento a los cinco integr
 | V_1_0_5 | 25/10/2026 | Revisión técnica, compatibilidad ampliada, responsables nominales y seguimiento actualizado. |
 | V_1_0_6 | 25/10/2026 | Cierre administrativo de Sprint 1 y fecha real de activación de Sprint 3; ECO-18 conservado en QA. |
 
-La [matriz de entrega](<../../03 Implementación/Sprint 03/Matriz de entrega y rúbrica V_1_0_0.md>) conserva los ocho criterios de la consigna sin convertir toda mejora del backlog en obligación de esta entrega. Las limitaciones de evaluación y la aceptación pendiente se declaran expresamente para revisión del equipo.
+Los cinco informes oficiales de Sprint 3 conservan los criterios de la consigna sin convertir toda mejora del backlog en obligación de esta entrega. Las limitaciones y la aceptación pendiente se declaran en la [Revisión del Sprint](<../../03 Implementación/Sprint 03/01 Revisión del Sprint V_1_0_0.md>).

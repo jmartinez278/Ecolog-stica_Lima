@@ -12,6 +12,8 @@ __pycache__/
 htmlcov/
 coverage/
 coverage.xml
+coverage-scripts.xml
+sonarcloud-report.json
 .scannerwork/
 dist/
 build/

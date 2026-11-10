@@ -101,5 +101,5 @@ export async function demonstrateWorkflows(page, evidenceDirectory) {
   await order.getByText('CANCELADO', { exact: true }).waitFor()
   await record('Cancelación y consulta del pedido cancelado', ['US-006', 'US-008'])
 
-  return { scope: 'Recorrido técnico de la aplicación real con API y base exclusiva de evaluación; no registra aceptación de interesados.', steps, historiesExercised: [...new Set(steps.flatMap(step => step.histories))].sort(), failedSteps: 0 }
+  return { scope: 'Recorrido técnico de la aplicación real con API y base exclusiva de evaluación; no registra aceptación de interesados.', steps, historiesExercised: [...new Set(steps.flatMap(step => step.histories))].sort((left, right) => left.localeCompare(right)), failedSteps: 0 }
 }

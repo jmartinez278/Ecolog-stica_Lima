@@ -12,9 +12,10 @@ const require = createRequire(path.join(frontend, 'package.json'))
 const { chromium } = require('playwright')
 const version = require('./package.json').version
 assert.match(version, /^\d+\.\d+\.\d+$/)
-const nvda = path.resolve(process.argv[2] || path.join(root, 'tmp/browser-tools/nvda/nvda.exe'))
+const nvda = path.join(root, 'tmp/browser-tools/nvda/nvda.exe')
+const git = 'C:\\Program Files\\Git\\cmd\\git.exe'
 assert.ok(existsSync(nvda), 'Se requiere NVDA portable instalado; no se descarga ni instala software.')
-const running = spawnSync('tasklist.exe', ['/FI', 'IMAGENAME eq nvda.exe', '/FO', 'CSV', '/NH'], { encoding: 'utf8', windowsHide: true })
+const running = spawnSync('C:\\Windows\\System32\\tasklist.exe', ['/FI', 'IMAGENAME eq nvda.exe', '/FO', 'CSV', '/NH'], { encoding: 'utf8', windowsHide: true })
 assert.equal(running.status, 0)
 assert.ok(!/"nvda\.exe"/i.test(running.stdout), 'Cierre su sesión personal de NVDA antes de ejecutar este perfil aislado.')
 const temporary = path.join(root, 'tmp', `screen-reader-${Date.now()}-${process.pid}`)
@@ -26,7 +27,7 @@ const evidence = path.join(root, 'docs/03 Implementación/Sprint 03/evidencias')
 const python = path.join(root, '.venv/Scripts/python.exe')
 const password = randomBytes(24).toString('base64url')
 const environment = { ...process.env, DATABASE_URL: `sqlite:///${path.join(temporary, 'test_reader.db').replaceAll('\\', '/')}`, JWT_SECRET: randomBytes(48).toString('hex'), BOOTSTRAP_OPERATOR_EMAIL: 'lector@sprint3.example.test', BOOTSTRAP_OPERATOR_PASSWORD: password, VITE_API_PROXY_TARGET: 'http://127.0.0.1:8004' }
-const report = { executedAt: new Date().toISOString(), applicationVersion: version, sourceCommit: spawnSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).stdout.trim(), sourceFiles: {}, method: 'NVDA real, extensión pre_speech de solo lectura, Edge visible, foco y eventos de la aplicación real; síntesis silenciosa y transcripción textual anterior al sintetizador.', scope: 'Acceso, Inicio, navegación, formularios de cuatro módulos, mensajes y cierre de sesión en localhost 5176/8004; SQLite y operador sintéticos exclusivos; perfil NVDA y navegador desechables.', checks: [], limits: ['No evalúa la calidad acústica, pronunciación ni comprensión de una persona: se recoge la salida textual real de NVDA con sintetizador silencioso.', 'Acredita únicamente la combinación y los controles identificados, no conformidad WCAG AA universal.', 'La revisión del cliente o del usuario y su aceptación permanecen pendientes.'] }
+const report = { executedAt: new Date().toISOString(), applicationVersion: version, sourceCommit: spawnSync(git, ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).stdout.trim(), sourceFiles: {}, method: 'NVDA real, extensión pre_speech de solo lectura, Edge visible, foco y eventos de la aplicación real; síntesis silenciosa y transcripción textual anterior al sintetizador.', scope: 'Acceso, Inicio, navegación, formularios de cuatro módulos, mensajes y cierre de sesión en localhost 5176/8004; SQLite y operador sintéticos exclusivos; perfil NVDA y navegador desechables.', checks: [], limits: ['No evalúa la calidad acústica, pronunciación ni comprensión de una persona: se recoge la salida textual real de NVDA con sintetizador silencioso.', 'Acredita únicamente la combinación y los controles identificados, no conformidad WCAG AA universal.', 'La revisión del cliente o del usuario y su aceptación permanecen pendientes.'] }
 for (const relative of ['src/frontend/src/App.tsx', 'src/frontend/src/pages/LoginPage.tsx', 'src/frontend/src/forms/ClientForm.tsx', 'src/frontend/src/forms/VehicleForm.tsx', 'src/frontend/src/forms/OrderForm.tsx', 'src/frontend/src/forms/DriverForm.tsx', 'src/frontend/src/components/common/StatusMessage.tsx']) report.sourceFiles[relative] = createHash('sha256').update(readFileSync(path.join(root, relative))).digest('hex')
 const children = []
 let server, browser, nvdaStarted = false, browserPid
@@ -69,7 +70,7 @@ try {
   start(nvda, ['--minimal', '--no-sr-flag', '--config-path=' + profile, '--log-file=' + path.join(profile, 'nvda.log')], path.dirname(nvda))
   nvdaStarted = true
   await until(() => existsSync(path.join(profile, 'ready.json')) && existsSync(path.join(profile, 'nvda.log')) && readFileSync(path.join(profile, 'nvda.log'), 'utf8').includes('NVDA initialized'), 'NVDA inicializado')
-  report.workingTreeDirtyAtStart = Boolean(spawnSync('git', ['status', '--porcelain'], { cwd: root, encoding: 'utf8' }).stdout.trim())
+  report.workingTreeDirtyAtStart = Boolean(spawnSync(git, ['status', '--porcelain'], { cwd: root, encoding: 'utf8' }).stdout.trim())
   report.nvdaVersion = readFileSync(path.join(profile, 'nvda.log'), 'utf8').match(/Starting NVDA version (.+)/)?.[1].trim()
   server = await chromium.launchServer({ channel: 'msedge', headless: false, args: ['--force-renderer-accessibility'] })
   browserPid = server.process().pid
