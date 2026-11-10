@@ -31,3 +31,7 @@ tmp/
 *~
 .DS_Store
 Thumbs.db
+
+# Reportes locales de Lighthouse CI
+.lighthouseci/
+lighthouse-reports/

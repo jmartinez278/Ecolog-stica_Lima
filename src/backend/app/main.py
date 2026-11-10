@@ -2,9 +2,11 @@ import logging
 from uuid import UUID
 
 from fastapi import FastAPI, Request
+from fastapi.middleware.gzip import GZipMiddleware
 from sqlalchemy import text
 
 from app.api import auth, clients, drivers, orders, vehicles
+from app.core.http_cache import ETagMiddleware
 from app.core.security import user_from_token
 from app.db.session import SessionLocal
 from app.models import Audit
@@ -53,3 +55,9 @@ async def audit_failed_writes(request: Request, call_next):
     except Exception:
         logger.exception("No se pudo auditar la operación fallida")
     return response
+
+
+# Green IT (Inspección 04). Starlette ejecuta primero el último middleware registrado:
+# GZip (externo) comprime lo que ETag (interno) ya validó; un 304 no lleva cuerpo.
+app.add_middleware(ETagMiddleware)
+app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=6)

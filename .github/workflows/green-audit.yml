@@ -1,0 +1,47 @@
+# Green IT & Performance Audit — Inspección 04 (v1.0.0)
+# Construye el frontend de producción y ejecuta Lighthouse CI (LHCI) con los umbrales
+# de lighthouserc.json. Si una métrica supera su presupuesto, el job falla.
+name: ECO - Green IT & Performance Audit
+
+on:
+  push:
+    branches: [main, inspeccion-04-green-it]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lighthouse:
+    name: Lighthouse CI (presupuesto de rendimiento)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: src/frontend/package-lock.json
+
+      - name: Instalar dependencias del frontend
+        working-directory: src/frontend
+        run: npm ci --ignore-scripts
+
+      - name: Build de producción con precompresión Brotli/Gzip
+        working-directory: src/frontend
+        run: npm run build
+
+      - name: Ejecutar Lighthouse CI
+        run: npx --yes @lhci/cli@0.15.1 autorun --config=./lighthouserc.json
+
+      - name: Conservar reportes de Lighthouse
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci/
+          if-no-files-found: warn

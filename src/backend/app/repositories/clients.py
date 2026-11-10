@@ -1,22 +1,24 @@
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import Select, select
 from sqlalchemy.orm import Session
 
+from app.api.pagination import projected_columns
 from app.models import Client
+from app.schemas.operations import ClientOut
 
 
 def get(db: Session, client_id: UUID) -> Client | None:
     return db.get(Client, client_id)
 
 
-def list_all(db: Session, active: bool | None = None) -> list[Client]:
-    query = select(Client).order_by(Client.nombre, Client.cliente_id)
+def list_query(active: bool | None = None) -> Select:
+    query = select(*projected_columns(Client, ClientOut)).order_by(Client.nombre, Client.cliente_id)
     if active is True:
         query = query.where(Client.estado == "ACTIVO")
     elif active is False:
         query = query.where(Client.estado == "INACTIVO")
-    return list(db.scalars(query))
+    return query
 
 
 def email_exists(db: Session, email: str, exclude_id: UUID | None = None) -> bool:
