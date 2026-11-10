@@ -1,5 +1,6 @@
 // Medición Green IT: Lighthouse (navegación + flujo autenticado) y benchmark de API.
 // Uso: node measure.mjs <etiqueta> <dir_salida>
+import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import lighthouse, { startFlow, desktopConfig } from 'lighthouse'
@@ -94,9 +95,11 @@ async function apiBench() {
       const body = JSON.parse(buf.toString())
       count = Array.isArray(body) ? body.length : (body.items?.length ?? 0)
     }
-    // bytes en el cable: petición sin decodificar automática
-    const { execSync } = await import('node:child_process')
-    wire = Number(execSync(`curl -s -o /dev/null -w "%{size_download}" -H "Authorization: Bearer ${access_token}" -H "Accept-Encoding: br, gzip" ${BASE}/api/v1/${res}`).toString())
+    // Bytes en el cable (sin decodificar). execFileSync no usa shell: el token y la URL
+    // se pasan como argumentos separados y no pueden inyectar comandos.
+    wire = Number(execFileSync('curl', ['-s', '-o', '/dev/null', '-w', '%{size_download}',
+      '-H', `Authorization: Bearer ${access_token}`, '-H', 'Accept-Encoding: br, gzip',
+      `${BASE}/api/v1/${res}`]).toString())
     out[res] = { registros_devueltos: count, bytes_json: raw, bytes_transferidos: wire, content_encoding: encoding, mediana_ms: Number(median(times).toFixed(1)), p95_ms: Number([...times].sort((a, b) => a - b)[Math.floor(times.length * 0.95)].toFixed(1)) }
   }
   return out
