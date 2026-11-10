@@ -265,6 +265,41 @@ class TransportAndGateTests(unittest.TestCase):
             with patch('cd.request', return_value=(status, body, {})), self.assertRaises(RuntimeError):
                 cd.health(BACKEND)
 
+class PromotionTests(unittest.TestCase):
+    def setUp(self):
+        env = {'FRONTEND_URL':'https://ecolog.vercel.app','VERCEL_PROJECT_ID':'prj_test',
+               'VERCEL_ORG_ID':'team_test','VERCEL_TOKEN':'test-only'}
+        patcher=patch.dict(os.environ,env)
+        patcher.start();self.addCleanup(patcher.stop)
+        self.deployment={'id':'dpl_test','projectId':'prj_test','ownerId':'team_test',
+                         'readyState':'READY','target':'production'}
+
+    def test_promotes_exact_project_deployment_with_team_scope_and_handles_empty_204(self):
+        with patch('cd.api',side_effect=[self.deployment,{'id':'dpl_test'}]) as api, \
+                patch('cd.request',return_value=(204,b'',{})) as request,patch('cd.output') as output:
+            cd.promote('https://ecolog-deployment.vercel.app')
+        self.assertEqual(request.call_args.args[0], 'https://api.vercel.com/v10/projects/prj_test/promote/dpl_test?teamId=team_test')
+        self.assertEqual(request.call_args.kwargs['payload'],{})
+        self.assertTrue(all('/user' not in call.args[0] for call in api.call_args_list))
+        self.assertIn('ecolog.vercel.app',api.call_args_list[-1].args[0])
+        output.assert_called_once_with(frontend_url='https://ecolog.vercel.app')
+
+    def test_wrong_project_owner_state_target_or_identifier_blocks_publication(self):
+        for changes in [{'projectId':'prj_other'},{'ownerId':'team_other'},{'readyState':'ERROR'},
+                        {'target':'preview'},{'id':'other/invalid'}]:
+            with self.subTest(changes=changes),patch('cd.api',return_value={**self.deployment,**changes}), \
+                    patch('cd.request') as request,self.assertRaises(RuntimeError):
+                cd.promote('https://ecolog-deployment.vercel.app')
+            request.assert_not_called()
+
+    def test_alias_assignment_waits_for_expected_deployment_and_expires_if_unconfirmed(self):
+        with patch('cd.api',side_effect=[self.deployment,RuntimeError('HTTP 404 en api.vercel.com'),{'id':'dpl_old'},{'id':'dpl_test'}]), \
+                patch('cd.request',return_value=(204,b'',{})),patch('cd.time.sleep') as sleep,patch('cd.output'):
+            cd.promote('https://ecolog-deployment.vercel.app')
+        self.assertEqual(sleep.call_count,2)
+        with patch('cd.api',return_value=self.deployment),patch('cd.request',return_value=(204,b'',{})),self.assertRaises(RuntimeError):
+            cd.promote('https://ecolog-deployment.vercel.app',timeout=0)
+
 
 if __name__ == '__main__':
     unittest.main()

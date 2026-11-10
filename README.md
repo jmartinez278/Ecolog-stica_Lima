@@ -1,6 +1,8 @@
 # EcoLogística Lima
 
-**Versión del proyecto:** 1.4.0 · **Revisión del README:** 1.4.2 · **Actualizado:** 10/11/2026
+**Versión del proyecto:** 1.4.0 · **Revisión del README:** 1.4.3 · **Actualizado:** 10/11/2026
+
+**Aplicación:** [Abrir EcoLogística Lima](https://ecologistica-lima.vercel.app) · **API:** [Swagger](https://ecologistica-lima-api-ktea.onrender.com/docs)
 
 **EcoLogística Lima** es un proyecto de software orientado a la optimización sostenible de rutas de distribución de última milla para el escenario empresarial de **DistriRápido S.A.C.**
 
@@ -56,7 +58,7 @@ El sistema contempla los siguientes módulos:
 | Pruebas Backend | Pytest |
 | Pruebas Frontend | Vitest / React Testing Library |
 | Contenedores | Docker |
-| CI/CD | GitHub Actions: CI activo; CD Vercel/Render preparado, pendiente de configuración |
+| CI/CD | GitHub Actions: CI y pipeline CD Vercel/Render |
 
 ---
 
@@ -347,8 +349,9 @@ Render y promueve Vercel después del smoke de interfaz/API/base de datos.
 
 La [guía de configuración y operación](.github/DEPLOYMENT.md) explica los servicios,
 variables, secretos, migraciones y reintentos. El [workflow CD](.github/workflows/cd.yml)
-está preparado y desactivado hasta configurar los destinos y `CD_ENABLED=true`.
-Las comprobaciones externas quedan pendientes hasta su primera ejecución real.
+está habilitado con `CD_ENABLED=true` y los destinos configurados. La página de acceso
+y la conexión API/PostgreSQL se comprobaron externamente; el resultado de cada
+publicación automática debe verificarse en [GitHub Actions](https://github.com/jmartinez278/Ecolog-stica_Lima/actions).
 
 ## Historial de control de cambios del README
 
@@ -369,6 +372,7 @@ Las comprobaciones externas quedan pendientes hasta su primera ejecución real.
 | 1.4.0 | 10/11/2026 | Inspección 04: optimizaciones Green IT en backend, frontend y Caddy; informes de impacto ambiental y estándares; workflow LHCI. |
 | 1.4.1 | 10/11/2026 | Limpieza documental: contenido técnico de Sprint 2 consolidado en su informe de estado; retirada de evidencias Green IT superadas y presentaciones HTML repetidas, conservando todas las muestras JSON. |
 | 1.4.2 | 10/11/2026 | Estado remoto de Sprint 4 actualizado; CD GitHub Actions preparado para Vercel/Render, guía de activación y artefacto frontend del mismo CI. |
+| 1.4.3 | 10/11/2026 | Enlaces públicos de aplicación y API; infraestructura Vercel/Render configurada, verificación de acceso y promoción por API con equipo/proyecto explícitos. |
 
 ---
 
