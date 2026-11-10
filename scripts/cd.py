@@ -226,10 +226,9 @@ def vercel_request(url, headers=None):
     """La CLI usa la sesión Vercel para acceder al deployment protegido."""
     with tempfile.TemporaryDirectory(prefix='ecolog-cd-smoke-') as directory:
         body = Path(directory) / 'body'
-        command = ['vercel', 'curl', url, '--cwd', os.environ['VERCEL_RELEASE_WORKSPACE'],
-                   '--', '--silent', '--show-error', '--max-time', '30',
+        command = ['vercel', 'curl', url, '--', '--silent', '--show-error', '--max-time', '30',
                    '--output', str(body), '--write-out', '%{http_code}']
-        result = subprocess.run(command, capture_output=True, text=True)
+        result = subprocess.run(command, cwd=os.environ['VERCEL_RELEASE_WORKSPACE'], capture_output=True, text=True)
         if result.returncode or not re.fullmatch(r'[0-9]{3}', result.stdout.strip()):
             raise RuntimeError('No se pudo verificar el deployment protegido mediante Vercel CLI')
         return int(result.stdout.strip()), body.read_bytes(), {}
