@@ -57,7 +57,8 @@ jobs:
           path: |
             .lighthouseci/
             .green-results/
-          if-no-files-found: warn
+          include-hidden-files: true
+          if-no-files-found: error
       - name: Retirar solo el entorno temporal de CI
         if: ${{ always() && hashFiles('.env.green-audit') != '' }}
         run: docker compose --env-file .env.green-audit -f docker-compose.staging.yml -p ecolog-green-ci down --volumes
