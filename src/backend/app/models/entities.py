@@ -77,6 +77,7 @@ class Vehicle(Base):
         CheckConstraint("factor_emision_kg_co2_km IS NULL OR factor_emision_kg_co2_km >= 0"),
         CheckConstraint("estado IN ('DISPONIBLE','EN_RUTA','MANTENIMIENTO','INACTIVO')"),
         Index("idx_vehiculos_estado", "estado"),
+        Index("idx_vehiculos_listado", "creado_en", "vehiculo_id"),
     )
 
 
@@ -96,6 +97,7 @@ class Driver(Base):
         CheckConstraint("experiencia_anios IS NULL OR experiencia_anios >= 0"),
         CheckConstraint("estado IN ('DISPONIBLE','ASIGNADO','DESCANSO','INACTIVO')"),
         Index("idx_conductores_estado", "estado"),
+        Index("idx_conductores_listado", "creado_en", "conductor_id"),
     )
 
 
@@ -112,6 +114,7 @@ class Client(Base):
     __table_args__ = (
         CheckConstraint("estado IN ('ACTIVO','INACTIVO')"),
         Index("idx_clientes_estado", "estado"),
+        Index("idx_clientes_listado", "nombre", "cliente_id"),
         Index("uq_clientes_email_normalized", func.lower(email), unique=True),
     )
 
@@ -143,6 +146,8 @@ class Order(Base):
         Index("idx_pedidos_cliente", "cliente_id"), Index("idx_pedidos_estado", "estado"),
         Index("idx_pedidos_prioridad", "prioridad"), Index("idx_pedidos_ventana", "ventana_inicio", "ventana_fin"),
         Index("idx_pedidos_coordenadas", "latitud", "longitud"),
+        Index("idx_pedidos_listado", "creado_en", "pedido_id"),
+        Index("idx_pedidos_estado_listado", "estado", "creado_en", "pedido_id"),
     )
 
 

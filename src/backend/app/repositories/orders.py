@@ -1,20 +1,22 @@
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import Select, select
 from sqlalchemy.orm import Session
 
+from app.api.pagination import projected_columns
 from app.models import Client, Order
+from app.schemas.operations import OrderOut
 
 
 def get(db: Session, order_id: UUID) -> Order | None:
     return db.get(Order, order_id)
 
 
-def list_all(db: Session, state: str | None = None) -> list[Order]:
-    query = select(Order).order_by(Order.creado_en, Order.pedido_id)
+def list_query(state: str | None = None) -> Select:
+    query = select(*projected_columns(Order, OrderOut)).order_by(Order.creado_en, Order.pedido_id)
     if state:
         query = query.where(Order.estado == state)
-    return list(db.scalars(query))
+    return query
 
 
 def code_exists(db: Session, code: str, exclude_id: UUID | None = None) -> bool:

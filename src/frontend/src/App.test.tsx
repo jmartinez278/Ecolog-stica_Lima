@@ -22,6 +22,25 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.unstubAllGlobals() })
 
 describe('flujos principales', () => {
+  it('pagina los pedidos en bloques de 12 y navega a la página siguiente', async () => {
+    const order = (n: number) => ({ pedido_id: `p${n}`, cliente_id: 'c1', codigo_pedido: `PED-${n}`, direccion_entrega: 'Av. Lima', referencia_entrega: null, latitud: '-12', longitud: '-77', peso_kg: '1', volumen_m3: '1', ventana_inicio: '2026-10-25T14:00:00Z', ventana_fin: '2026-10-25T17:00:00Z', prioridad: 'MEDIA', tipo_producto: null, estado: 'ENTREGADO' })
+    const fetchMock = vi.fn(async (input: string) => {
+      if (input.endsWith('/auth/login')) return json({ access_token: 'token' })
+      if (input.includes('/clientes?activo=true')) return json([])
+      const page = Number(new URL(input, 'http://x').searchParams.get('page'))
+      const items = page === 1 ? Array.from({ length: 12 }, (_, i) => order(i)) : [order(12)]
+      return json({ items, total: 13, page, limit: 12, pages: 2 })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+    render(<App />); await login()
+    await userEvent.click(screen.getByRole('button', { name: 'Pedidos' }))
+    expect(await screen.findByText('Página 1 de 2 · 13 registros')).toBeInTheDocument()
+    expect(fetchMock).toHaveBeenCalledWith('/api/v1/pedidos?page=1&limit=12', expect.objectContaining({ cache: 'no-cache' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Siguiente' }))
+    expect(await screen.findByText('PED-12')).toBeInTheDocument()
+    expect(fetchMock).toHaveBeenCalledWith('/api/v1/pedidos?page=2&limit=12', expect.anything())
+  })
+
   it.each([
     { page: 'Vehículos', endpoint: '/vehiculos', item: { vehiculo_id: 'v1', placa: 'PRU-101', marca: 'Toyota', modelo: 'Hiace', capacidad_kg: '1200', capacidad_m3: '8', consumo_km_l: null, factor_emision_kg_co2_km: null, estado: 'DISPONIBLE' }, changes: { 'Consumo (km/l)': '12', 'Emisión (kg CO₂/km)': '0.2' }, select: 'Estado', option: 'MANTENIMIENTO' },
     { page: 'Conductores', endpoint: '/conductores', item: { conductor_id: 'd1', nombres: 'Ana', apellidos: 'Pérez', numero_licencia: 'LIC-101', categoria_licencia: 'A-IIb', telefono: null, experiencia_anios: null, estado: 'DISPONIBLE' }, changes: { 'Experiencia (años)': '5' }, select: 'Estado', option: 'DESCANSO' },
@@ -32,7 +51,7 @@ describe('flujos principales', () => {
     const fetchMock = vi.fn(async (input: string, init?: RequestInit) => {
       if (input.endsWith('/auth/login')) return json({ access_token: 'token' })
       if (input.includes('/clientes?activo=true')) return json([{ cliente_id: 'c1', nombre: 'Cliente original' }])
-      if (input.endsWith(scenario.endpoint) && !init?.method) return json([scenario.item])
+      if (input.split('?')[0].endsWith(scenario.endpoint) && !init?.method) return json([scenario.item])
       throw new Error(`Unexpected request ${input}`)
     })
     vi.stubGlobal('fetch', fetchMock)
@@ -91,7 +110,7 @@ describe('flujos principales', () => {
     const vehicles: Record<string, unknown>[] = []
     const fetchMock = vi.fn(async (input: string, init?: RequestInit) => {
       if (input.endsWith('/auth/login')) return json({ access_token: 'token' })
-      if (input.endsWith('/vehiculos') && !init?.method) return json(vehicles)
+      if (input.split('?')[0].endsWith('/vehiculos') && !init?.method) return json(vehicles)
       if (input.endsWith('/vehiculos') && init?.method === 'POST') {
         const vehicle = { ...JSON.parse(init.body as string), vehiculo_id: 'v1' }
         vehicles.push(vehicle); return json(vehicle, 201)
@@ -129,7 +148,7 @@ describe('flujos principales', () => {
     vi.stubGlobal('fetch', vi.fn(async (input: string, init?: RequestInit) => {
       if (input.endsWith('/auth/login')) return json({ access_token: 'token' })
       if (input.includes('/clientes?activo=true')) return json([{ cliente_id: 'c1', nombre: 'Cliente de ejemplo' }])
-      if (input.endsWith('/pedidos') && !init?.method) return json(orders)
+      if (input.split('?')[0].endsWith('/pedidos') && !init?.method) return json(orders)
       if (input.endsWith('/pedidos') && init?.method === 'POST') {
         const order = { ...JSON.parse(init.body as string), pedido_id: 'p1', estado: 'PENDIENTE' }
         orders.push(order); return json(order, 201)

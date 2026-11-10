@@ -1,7 +1,9 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { api, type Vehicle } from '../api'
 import type { Notice } from '../types'
 import { NoticeBox } from '../components/common/StatusMessage'
+import { Pagination } from '../components/common/Pagination'
+import { usePagedList } from '../hooks/usePagedList'
 import { PageIntro } from '../components/common/PageIntro'
 import { VehicleFormView } from '../forms/VehicleForm'
 
@@ -12,17 +14,13 @@ const emptyVehicle: VehicleForm = {
 }
 
 export function VehiclesPage({ token }: { token: string }) {
-  const [items, setItems] = useState<Vehicle[]>([])
   const [form, setForm] = useState<VehicleForm>(emptyVehicle)
   const [editing, setEditing] = useState<string | null>(null)
   const [notice, setNotice] = useState<Notice>(null)
   const [busy, setBusy] = useState(false)
 
-  async function load() {
-    try { setItems(await api<Vehicle[]>('/vehiculos', token)) }
-    catch (error) { setNotice({ text: (error as Error).message, error: true }) }
-  }
-  useEffect(() => { void load() }, [token])
+  const list = usePagedList<Vehicle>('/vehiculos', token, text => setNotice({ text, error: true }))
+  const { items, reload: load } = list
 
   function set<K extends keyof VehicleForm>(key: K, value: VehicleForm[K]) {
     setForm(current => ({ ...current, [key]: value }))
@@ -53,7 +51,7 @@ export function VehiclesPage({ token }: { token: string }) {
     <div className="split"><div className="panel">
       <p className="panel-label">FLOTA / FORMULARIO</p><h2>{editing ? 'Editar vehículo' : 'Registrar vehículo'}</h2><p className="panel-description">Datos que identifican y describen la capacidad de cada unidad.</p>
       <VehicleFormView form={form} editing={editing} busy={busy} set={set} submit={submit} onCancel={() => { setEditing(null); setForm(emptyVehicle) }} />
-    </div><div className="panel"><p className="panel-label">FLOTA / REGISTROS</p><div className="panel-heading"><h2>Flota registrada</h2><span className="count-pill">{items.length}</span></div>
+    </div><div className="panel"><p className="panel-label">FLOTA / REGISTROS</p><div className="panel-heading"><h2>Flota registrada</h2><span className="count-pill">{list.total}</span></div>
       {items.length === 0 ? <p className="empty-state">No existen vehículos registrados.</p> : <ul className="cards">
         {items.map(item => <li key={item.vehiculo_id}><div className="card-heading"><strong>{item.placa}</strong><span className="badge" data-state={item.estado}>{item.estado}</span></div>
           <p className="card-subtitle">{item.marca} · {item.modelo}</p><p className="card-detail"><span>{item.capacidad_kg} kg</span><span>{item.capacidad_m3} m³</span></p>
@@ -61,6 +59,7 @@ export function VehiclesPage({ token }: { token: string }) {
             {item.estado !== 'INACTIVO' && <button type="button" className="danger" onClick={() => void deactivate(item)}>Desactivar</button>}
           </div></li>)}
       </ul>}
+      <Pagination page={list.page} pages={list.pages} total={list.total} label="vehículos" onChange={list.setPage} />
     </div></div>
   </section>
 }
