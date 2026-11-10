@@ -3,11 +3,10 @@ from uuid import UUID
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.api.pagination import Page, PageParams, fetch, page_params
+from app.api.pagination import Page, PageParams, page_params
 from app.core.security import require_read, require_write
 from app.db.session import get_db
 from app.models import User
-from app.repositories import orders as repo
 from app.schemas.operations import OrderInput, OrderOut, OrderState
 from app.services import orders as service
 
@@ -21,7 +20,7 @@ def create(data: OrderInput, db: Session = Depends(get_db), user: User = Depends
 
 @router.get("", response_model=list[OrderOut] | Page[OrderOut])
 def list_all(estado: OrderState | None = None, params: PageParams = Depends(page_params), db: Session = Depends(get_db), user: User = Depends(require_read)):
-    return fetch(db, repo.list_query(estado), params)
+    return service.list_all(db, params, estado)
 
 
 @router.get("/{order_id}", response_model=OrderOut)

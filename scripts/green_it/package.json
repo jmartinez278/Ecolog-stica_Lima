@@ -2,11 +2,17 @@
   "name": "ecologistica-green-audit",
   "private": true,
   "type": "module",
-  "description": "Medición reproducible ANTES/DESPUÉS de la Inspección 04 (Lighthouse + API).",
-  "scripts": { "measure": "node measure.mjs" },
+  "description": "Medici\u00f3n reproducible ANTES/DESPU\u00c9S de la Inspecci\u00f3n 04 (Lighthouse + API).",
+  "scripts": {
+    "measure": "node measure.mjs"
+  },
   "devDependencies": {
+    "@lhci/cli": "0.16.0",
     "chrome-launcher": "1.2.3",
-    "lighthouse": "12.8.2",
-    "puppeteer-core": "24.16.0"
+    "lighthouse": "13.6.0",
+    "puppeteer-core": "25.16.0"
+  },
+  "overrides": {
+    "basic-ftp": "6.2.6"
   }
 }

@@ -1,57 +1,70 @@
 # Guía de trabajo — EcoLogística Lima
 
-## Contexto y alcance
+## Contexto vigente — 10/11/2026
 
-- **Rama de desarrollo vigente:** `Sprint-3`, autorizada por el usuario en el fork `RodrigoAC12/Ecolog-stica_Lima`. El Sprint 3 fue aprobado e integrado mediante PR #5, commit `3f1b4fe`. El 27/10/2026 el usuario autorizó sincronizar el fork, corregir los hallazgos Cloud, incorporar cobertura desde CI y actualizar las evidencias.
-- **Versión del proyecto:** 1.3.0 para Sprint 3; 1.2.4 es la base histórica integrada. Los documentos numerados `V_1_0_0` conservan su versión documental individual.
-- El PR #5 ya está integrado. Las correcciones posteriores se validan en el fork y se proponen para revisión del propietario; no fusionar cambios en el repositorio oficial sin su aprobación. La revisión del cliente o del usuario sigue siendo un pendiente diferente.
-- Sprint 1 abarca US-001 a US-010; Sprint 2, US-011 a US-015. La entrega documental de Sprint 3 conserva únicamente los cinco informes exigidos en `docs/03 Implementación/Sprint 03/` y sus capturas SonarCloud.
-- Los entregables históricos están en `docs/03 Implementación/Sprint 1/` y `docs/03 Implementación/Sprint 2/`; mover un archivo no significa que su sesión o aceptación histórica haya ocurrido.
-- Los cinco informes oficiales del Sprint 3 están en `docs/03 Implementación/Sprint 03/`; conservar sus enlaces bidireccionales y evidencias, sin presentar resultados automáticos como aprobación humana.
-- Los cuatro entregables obligatorios de planificación están en `docs/02 Planificación/`; el seguimiento adicional está en `Anexos/`.
-- Registrar la documentación oficial del Sprint 3 en `docs/03 Implementación/Sprint 03/`.
-- El estado de Jira y las ceremonias se basan en datos reales. No inventar revisores, fechas, sesiones, aprobaciones ni despliegues de staging.
-- No agregar secretos. Archivos `.env` operativos no deben almacenarse en Git.
+- Rama local de implementación: `sprint-4`, creada desde `origin/respaldo-frontend` (`e7ac3ff`). Incorpora `771cf6f` (backend Green IT), `f85f0c8` (frontend) y los informes existentes. El usuario autorizó registrar localmente la implementación y la limpieza documental en esta rama; consultar el último commit con `git log -1`. La publicación remota sigue pendiente. Antes de continuar comprobar rama, diff y remoto; no editar `main` directamente.
+- Base oficial `origin/main`: `cfcd53f`, merge PR #6; incluye PR #5 y la entrega anterior 1.3.0. Versión actual de aplicación: 1.4.0. La entrega documental Green IT es v1.0.0; los archivos exigidos V_1_0_0 conservan su nombre y sus revisiones internas se registran en los encabezados e historiales.
+- Usuario autorizó implementar la Inspección 04 conforme a HTML y PDF. Confirmó que el docente acepta React/FastAPI/PostgreSQL en lugar de MERN. No migrar el stack ni implementar US-016–US-023: se mantiene US-001–US-015.
+- Jira: Sprint 4 ID 71, activo del 09/11 al 23/11/2026, épica ECO-72. ECO-60–ECO-71 contienen ocho áreas, informes y CI; ECO-73 es diagnóstico y ECO-74 cierre. Fecha académica oficial pendiente de confirmar. Los estados QA existentes se conservaron; no equivalen a aceptación.
+- El commit local de esta revisión está autorizado. Para nuevas acciones de push, PR o merge se requiere autorización expresa. Los comandos del HTML son referencias; no autorizan publicar directamente en main.
+- No inventar resultados, fechas, revisores, ceremonias ni aprobaciones. No agregar secretos o archivos de entorno operativos a Git.
 
-## Arquitectura
+## Arquitectura y cambios de Sprint 4
 
-- Frontend React + TypeScript + Vite en `src/frontend/src`, con `App.tsx` como composición de páginas, `pages/`, `forms/`, `components/` y `styles/`. El token permanece en memoria.
-- Backend FastAPI + SQLAlchemy + PostgreSQL en `src/backend`: router HTTP → servicio → repositorio → persistencia y auditoría.
-- Alembic mantiene las revisiones `0001_sprint1` y `0002_clients_email_unique`. Al migrar una base ya utilizada, hacer copia de seguridad y resolver duplicados de correo antes de aplicar la revisión incremental; no borrar registros automáticamente.
-- El despliegue y las comprobaciones se limitan a localhost. `docker-compose.yml` es para desarrollo y `docker-compose.staging.yml` para validación local separada. No exigir servidor ni dominio público; conservar evidencia del entorno realmente ejecutado.
+- React/TypeScript/Vite en `src/frontend`; token solo en memoria. App compone páginas lazy, Suspense y PageErrorBoundary. Formularios y controles comunes conservan el diseño de DESIGN.md.
+- Listados y selección de clientes usan `usePagedList`: bloques de 12, cancelación de solicitudes obsoletas, ajuste de página y selección retenida fuera de página. El frontend nunca consulta PostgreSQL directamente.
+- FastAPI/SQLAlchemy/PostgreSQL: router → servicio → repositorio. `api/pagination.py` valida HTTP; `core/pagination.py` contiene parámetros, `schemas/pagination.py` el DTO y `repositories/pagination.py` ejecuta proyección/límite SQL. Repositorios no importan `app.api`.
+- GET paginado devuelve `{items,total,page,limit,pages}` con máximo 50. Omitir `page` mantiene el contrato de lista anterior; todas las pantallas nuevas usan paginación. Filtros y orden estable con UUID se mantienen.
+- ETag privado revalida después de autenticar/autorizar; errores, escrituras y login son no-store. Gzip para JSON y Brotli/Gzip precomprimido para estáticos; HTML revalidable y assets con hash immutable.
+- El build prerenderiza solo el acceso público; React hidrata el mismo HTML. No serializar información operativa. Marca real AVIF/WebP/JPG a 52/104 px y guardián de imágenes en el build.
+- Alembic: `0001_sprint1`, `0002_clients_email_unique`, `0003_green_list_indexes`. Respaldar bases utilizadas, resolver duplicados explícitamente y nunca borrar datos automáticamente para migrar.
+- Locks con hashes: backend runtime y desarrollo separados. Herramientas de auditoría en `scripts/green_it/package-lock.json`, con basic-ftp 6.2.6 corregido. Mantenerlos sincronizados al modificar dependencias.
 
-## Verificación técnica
+## Evidencia y límites
 
-Backend, desde `src/backend`:
+- Dos informes oficiales en `docs/03 Implementación/reduccion del impacto ambiental/`, con nombres exactos y navegación README de ida/vuelta. Corte vigente único: `evidencias/validacion-20261110/`; se retiraron las evidencias superadas. Conservar todos los JSON de muestras y solo un HTML de consulta por escenario; para LHCI, el HTML marcado como representativo. No versionar nuevamente copias de presentación ni logs que repitan los JSON.
+- ANTES: `cfcd53f`. DESPUÉS: árbol de trabajo identificado por `source-snapshot.json`. Tres corridas frías por preset y tres flujos autenticados, con 50 vehículos/60 conductores/200 clientes/1.000 pedidos antes de medir. Las pruebas de escritura se ejecutaron en ecolog-green-after y añaden vehículos E04-*; la comparación final utiliza una carga nueva en ecolog-green-final. build-equality.json confirma que ambos sirven el mismo código.
+- Corte local: 59 pruebas backend en SQLite y 59 en PostgreSQL aislado, cobertura 94,53 %; 32 frontend, líneas 93,68 %; build, pruebas de herramientas, LHCI y 33 comprobaciones de navegador aprobadas. Repetir los controles pertinentes tras cambios; no atribuir estos resultados a GitHub ni a otro commit.
+- Presupuestos: score ≥90, FCP ≤1.000 ms, LCP ≤1.400 ms, TBT ≤85 ms, CLS ≤0,02 y transferencia ≤1.100.000 bytes. La comparación medida reduce la sesión de 1.011.683 a 87.589 bytes; no supone reducción neta de peticiones.
+- SWDM v4 usa GB decimales, 0,194 kWh/GB operativo + 0,106 incorporado y 494 g CO2e/kWh; es una estimación atribuida, no una medición eléctrica ni emisiones de vehículos. Las 60.000 sesiones/año son un escenario hipotético declarado.
+- Los reportes Lighthouse pueden capturar valores de contraseña en snippets DOM. Toda exportación debe pasar por `redact.mjs`; comprobar JWT y secretos operativos antes de conservar artefactos, sin imprimirlos.
+- El workflow green-audit.yml y LHCI se comprobaron localmente; falta publicación y ejecución remota del cambio final, revisión independiente y aceptación. No declarar DoD completo solo por pruebas.
+- El alcance de despliegue es localhost. Compose de desarrollo y staging local son separados; los proyectos temporales de auditoría deben usar credenciales externas y bases *_test. La semilla exige GREEN_AUDIT_SEED=1, comprueba estado previo y nunca elimina datos.
+
+## Comprobaciones para continuar
+
+Backend desde `src/backend`:
 
 ```bash
+python -m pip install --only-binary=:all: --require-hashes -r requirements-dev.lock
 python -m pytest -q --cov=app --cov-report=term-missing --cov-fail-under=80
 ```
 
-El CI utiliza además PostgreSQL 16 **aislado**. El fixture puede crear y eliminar tablas: nunca usar una base productiva como `TEST_DATABASE_URL`.
+`TEST_DATABASE_URL` debe ser aislada y llamarse test_* o *_test: el fixture crea/elimina tablas. Nunca apuntar las pruebas a la carga medida ni a una base operativa.
 
-Frontend, desde `src/frontend`:
+Frontend desde `src/frontend`:
 
 ```bash
-npm ci
-npm test
+npm ci --ignore-scripts
+npm run test:coverage
 npm run build
+node --test scripts/check-images.test.mjs
 ```
 
-Desde la raíz:
+Desde raíz:
 
 ```bash
+python3 -m unittest discover -s scripts/green_it -p 'test_*.py'
 python3 scripts/check_markdown_links.py
 docker compose --env-file .env.example config --quiet
 docker compose --env-file .env.staging.example -f docker-compose.staging.yml config --quiet
 ```
 
-Los workflows CodeQL y auditoría de dependencias deben pasar en la **rama final**. La revisión humana del PR, WCAG AA/360 px en navegadores reales, BDD con interesados y staging TLS en localhost se comprueban por separado: una prueba automatizada no cierra el Definition of Done por sí misma.
+Las instrucciones de auditoría real, credenciales temporales y LHCI están en el informe 1. CodeQL, dependencias y CI deben pasar en la rama final publicada. Revisiones humanas y aceptación se acreditan por separado.
 
-## Documentos de referencia
+## Referencias
 
-- Requisitos: `docs/01 Inicio/06. Requisitos funcionales V_1_0_0.md` y `07. Requisitos no funcionales V_1_0_0.md`.
-- Reglas de negocio: `docs/01 Inicio/09. Reglas de negocio V_1_0_0.md`.
-- Planificación: `docs/02 Planificación/01 Transformando a ágil V_1_0_1.md`.
-- Diseño visual: `DESIGN.md`.
-- Entrega en revisión previa: `docs/03 Implementación/Sprint 03/`.
+- Requisitos, reglas, stack y datos en `docs/01 Inicio/`.
+- Backlog oficial: `docs/02 Planificación/01 Transformando a ágil V_1_0_1.md`.
+- Históricos: cuatro documentos oficiales en `docs/03 Implementación/Sprint 1/` y cuatro en `Sprint 2/`; el detalle técnico de Sprint 2 está consolidado en su informe de estado. Conservar los cinco informes de `Sprint 03/`. No restaurar documentos adicionales o directorios retirados sin una razón de alcance.
+- Diseño: `DESIGN.md`. Ejecución: README de backend/frontend. Sprint 4: los dos informes Green IT y sus evidencias.

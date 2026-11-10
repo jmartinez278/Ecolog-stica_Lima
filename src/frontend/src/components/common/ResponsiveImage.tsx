@@ -8,13 +8,18 @@ export type ResponsiveImageProps = {
   width: number
   height: number
   priority?: boolean
+  widths?: number[]
+  sizes?: string
 }
 
-export function ResponsiveImage({ base, alt, width, height, priority = false }: ResponsiveImageProps) {
+export function ResponsiveImage({ base, alt, width, height, priority = false, widths, sizes }: ResponsiveImageProps) {
+  const srcSet = (extension: string) => widths
+    ? widths.map(value => `${base}-${value}.${extension} ${value}w`).join(', ')
+    : `${base}.${extension}`
   return <picture>
-    <source srcSet={`${base}.avif`} type="image/avif" />
-    <source srcSet={`${base}.webp`} type="image/webp" />
-    <img src={`${base}.jpg`} alt={alt} width={width} height={height}
+    <source srcSet={srcSet('avif')} sizes={sizes} type="image/avif" />
+    <source srcSet={srcSet('webp')} sizes={sizes} type="image/webp" />
+    <img src={widths ? `${base}-${widths[0]}.jpg` : `${base}.jpg`} srcSet={widths ? srcSet('jpg') : undefined} sizes={sizes} alt={alt} width={width} height={height}
       loading={priority ? 'eager' : 'lazy'} decoding="async" fetchPriority={priority ? 'high' : 'auto'} />
   </picture>
 }

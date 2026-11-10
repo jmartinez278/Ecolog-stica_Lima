@@ -1,3 +1,5 @@
+from app.core.pagination import PageParams
+from app.repositories.pagination import fetch
 from uuid import UUID, uuid4
 
 from fastapi import HTTPException
@@ -50,3 +52,7 @@ def cancel(db: Session, user: User, order_id: UUID) -> Order:
     order.estado = "CANCELADO"
     commit_change(db, user, order, "PEDIDO", "CANCELAR", order_id)
     return order
+
+
+def list_all(db: Session, params: PageParams, value: str | None = None) -> list[dict] | dict:
+    return fetch(db, repo.list_query(value), params)

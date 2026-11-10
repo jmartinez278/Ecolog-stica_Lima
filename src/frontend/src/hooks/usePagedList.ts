@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '../api'
 
 // Green IT (Inspección 04): los listados piden bloques de 12 registros en lugar de la colección completa.
@@ -17,16 +17,33 @@ export function toPage<T>(body: PageResult<T> | T[], page: number): PageResult<T
 }
 
 export function usePagedList<T>(path: string, token: string, onError: (message: string) => void) {
-  const [page, setPage] = useState(1)
-  const [result, setResult] = useState<PageResult<T>>({ items: [], total: 0, page: 1, limit: PAGE_SIZE, pages: 0 })
-  useEffect(() => { setPage(1) }, [path])
-  const load = useCallback(async () => {
-    try {
-      const body = toPage(await api<PageResult<T> | T[]>(pagedPath(path, page), token), page)
-      if (body.pages > 0 && page > body.pages) { setPage(body.pages); return }
-      setResult(body)
-    } catch (error) { onError((error as Error).message) }
-  }, [path, page, token])
-  useEffect(() => { void load() }, [load])
-  return { ...result, page, setPage, reload: load }
+  const scope = `${token}\0${path}`
+  const [position, setPosition] = useState({ scope, page: 1 })
+  const page = position.scope === scope ? position.page : 1
+  const [revision, setRevision] = useState(0)
+  const errorHandler = useRef(onError)
+  errorHandler.current = onError
+  const [response, setResponse] = useState<{ scope: string; page: number; body: PageResult<T> } | null>(null)
+  const [pending, setPending] = useState(false)
+  const setPage = useCallback((value: number) => setPosition({ scope, page: Math.max(1, value) }), [scope])
+  const reload = useCallback(() => setRevision(value => value + 1), [])
+  useEffect(() => {
+    const controller = new AbortController()
+    let active = true
+    setPending(true)
+    void api<PageResult<T> | T[]>(pagedPath(path, page), token, { signal: controller.signal })
+      .then(data => {
+        if (!active) return
+        const body = toPage(data, page)
+        const last = Math.max(1, body.pages)
+        if (page > last) { setPage(last); return }
+        setResponse({ scope, page, body })
+      })
+      .catch(error => { if (active) errorHandler.current((error as Error).message) })
+      .finally(() => { if (active) setPending(false) })
+    return () => { active = false; controller.abort() }
+  }, [path, token, scope, page, revision, setPage])
+  const result = response?.scope === scope && response.page === page
+    ? response.body : { items: [], total: 0, page, limit: PAGE_SIZE, pages: 0 }
+  return { ...result, page, setPage, reload, loading: pending }
 }

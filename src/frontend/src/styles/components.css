@@ -81,3 +81,6 @@
 .pagination button { min-height: 44px; padding: .55rem 1rem; font-family: inherit; font-size: .9rem; font-weight: 800; color: #edf8f1; background: #2b3535; border: 1px solid #637473; cursor: pointer; }
 .pagination button:hover:not(:disabled) { background: #3a4847; }
 .pagination button:disabled { opacity: .45; cursor: not-allowed; }
+
+.login-emblem picture, .login-emblem img { display: block; width: 52px; height: 52px; }
+.client-picker { min-width: 0; }

@@ -6,7 +6,7 @@
 
 **Líder del Proyecto:** Marco Jhair Martinez Llanos (según el acta de constitución)
 
-**Sprint:** ECO Sprint 2 · **Fecha de corte:** 06/10/2026 (Lima) · **Versión interna del documento:** 1.0.2
+**Sprint:** ECO Sprint 2 · **Fecha de corte:** 06/10/2026 (Lima) · **Versión interna del documento:** 1.0.3
 
 El nombre del archivo conserva `V_1_0_0` porque la consigna exige ese nombre exacto; las revisiones se identifican en este encabezado y en el historial.
 
@@ -51,6 +51,37 @@ El PR #1 acredita la integración en `main`; no se verificó una aprobación de 
 | US-015 | `PUT /api/v1/clientes/{id}` | Actualiza contacto, preferencias, restricciones y estado; rechaza correo inválido o duplicado. | `test_client_registration_query_and_update`, `test_client_rejections_and_filters` |
 
 Las rutas usan permisos de lectura o escritura mediante dependencias de FastAPI; las mutaciones pasan por `commit_change`, que persiste entidad y auditoría en una transacción. Los modelos SQLAlchemy `conductores` y `clientes` ya existían en la base del Sprint 1: este incremento no añadió una migración. Los pedidos conservan la comprobación de `cliente_id` activo. Los archivos citados se encuentran bajo `src/backend/app/` y `src/backend/tests/`; las acciones de la interfaz están en `src/frontend/src/App.tsx` y el cliente HTTP en `src/frontend/src/api.ts`. La API documenta sus rutas en `/docs` y `/openapi.json`. Para repetir la suite: desde `src/backend`, ejecutar `python -m pytest -q --cov=app --cov-report=term --cov-fail-under=80`; usar una base de prueba aislada si se configura `TEST_DATABASE_URL` para PostgreSQL.
+
+### Alcance funcional y trazabilidad técnica consolidados
+
+El Sprint 2 comprometió **15 Story Points**: US-011 (3), US-012 (2), US-013 (5), US-014 (2) y US-015 (3). El objetivo fue completar la gestión de conductores y clientes para futuras planificaciones; estos valores corresponden al registro histórico del 06/10/2026 y no a una reestimación actual.
+
+- **Conductores:** actualizar nombres, apellidos, licencia, categoría, teléfono, experiencia y disponibilidad; conservar la licencia del propio registro sin detectarla como duplicada. La desactivación se realiza por la acción específica, con rechazo de conductores asignados, inactivos y de la inactivación por actualización general.
+- **Clientes:** registrar y actualizar contacto, correo, preferencias, restricciones y estado; normalizar campos opcionales y correo. Los pedidos mantienen selección exclusiva de clientes activos. Se admiten lista, ficha y filtro por activos/inactivos.
+- **Interfaz:** incorporar Clientes al inicio y navegación, formularios y tarjetas de condiciones de entrega; filtrar activos, editar y desactivar conductores. El token permanece en memoria.
+- **Integridad:** reutilizar `commit_change` para entidad y auditoría; auditar operaciones fallidas. No se requirió una migración de esquema en este incremento porque las tablas y campos ya existían.
+
+Los puntos de entrada históricos son `src/backend/app/api/drivers.py`, `services/drivers.py`, `api/clients.py`, `services/clients.py`, `repositories/clients.py`, `schemas/operations.py` y `main.py`; la interfaz de ese corte se encontraba en `src/frontend/src/App.tsx` y `api.ts`. Los módulos posteriores pueden reorganizar estos archivos; los datos de esta sección describen el corte del Sprint 2.
+
+Los casos críticos comprenden actualización válida, datos inválidos, licencia duplicada, ID inexistente, conservación del estado, conductor asignado/inactivo, nombre requerido, correo inválido/duplicado, ficha inexistente y filtros. Se conservan en `src/backend/tests/test_drivers.py` y `test_clients.py`, con recorridos de interfaz en `src/frontend/src/App.test.tsx`.
+
+### Reproducción y publicación del corte histórico
+
+```bash
+# Desde src/backend, con una base de prueba aislada:
+python -m pytest -q --cov=app --cov-report=term-missing --cov-fail-under=80
+# Desde src/frontend:
+npm test
+npm run build
+# Desde la raíz, con variables locales configuradas:
+docker compose up --build -d
+```
+
+El contrato OpenAPI del corte de implementación se identificó como `0.2.0`. En la repetición del 06/10/2026 se verificaron lectura HTTP, login, proxy y suites aisladas; el recorrido de mutaciones HTTP de la entrega inicial no se repitió fuera de esas suites. No se atribuye aquí una nueva ejecución de pruebas históricas.
+
+La publicación técnica se realizó en `sprint-2`, commit `53642da` del 06/10/2026 a las 13:53:08, y se integró mediante [PR #1](https://github.com/jmartinez278/EcoLog-stica-Lima/pull/1) a las 16:23:33 de ese día, hora de Lima. El merge no acredita revisión por pares ni aceptación, según los resultados y pendientes ya registrados en este informe.
+
+La revisión documental del 10/11/2026 consolida aquí el contenido único del anterior informe adicional de implementación; sus comprobaciones y fechas originales se mantienen como antecedentes. La matriz siguiente es la referencia única del DoD del corte.
 
 ## Seguimiento del Definition of Done
 
@@ -102,3 +133,4 @@ El [registro de impedimentos](<02 Registro de Impedimentos V_1_0_0.md>) document
 | 1.0.0 | 06/10/2026 | Informe inicial del Sprint 2 con avance técnico, estado real de Jira, comprobaciones y pendientes de aceptación. |
 | 1.0.1 | 06/10/2026 | DoD como criterio único de cierre, detalle técnico por historia, matriz de evidencia y calendario exacto de Jira frente a fechas comprobadas. |
 | 1.0.2 | 06/10/2026 | Verificación local con Docker, PostgreSQL aislado, frontend y API; actualización de las cinco tarjetas a revisión en Jira. |
+| 1.0.3 | 10/11/2026 | Consolidación del informe adicional de implementación en este documento; conservación de alcance, pruebas y publicación históricos, sin repetir datos en otro archivo. |

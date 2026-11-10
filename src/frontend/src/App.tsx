@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import type { Page } from './types'
 import { LoginPage } from './pages/LoginPage'
 import { AppHeader } from './components/layout/AppHeader'
+import { PageErrorBoundary } from './components/common/PageErrorBoundary'
 
 // Green IT (Inspección 04): solo el acceso viaja en el bundle inicial; cada pantalla
 // autenticada se descarga bajo demanda la primera vez que se abre.
@@ -29,13 +30,13 @@ export function App() {
     <a className="skip-link" href="#main-content">Saltar al contenido</a>
     <AppHeader page={page} navigate={navigate} onLogout={() => {setToken(''); setPage('Inicio')}} />
     <main key={page} id="main-content" aria-label={page} tabIndex={-1} className="content">
-      <Suspense fallback={<p className="loading" role="status">Cargando…</p>}>
+      <PageErrorBoundary><Suspense fallback={<p className="loading" role="status">Cargando…</p>}>
       {page === 'Inicio' && <HomePage onNavigate={navigate} />}
       {page === 'Vehículos' && <VehiclesPage token={token} />}
       {page === 'Pedidos' && <OrdersPage token={token} />}
       {page === 'Conductores' && <DriversPage token={token} />}
       {page === 'Clientes' && <ClientsPage token={token} />}
-      </Suspense>
+      </Suspense></PageErrorBoundary>
     </main>
   </div>
 }

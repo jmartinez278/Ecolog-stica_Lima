@@ -1,0 +1,15 @@
+{
+  "platform": "Linux",
+  "release": "6.18.33.2-microsoft-standard-WSL2",
+  "architecture": "x86_64",
+  "cpu": "12th Gen Intel(R) Core(TM) i7-12650H",
+  "logical_cpus": 3,
+  "node_audit": "v26.10.0",
+  "chrome": "Google Chrome for Testing 156.0.8078.4",
+  "measurement_projects": [
+    "ecolog-green-before",
+    "ecolog-green-final"
+  ],
+  "functional_verification_project": "ecolog-green-after",
+  "notes": "Las comprobaciones funcionales y axe se ejecutaron sobre el mismo build en el proyecto after; sus escrituras no forman parte de la carga nueva final. La capacidad del host es compartida; no se mide consumo el\u00e9ctrico."
+}

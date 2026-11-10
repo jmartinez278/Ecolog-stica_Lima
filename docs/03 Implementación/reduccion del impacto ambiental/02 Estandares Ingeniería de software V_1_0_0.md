@@ -1,115 +1,143 @@
-[← Volver al README](../../../README.md) · [Informe de reducción del impacto ambiental](<01 Informe de reduccion del impacto ambiental V_1_0_0.md>)
+[← Volver al README](../../../README.md) · [Informe ambiental y comparativos](<01 Informe de reduccion del impacto ambiental V_1_0_0.md>)
 
-# Estándares de Ingeniería de Software y Guía de Desarrollo Verde
+# Estándares de ingeniería de software y guía de desarrollo verde
 
-**Nombre del Proyecto:** EcoLogística Lima<br>
-**Líder del Proyecto:** Marco Jhair Martinez Llanos<br>
-**Entrega:** Inspección 04 — Reducción del impacto ambiental y estándares de ingeniería de software<br>
-**Versión del documento:** V_1_0_0 · **Versión semántica de la entrega:** v1.0.0<br>
-**Stack:** React 19 + TypeScript + Vite · FastAPI + SQLAlchemy 2 · PostgreSQL 16 · Caddy 2<br>
-**Fecha de actualización:** 10/11/2026
+**Proyecto:** EcoLogística Lima · **Líder:** Marco Jhair Martinez Llanos<br>
+**Entrega:** Sprint 4 / Inspección 04 · **Versión de entrega:** v1.0.0<br>
+**Revisión documental:** V_1_0_1; se conserva el nombre V_1_0_0 exigido<br>
+**Aplicación:** 1.4.0 · **Actualizado:** 10/11/2026
 
-## 1. Propósito y alcance
+## 1. Alcance y fundamento
 
-Este documento fundamenta las ocho optimizaciones descritas en el [informe de reducción del impacto ambiental](<01 Informe de reduccion del impacto ambiental V_1_0_0.md>) en tres marcos de referencia. El primero es la norma de calidad de producto ISO/IEC 25010. El segundo son los principios de la Green Software Foundation (GSF). El tercero son las W3C Web Sustainability Guidelines (WSG 1.0). Además, define las reglas de desarrollo verde que el equipo aplicará en adelante en backend y frontend.
+Esta guía relaciona las ocho áreas implementadas con calidad, sostenibilidad y reglas de desarrollo verificables. El [informe ambiental](<01 Informe de reduccion del impacto ambiental V_1_0_0.md>) conserva el diagnóstico, el código ANTES/DESPUÉS y la medición. Los criterios de la rúbrica son presupuestos de aceptación técnica, no resultados tomados del ejemplo HTML.
 
-La consigna se redactó para el stack MERN. EcoLogística Lima no usa MongoDB, Express ni Node.js en el servidor, por lo que cada optimización se implementa con su **equivalente técnico real** en el stack del proyecto. La correspondencia se detalla en la sección 1.4 del informe.
+El docente acepta React/TypeScript/Vite, FastAPI/SQLAlchemy, PostgreSQL y Docker según confirmación del usuario el 10/11/2026. Las equivalencias son: proyección y lecturas de filas por `.select()`/`.lean()`; índices PostgreSQL por índices MongoDB; middleware FastAPI/Caddy por Express; revalidación HTTP nativa por caché React Query. El navegador accede a la API y conserva Router → Service → Repository → PostgreSQL.
 
-## 2. Relación de estándares internacionales aplicados
+## 2. Estándares y aplicación razonada
 
-### 2.1 ISO/IEC 25010 — Modelo de calidad del producto de software
+### 2.1 ISO/IEC 25010:2023
 
-| Característica | Subcaracterística | Cómo se evidencia en EcoLogística Lima |
+Se adopta la edición 2023 del [modelo de calidad de producto ISO/IEC 25010](https://www.iso.org/standard/78176.html). El siguiente es un mapeo de ingeniería de las decisiones, no una declaración de certificación.
+
+| Característica y subcaracterística | Decisión y justificación | Comprobación |
 |---|---|---|
-| Eficiencia de desempeño | Comportamiento temporal | La primera página de pedidos pasa de *Seq Scan + Sort* (0,609 ms) a *Index Scan* (0,028 ms) en PostgreSQL. El FCP móvil se reduce según la tabla comparativa del informe. |
-| Eficiencia de desempeño | Utilización de recursos | Hay menos bytes por sesión gracias a la paginación, la compresión y el 304. No se crean objetos ORM en los listados. La imagen de ejecución lleva 10 paquetes Python menos. |
-| Eficiencia de desempeño | Capacidad | El tamaño de respuesta queda acotado (máximo 50 registros por página), con independencia del volumen de pedidos almacenado. |
-| Mantenibilidad | Modularidad | `app/api/pagination.py` y `app/core/http_cache.py` son módulos únicos reutilizados por los cuatro listados. El frontend se divide en fragmentos cargados bajo demanda. |
-| Mantenibilidad | Reusabilidad | `projected_columns()` y `fetch()` se aplican a cualquier entidad con su esquema de salida. |
-| Mantenibilidad | Analizabilidad | Las dependencias de ejecución (`requirements.lock`) están separadas de las de prueba (`requirements-dev.lock`). Hay presupuestos explícitos en `lighthouserc.json`. |
-| Mantenibilidad | Capacidad de ser probado | 13 pruebas nuevas en `tests/test_green_it.py` (paginación, ETag/304, compresión y validación de parámetros). Los módulos nuevos tienen 100 % de cobertura. |
-| Compatibilidad | Coexistencia | Sin `?page=` la API conserva el contrato anterior (lista completa), por lo que los clientes previos no se rompen. |
+| Eficiencia de desempeño: comportamiento temporal | Índices alineados con orden/filtro y acceso público prerenderizado reducen trabajo o espera evitable. | Planes SQL y FCP/LCP/TBT; informar también cambios sin mejora. |
+| Eficiencia de desempeño: utilización de recursos | Filas ligeras, páginas acotadas, compresión y validadores reducen materialización y transferencia. | Bytes lógicos/transferidos, inventario de paquetes y 304; CPU/energía física no se infieren del score. |
+| Eficiencia de desempeño: capacidad | La interfaz solicita 12 registros con máximo de 50 por página; permite operar con 1.000 pedidos sin entregar toda la colección en cada vista. | Volumen idéntico antes/después y pruebas de límites/filtros. No equivale a una prueba de concurrencia. |
+| Mantenibilidad: modularidad y reutilización | Parámetros HTTP, DTO, servicio y ejecución SQL están separados; hook y controles comunes evitan repetir paginación. | Imports de repositorios sin dependencia de `app.api`; revisión de capas y pruebas compartidas. |
+| Mantenibilidad: analizabilidad | Locks separados, manifiesto de fuentes, presupuestos y artefactos permiten identificar qué se evaluó. | Fuente SHA-256, configuración de herramientas y comandos reproducibles. |
+| Mantenibilidad: capacidad de prueba y modificación | Casos de regresión, errores, carreras de red y autorización condicional permiten cambiar módulos conservando reglas. | 59 pruebas backend por motor, 32 frontend y pruebas de herramientas. |
 
-### 2.2 Principios de la Green Software Foundation
+### 2.2 Principios de Green Software Foundation
 
-| Principio | Definición operativa | Aplicación en el proyecto |
+La [formación oficial de GSF](https://greensoftware.foundation/education/) incluye eficiencia de carbono, energía, hardware, conciencia de carbono, medición y compromisos climáticos. Se desarrollan los cuatro primeros ejes que solicita esta entrega; no se afirma que sean los únicos principios de la fundación.
+
+| Eje | Aplicación concreta | Límite y criterio de revisión |
 |---|---|---|
-| Eficiencia de carbono | Emitir la menor cantidad de carbono por unidad de trabajo útil. | Se miden los gramos de CO2e por sesión de operador con SWDM v4 y se reducen en el porcentaje indicado en el informe. |
-| Eficiencia energética | Consumir la menor energía posible por unidad de trabajo. | Hay menos datos transferidos (energía de red y de dispositivo) y menos trabajo de CPU (sin ordenar 1 000 filas ni hidratar objetos). |
-| Eficiencia de hardware | Usar la menor cantidad de hardware incorporado posible. | La imagen del backend es más pequeña, los assets son inmutables y quedan en caché, y el JavaScript inicial es menor, lo que importa en equipos modestos de operadores y conductores. |
-| Conciencia de carbono | Hacer más cuando la energía es más limpia y menos cuando es más sucia. | El trabajo pesado se reduce de forma permanente en lugar de desplazarse. La auditoría LHCI se ejecuta solo en *push* o *pull request*, no de forma programada. Se declara como mejora futura en la sección 5. |
+| Eficiencia de carbono | Comparar emisiones estimadas para una misma sesión funcional, con menos transferencia. | SWDM v4 es estimación; evitar confundirlo con combustible o emisiones físicas medidas. |
+| Eficiencia energética | Reducir filas serializadas, dependencias de ejecución y compresión repetida de estáticos. | Medir coste de CPU/latencia cuando se cambie compresión; menos bytes no prueba por sí solo menor potencia instantánea. |
+| Eficiencia de hardware | Mantener cargas pequeñas y una interfaz utilizable en dispositivos de 360 px, sin ampliar infraestructura para esta escala. | No atribuir prolongación real de vida útil sin estudio; controlar tamaño de imagen, JS y memoria cuando se amplíe el sistema. |
+| Conciencia de carbono | Conservar las operaciones interactivas disponibles y permitir programar auditorías adicionales manuales cuando exista señal verificable de intensidad menor. | No se dispone de señal temporal/regional ni se implementa desplazamiento automático. Se documenta como política condicionada; cancelar ejecuciones obsoletas ahorra trabajo, pero no acredita conciencia de carbono medida. |
 
-La medición se apoya en la idea de la especificación SCI (*Software Carbon Intensity*) de la GSF: expresar las emisiones por unidad funcional. Aquí esa unidad es la **sesión de operador**, que comprende el acceso y la consulta de los cuatro listados.
+La [introducción oficial de GSF](https://learn.greensoftware.foundation/practitioner/introduction/) distingue las acciones de eficiencia energética, hardware y conciencia de carbono. La medición por sesión se inspira en una unidad funcional, pero el cálculo SWDM no se presenta como una certificación ni implementación completa de la [especificación SCI](https://sci.greensoftware.foundation/).
 
-### 2.3 W3C Web Sustainability Guidelines (WSG 1.0)
+### 2.3 W3C Web Sustainability Guidelines
 
-La consigna numera las pautas como 1.2, 2.4 y 3.1. El borrador vigente de la W3C las organiza por categorías: *User Experience Design*, *Web Development*, *Hosting, Infrastructure, and Systems* y *Business Strategy and Product Management*. La tabla relaciona cada referencia de la consigna con el título oficial de la pauta.
+Se fija como referencia verificable la [nota de grupo en borrador del 26/06/2026](https://www.w3.org/TR/2026/DNOTE-web-sustainability-guidelines-20260626/). La consigna usa los identificadores 1.2, 2.4 y 3.1 como etiquetas temáticas. Su numeración no coincide con esta edición; se conserva su intención y se declara el cruce, sin atribuir títulos inventados a W3C.
 
-| Referencia de la consigna | Pauta oficial WSG 1.0 (título) | Aplicación |
+| Etiqueta de la consigna | Tema requerido | Correspondencia en la edición fijada |
 |---|---|---|
-| 1.2 — UI y recursos | *Optimize media to reduce resource use* (UX Design) | Imágenes en WebP/AVIF con `<picture>`, ícono SVG inline y ninguna imagen ráster sin optimizar. |
-| 2.4 — Arquitectura y caché | *Modularize bandwidth-heavy components* (Web Development) y *Optimize caching and support offline access* (Hosting) | `React.lazy`/`Suspense`, ETag con 304 en la API y `Cache-Control: immutable` en los assets con hash. |
-| 3.1 — Red | *Reduce data transfer with compression* (Hosting) y *Use sustainable JavaScript and APIs* (Web Development, criterio *API requests*) | GZip/zstd dinámico, Brotli precomprimido y respuestas que solo incluyen los datos que la vista necesita (paginación y proyección). |
-| Complementarias | *Minify and remove unused code*, *Use dependencies sparingly and maintain them*, *Reduce the number and complexity of database queries*, *Set goals based on performance and energy impact* | Build minificado, dependencias de prueba fuera de la imagen, índices compuestos y presupuestos de Lighthouse en CI. |
+| 1.2 | UI y recursos | 2.11, optimización de medios; variantes, dimensiones y carga apropiada. |
+| 2.4 | Arquitectura y caché | 3.3, modularización; 3.8, recursos no críticos; 4.2, caché. |
+| 3.1 | Transferencia y consultas | 3.20, consultas; 4.3, compresión. El 3.1 oficial se refiere a objetivos de rendimiento e impacto energético. |
+| Complementarias | Dependencias, presupuesto y automatización | 3.4, código innecesario; 3.16, dependencias; 4.6, uso de automatización. |
 
-## 3. Matriz de mapeo directo: optimizaciones frente a estándares
+Estas referencias fundamentan decisiones concretas de los apartados siguientes. No se declara conformidad integral con todas las pautas del borrador.
 
-| # | Optimización aplicada en EcoLogística Lima | ISO/IEC 25010 | Principio GSF | Pauta W3C WSG 1.0 |
-|---|---|---|---|---|
-| 1 | Consultas con proyección de columnas, filas sin hidratación ORM e índices compuestos | Eficiencia de desempeño: utilización de recursos | Eficiencia de hardware | *Reduce the number and complexity of database queries* (3.1 en la consigna) |
-| 2 | Paginación de 12 registros en API y listados React | Eficiencia de desempeño: capacidad | Eficiencia energética | *Use sustainable JavaScript and APIs*, criterio *API requests* (3.1) |
-| 3 | Imágenes WebP/AVIF con `<picture>` y carga diferida | Eficiencia de desempeño: comportamiento temporal | Eficiencia de carbono | *Optimize media to reduce resource use* (1.2) |
-| 4 | Code splitting con `React.lazy` y `Suspense` | Mantenibilidad: modularidad | Eficiencia de hardware | *Modularize bandwidth-heavy components* (2.4) |
-| 5 | Depuración de dependencias (imagen de ejecución sin herramientas de prueba; bundle sin librerías innecesarias) | Mantenibilidad: analizabilidad | Eficiencia energética | *Use dependencies sparingly and maintain them* / *Minify and remove unused code* |
-| 6 | Reducción de peticiones HTTP (SVG inline) | Eficiencia de desempeño: comportamiento temporal | Eficiencia de carbono | *Use sustainable JavaScript and APIs* (3.1) |
-| 7 | Caché: ETag/304 en la API, `immutable` en assets y caché en cliente | Eficiencia de desempeño: comportamiento temporal | Eficiencia energética | *Optimize caching and support offline access* (2.4) |
-| 8 | Compresión: GZip en FastAPI, zstd/gzip en Caddy y Brotli precomprimido | Eficiencia de desempeño: capacidad | Eficiencia de carbono | *Reduce data transfer with compression* (3.1) |
+## 3. Matriz de mapeo directo de las ocho áreas
 
-## 4. Guía de desarrollo verde para EcoLogística Lima
+Las rutas de código se refieren al árbol identificado en el [manifiesto de fuentes](evidencias/validacion-20261110/source-snapshot.json). La evidencia y los ocho comparativos están en el primer informe.
 
-Las reglas se redactan como criterios verificables. Las que tienen control automático lo indican.
+| # | Optimización y código | ISO/IEC 25010 | Eje GSF | WSG de referencia | Regla verificable/evidencia |
+|---|---|---|---|---|---|
+| 1 | Consultas ligeras: [repositorios](../../../src/backend/app/repositories/) e [índices Alembic](../../../src/backend/alembic/versions/0003_green_list_indexes.py) | Utilización de recursos; analizabilidad | Energía y hardware | 3.20 | Proyección DTO, mappings e índice justificado por plan SQL; [planes](evidencias/validacion-20261110/postgres-after.json). |
+| 2 | [Paginación SQL](../../../src/backend/app/repositories/pagination.py), [hook](../../../src/frontend/src/hooks/usePagedList.ts) y [selector](../../../src/frontend/src/components/common/ClientPicker.tsx) | Capacidad; reutilización | Energía | 3.20 y 3.3 | 12 registros en interfaz, máximo 50; filtros/conteo y cliente fuera de página probados. |
+| 3 | [ResponsiveImage](../../../src/frontend/src/components/common/ResponsiveImage.tsx), [marca](../../../src/frontend/public/brand/) y [guardián](../../../src/frontend/scripts/check-images.mjs) | Comportamiento temporal | Carbono y hardware | 2.11 | Picture/AVIF/WebP/srcset/sizes; dimensiones; fallback; archivo ≤200 kB decimales (200.000 bytes). No atribuir ahorro a imágenes inexistentes en ANTES. |
+| 4 | [App](../../../src/frontend/src/App.tsx), [recuperación](../../../src/frontend/src/components/common/PageErrorBoundary.tsx) y [prerender](../../../src/frontend/scripts/prerender.mjs) | Modularidad y comportamiento temporal | Energía y hardware | 3.3 y 3.8 | Chunks reales, carga/errores accesibles; acceso visible sin JS e hidratación comprobada. |
+| 5 | [Lock runtime](../../../src/backend/requirements.lock), [lock dev](../../../src/backend/requirements-dev.lock) y [lock de auditoría](../../../scripts/green_it/package-lock.json) | Analizabilidad; utilización de recursos | Energía y hardware | 3.4 y 3.16 | Instalación con hashes, auditorías y comparación de distribuciones/almacenamiento reales. |
+| 6 | [Favicon SVG inline](../../../src/frontend/index.html) | Comportamiento temporal | Carbono | 3.4 y 4.3 | Evitar petición favicon; contar también la nueva marca y chunks. El total global puede aumentar aunque se elimine una solicitud concreta. |
+| 7 | [ETag](../../../src/backend/app/core/http_cache.py), [cliente HTTP](../../../src/frontend/src/api.ts) y [Caddy](../../../src/frontend/Caddyfile.staging) | Comportamiento temporal; modularidad | Energía | 4.2 | 304 autorizado, private/no-cache, Vary, invalidación; no-store para errores/login/escrituras y assets con hash immutable. |
+| 8 | [Middleware](../../../src/backend/app/main.py) y [precompresión](../../../src/frontend/scripts/precompress.mjs) | Utilización de recursos y capacidad | Carbono y energía | 4.3 | Negociación Gzip/Brotli, contenido equivalente y bytes reales; zstd es complementario. |
 
-### 4.1 Reglas de backend (FastAPI, SQLAlchemy y PostgreSQL)
+## 4. Guía de desarrollo verde y arquitectura
 
-1. **Ningún listado sin límite.** Todo endpoint de colección acepta `page` y `limit`, con 12 por defecto y 50 como máximo. *Control:* pruebas `test_every_list_supports_pagination` y `test_pagination_rejects_invalid_parameters`.
-2. **Proyección explícita.** Los listados se construyen con `select(*projected_columns(Modelo, EsquemaOut))`, no con `select(Modelo)`, y se leen con `.mappings()`. Se prohíbe devolver columnas que el esquema de salida no expone.
-3. **Índice para cada orden de listado.** Si un listado ordena o filtra por columnas nuevas, la migración Alembic que lo introduce crea el índice compuesto correspondiente y se verifica con `EXPLAIN ANALYZE`.
-4. **Compresión y validación condicional activas.** `GZipMiddleware` (≥1 KB) y `ETagMiddleware` no se retiran de `app/main.py`. *Control:* `test_large_json_responses_are_compressed` y `test_etag_returns_304_when_content_is_unchanged`.
-5. **La imagen de ejecución solo contiene lo que se ejecuta.** Las herramientas de prueba van en `requirements-dev.txt`/`requirements-dev.lock`. Las librerías nuevas de producción se justifican en el PR.
+### 4.1 Backend
 
-### 4.2 Reglas de frontend (React, TypeScript y Vite)
+1. El router recibe y valida HTTP; el servicio coordina la operación; el repositorio construye/ejecuta SQL. No importar `app.api` desde repositorios. `PageParams` está en `core`, el DTO `Page` en `schemas` y las utilidades SQL en `repositories`.
+2. Todo listado nuevo debe estar paginado en servidor y toda consulta de la interfaz usar `page/limit`. La ruta de compatibilidad sin `page` de los cuatro recursos existentes conserva contratos anteriores y puede entregar la colección completa; es una excepción explícita, no la política para nuevas pantallas.
+3. Seleccionar columnas de salida y leer mappings en listados. No cargar entidades completas para descartarlas después. Elegir índices por consultas y planes medidos; no crear un índice por cada campo sin justificación de coste/escrituras.
+4. Mantener validación Pydantic, UUID, unicidad, transacciones, auditoría y RBAC. Un ETag conocido nunca elude autorización. Probar 401/403 incluso con `If-None-Match` y después de retirar roles.
+5. Los datos operativos solo se almacenan en caché privada revalidable cuando procede; autenticación, escrituras y errores son `no-store`. No introducir caché compartida de usuarios, tokens o roles. Las mutaciones recargan la lectura y modifican el validador.
+6. Mantener migraciones incrementales. Respaldar bases utilizadas y resolver conflictos explícitamente; los índices Green IT no deben borrar información. Las pruebas destructivas solo usan una base `*_test` independiente.
+7. Separar dependencias runtime/dev y mantener hashes de locks. Ejecutar la auditoría completa al cambiarlos. No retirar validación/seguridad para mejorar tamaño o score.
+8. La semilla de carga exige `GREEN_AUDIT_SEED=1`, nombre `*_test` y estado vacío esperado. Rechaza bases no preparadas o parciales y no elimina datos para regenerar un ensayo.
 
-1. **Las pantallas secundarias se cargan bajo demanda** con `React.lazy` y un `Suspense` con mensaje accesible. Solo el acceso y el armazón entran en el bundle inicial.
-2. **Las imágenes ráster de más de 200 KB no se suben.** Toda imagen nueva se entrega en AVIF/WebP mediante `<picture>`, con `width`/`height` declarados (para no generar CLS) y `loading="lazy"` si está debajo del pliegue.
-3. **Los íconos van como SVG inline** en componentes, sin fuentes de íconos ni peticiones por ícono.
-4. **Las peticiones GET permiten revalidación** (`cache: 'no-cache'`), nunca `no-store`, salvo datos sensibles justificados.
-5. **El peso de cada librería nueva se revisa** antes de añadirla (por ejemplo en Bundlephobia). Se prefieren las APIs nativas (`Intl`, `fetch`, `URLSearchParams`).
-6. **Presupuesto de rendimiento.** El build no se integra si Lighthouse CI incumple `lighthouserc.json`: rendimiento ≥0,90, FCP ≤1,0 s, LCP ≤1,4 s, TBT ≤85 ms, CLS ≤0,02 y peso ≤1,1 MB.
+### 4.2 Frontend
 
-### 4.3 Principios de código limpio aplicados
+1. Solicitar bloques de 12, reflejar total/página, reiniciar al filtrar y descartar peticiones obsoletas. La selección de clientes debe funcionar fuera de la página visible sin descargar la colección completa.
+2. Usar `React.lazy` y `Suspense` para módulos secundarios, con estado accesible y recuperación ante fallo. No diferir funcionalidad o esconder contenido solo durante auditorías.
+3. Prerenderizar únicamente contenido público estable y sin credenciales; hidratar los mismos controles. No serializar tokens ni datos operativos en HTML. Probar con JS desactivado y revisar errores de hidratación con JS activado.
+4. Usar `ResponsiveImage` con variantes AVIF/WebP, fallback JPG, tamaños por viewport/densidad y dimensiones. Lazy fuera de pantalla; carga inmediata para un recurso inicialmente visible. El build rechaza archivos fuera de la política; comprobar coste real en vez de asumir que AVIF siempre es menor.
+5. Mantener iconos pequeños inline cuando ahorren solicitudes. No usar fuentes de iconos externas para unos pocos símbolos. Contar el coste de HTML y la pérdida de caché al decidir inline.
+6. Preferir APIs nativas cuando satisfagan los requisitos (`fetch`, `Intl`, `Set`, `AbortController`). Antes de una dependencia nueva, registrar necesidad y tamaño de bundle, actualizar lock y comprobar auditoría/build.
+7. Conservar token en memoria, foco, teclado, estados/errores visibles y navegación desde 360 px. Un build de producción debe conservar la misma funcionalidad que desarrollo.
+8. Evaluar carga fría y revalidación por separado. Las medianas deben incluir todos los ensayos y dispositivos del protocolo, sin escoger solo el más favorable.
 
-| Principio | Aplicación concreta |
-|---|---|
-| Clean Code | Funciones cortas con nombre de intención (`projected_columns`, `fetch`, `etag_for`). Docstrings en español que explican el porqué de cada optimización. |
-| SOLID (responsabilidad única) | El router recibe los parámetros, el repositorio construye la consulta, `pagination.fetch` ejecuta y pagina, y el middleware gestiona la caché HTTP. Ninguna capa conoce los detalles de otra. |
-| SOLID (abierto/cerrado) | Un listado nuevo se pagina sin modificar `pagination.py`: basta con pasar su consulta y su esquema. |
-| DRY | Una sola implementación de paginación, ETag y compresión para los cuatro recursos, en lugar de repetir lógica en cada endpoint. |
-| YAGNI | No se añadió Redis ni una CDN ni otra infraestructura que el volumen actual no requiere. El ETag usa el cuerpo ya serializado, sin almacenamiento adicional. |
+### 4.3 Clean Code, SOLID, DRY y YAGNI
 
-### 4.4 Integración en CI/CD verde
-
-El workflow [`green-audit.yml`](../../../.github/workflows/green-audit.yml) se ejecuta en cada *push* a `main` o a `inspeccion-04-green-it` y en cada *pull request*. Instala dependencias, construye el frontend con precompresión y ejecuta **Lighthouse CI 0.15.1** tres veces con el preset de escritorio. Las aserciones de [`lighthouserc.json`](../../../lighthouserc.json) hacen fallar el job si se rompe un presupuesto. Los reportes se conservan como artefacto `lighthouse-reports`.
-
-## 5. Limitaciones y mejoras futuras
-
-- LHCI audita la pantalla de acceso servida como estático. El recorrido autenticado se mide con `scripts/green_it/measure.mjs`, que todavía no corre en CI porque requiere PostgreSQL y datos de carga.
-- La intensidad de carbono usa el promedio mundial de SWDM v4 (494 gCO2e/kWh). Un cálculo con la intensidad de la red peruana o de un proveedor verde verificado cambiaría el valor absoluto, pero no el porcentaje de reducción.
-- La conciencia de carbono (ejecutar procesos diferibles en horas de energía más limpia) aplicará cuando existan procesos por lotes, como la optimización de rutas de US-016.
-
-## Control documental
-
-| Versión | Fecha | Cambio |
+| Principio | Aplicación | Revisión concreta |
 |---|---|---|
-| V_1_0_0 | 10/11/2026 | Versión inicial para la Inspección 04: estándares, matriz de mapeo y guía de desarrollo verde. |
+| Clean Code | Nombres orientados a propósito, estados tipados y errores claros; funciones con responsabilidad acotada. | No duplicar reglas de dominio en UI; conservar manejo explícito de vacío/error/carga. |
+| SOLID: responsabilidad única | Dependencia HTTP, coordinación, SQL, serialización y caché en módulos distintos. | Revisar imports y que el router no ejecute consultas ni el repositorio dependa de HTTP. |
+| SOLID: extensión | Otro listado reutiliza DTO/parámetros/ejecutor pasando una consulta; componentes reciben props explícitas. | Añadir prueba de un recurso nuevo sin modificar lógica común de los existentes. |
+| SOLID: sustitución, interfaces y dependencias | Conservar contrato legacy deliberado, interfaz paginada tipada y separación de detalles de transporte/persistencia. | Probar ambos contratos y evitar interfaces globales que obliguen a un componente a conocer toda la aplicación. No introducir abstracciones solo para citar SOLID. |
+| DRY | Ejecutor SQL, hook, Pagination, ClientPicker y ResponsiveImage compartidos. | Una corrección de paginación/ETag debe beneficiar a los cuatro recursos; comparar antes de copiar código. |
+| YAGNI | Evitar Redis, CDN, TanStack Query o motor de rutas cuando no son necesarios para esta entrega. | Justificar cualquier nueva infraestructura con necesidad y medición; las herramientas de auditoría son de desarrollo y no viajan al cliente. |
+
+## 5. CI/CD verde, calidad y gestión de versiones
+
+[green-audit.yml](../../../.github/workflows/green-audit.yml) usa acciones fijadas, permisos mínimos y concurrencia por rama para cancelar auditorías obsoletas. Instala desde locks, comprueba matemáticas/imágenes, prepara un proyecto Compose aislado, carga datos sintéticos, ejecuta LHCI y tres auditorías por dispositivo con recorrido autenticado, aplica presupuestos y conserva artefactos. Las credenciales temporales no se suben como artefacto; los reportes no se envían a almacenamiento público temporal. La limpieza afecta solo al proyecto CI creado para esa ejecución.
+
+[Los presupuestos](../../../lighthouserc.json) exigen score ≥90, FCP ≤1.000 ms, LCP ≤1.400 ms, TBT ≤85 ms, CLS ≤0,02 y 1.100.000 bytes. [check_budgets.py](../../../scripts/green_it/check_budgets.py) añade móvil y sesión autenticada; sus pruebas demuestran que una métrica fuera de límite falla. El comando local LHCI pasó tres corridas con sus aserciones, conservadas en la evidencia. La ejecución en GitHub de esta revisión permanece pendiente de publicar el código y ejecutar el workflow final.
+
+Los controles generales CI, CodeQL y dependencias incluyen las ramas del Sprint 4. Se conservan Pytest con cobertura ≥80 %, PostgreSQL aislado, Vitest/RTL, compilación y enlaces Markdown. La auditoría de npm del frontend y herramientas no informa vulnerabilidades; ello no equivale a ausencia universal de riesgos.
+
+La [secuencia Git y su estado real](<01 Informe de reduccion del impacto ambiental V_1_0_0.md>) incluye mkdir, git add, git commit y git push en rama de trabajo. El usuario autorizó el commit local; push y merge requieren autorización adicional. La ejecución remota no se presenta como realizada. La revisión por pares y aprobación formal del entregable también conservan su estado pendiente.
+
+## 6. Matriz de verificación documental y de rúbrica
+
+| Criterio | Evidencia prevista o disponible | Cierre pendiente |
+|---|---|---|
+| Refactorización/impacto, 11 puntos | Ocho áreas comparadas, métricas locales, JSON/HTML y fórmulas reproducibles en informe 1. | Revisión académica de las equivalencias y de la evidencia técnica; stack aceptado según confirmación del usuario. |
+| Estándares/guía, 4 puntos | ISO/IEC 25010, cuatro ejes GSF, cruce WSG y matriz 8/8 con reglas verificables. | Revisión independiente del contenido. |
+| CI/CD/Git, 3 puntos | Workflow y LHCI local funcional, rutas/nombres exactos y versión de entrega v1.0.0. | Publicación y ejecución de este cambio en GitHub, con su evidencia. |
+| Comunicación, 2 puntos | Dos archivos con nombres solicitados, tablas y bloques delimitados, enlaces relativos bidireccionales. | Aprobación docente final. |
+
+Los archivos oficiales se conservan en `docs/03 Implementación/reduccion del impacto ambiental/` con los nombres exactos de la consigna. Los datos temporales de auditoría y las credenciales no se versionan. Las evidencias publicables corresponden únicamente a datos sintéticos y al código identificado.
+
+## 7. Fuentes
+
+- [ISO/IEC 25010:2023, modelo de calidad de producto](https://www.iso.org/standard/78176.html).
+- [GSF, formación y principios](https://greensoftware.foundation/education/), [introducción del curso](https://learn.greensoftware.foundation/practitioner/introduction/) y [especificación SCI](https://sci.greensoftware.foundation/).
+- [W3C WSG, nota de grupo en borrador del 26/06/2026](https://www.w3.org/TR/2026/DNOTE-web-sustainability-guidelines-20260626/).
+- [Sustainable Web Design Model v4](https://sustainablewebdesign.org/estimating-digital-emissions/).
+- Consigna HTML y rúbrica PDF aportadas por el usuario: nombres y huellas SHA-256 registrados en la [épica ECO-72](https://jhonpaitanrcm.atlassian.net/browse/ECO-72).
+
+## 8. Control documental
+
+| Revisión | Fecha | Cambio |
+|---|---|---|
+| V_1_0_0 | 10/11/2026 | Documento heredado de `respaldo-frontend`, commit `e7ac3ff`. |
+| V_1_0_1 | 10/11/2026 | Reglas contrastadas con código corregido, fuentes con edición explícita, matriz completa y límites de validación/publicación. Nombre de archivo exigido conservado. |
 
 [← Volver al README](../../../README.md)

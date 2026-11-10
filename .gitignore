@@ -35,3 +35,15 @@ Thumbs.db
 # Reportes locales de Lighthouse CI
 .lighthouseci/
 lighthouse-reports/
+
+# Artefactos temporales del pipeline Green IT
+.green-results/
+.env.green-audit
+
+# En Git se conservan los JSON de todas las corridas y un HTML por escenario.
+# Las presentaciones adicionales y logs de agregados se pueden regenerar.
+docs/03 Implementación/reduccion del impacto ambiental/evidencias/validacion-*/lighthouse-*-2.html
+docs/03 Implementación/reduccion del impacto ambiental/evidencias/validacion-*/lighthouse-*-3.html
+docs/03 Implementación/reduccion del impacto ambiental/evidencias/validacion-*/flow-*-2.html
+docs/03 Implementación/reduccion del impacto ambiental/evidencias/validacion-*/flow-*-3.html
+docs/03 Implementación/reduccion del impacto ambiental/evidencias/validacion-*/medicion-*.log

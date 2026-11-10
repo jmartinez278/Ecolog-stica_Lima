@@ -5,6 +5,7 @@ USER node
 COPY package.json package-lock.json ./
 RUN npm ci --ignore-scripts
 COPY src/ ./src/
+COPY public/ ./public/
 COPY index.html tsconfig.json vite.config.ts ./
 COPY scripts/ ./scripts/
 RUN npm run build

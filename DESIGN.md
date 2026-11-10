@@ -1,12 +1,12 @@
 # Diseño de interfaz — EcoLogística Lima
 
-Esta guía describe la interfaz implementada para el Sprint 1. La fuente ejecutable de los estilos es `src/frontend/src/style.css`; si cambian los estilos, actualizar esta guía en el mismo trabajo.
+Esta guía describe la interfaz conservada hasta el Sprint 4. La fuente ejecutable es `src/frontend/src/style.css` y los módulos de `src/frontend/src/styles/`; si cambian los estilos, actualizar esta guía en el mismo trabajo.
 
 ## Dirección visual
 
 La interfaz toma como referencia general la estética de [mouredev pro](https://mouredev.pro/): fondo oscuro con cuadrícula, títulos de gran tamaño, acentos vivos y paneles que recuerdan a ventanas de software. La composición, el monograma `EL`, los textos y los elementos gráficos de EcoLogística Lima son propios; no se usan logotipos, imágenes ni otros recursos de la referencia.
 
-El resultado debe sentirse como una herramienta de operación logística: el contenido y las acciones tienen prioridad sobre la decoración. El diseño cubre acceso, Inicio, Vehículos, Pedidos y Conductores.
+El resultado debe sentirse como una herramienta de operación logística: el contenido y las acciones tienen prioridad sobre la decoración. El diseño cubre acceso, Inicio, Vehículos, Pedidos, Conductores y Clientes.
 
 ## Colores
 
@@ -75,3 +75,12 @@ Antes de dar por terminado un cambio visual, ejecutar `npm test` y `npm run buil
 ## Organización de la interfaz — versión del proyecto 1.2.4
 
 El diseño anterior conserva su identidad visual. Para facilitar mantenimiento, `src/frontend/src/App.tsx` compone las pantallas, mientras `pages/` contiene login, inicio y los cuatro módulos; `forms/` separa los formularios, `components/common/` sus elementos reutilizables y `components/layout/` la navegación. Los estilos se organizan por propósito en `styles/` e ingresan por `style.css`. Las pruebas de componente y el build verifican que los flujos existentes sigan funcionando. Una revisión manual de accesibilidad y viewport de 360 px sigue siendo un control distinto.
+
+
+## Controles y recursos del Sprint 4
+
+- Los cuatro módulos y el selector de clientes muestran páginas de 12 registros, con controles Anterior/Siguiente y estado accesible. Los filtros reinician la página; las respuestas obsoletas se descartan.
+- Las pantallas cargadas bajo demanda muestran un estado de carga y recuperación si un módulo falla. El acceso público se prerenderiza y se hidrata con los mismos controles.
+- La marca del acceso usa `ResponsiveImage`, con dimensiones 52×52 y variantes 52/104 px AVIF/WebP/JPG. El SVG fuente y sus alternativas están en `src/frontend/public/brand/`; el fondo del recurso es `#9df8bf` y sus trazos `#0c1510`, coherentes con los tonos de marca del favicon.
+- Conservar dimensiones, texto alternativo apropiado y prioridad: la marca visible inicialmente es eager; recursos fuera de pantalla usan lazy. El build valida alternativas y peso máximo.
+- La comprobación real en 360 y 1440 px se conserva en la evidencia de Sprint 4; no añadir imágenes decorativas pesadas para simular un ahorro ambiental.

@@ -1,0 +1,58 @@
+[
+  {
+    "page": "Vehículos",
+    "width": 360,
+    "violations": [],
+    "passed_rules": 24,
+    "incomplete": []
+  },
+  {
+    "page": "Pedidos",
+    "width": 360,
+    "violations": [],
+    "passed_rules": 24,
+    "incomplete": []
+  },
+  {
+    "page": "Conductores",
+    "width": 360,
+    "violations": [],
+    "passed_rules": 24,
+    "incomplete": []
+  },
+  {
+    "page": "Clientes",
+    "width": 360,
+    "violations": [],
+    "passed_rules": 24,
+    "incomplete": []
+  },
+  {
+    "page": "Vehículos",
+    "width": 1440,
+    "violations": [],
+    "passed_rules": 24,
+    "incomplete": []
+  },
+  {
+    "page": "Pedidos",
+    "width": 1440,
+    "violations": [],
+    "passed_rules": 24,
+    "incomplete": []
+  },
+  {
+    "page": "Conductores",
+    "width": 1440,
+    "violations": [],
+    "passed_rules": 24,
+    "incomplete": []
+  },
+  {
+    "page": "Clientes",
+    "width": 1440,
+    "violations": [],
+    "passed_rules": 24,
+    "incomplete": []
+  }
+]

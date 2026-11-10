@@ -3,6 +3,7 @@ import { api } from '../api'
 import type { Notice } from '../types'
 import { Field } from '../components/common/FormField'
 import { NoticeBox } from '../components/common/StatusMessage'
+import { ResponsiveImage } from '../components/common/ResponsiveImage'
 
 export function LoginPage({ onLogin }: { onLogin: (token: string) => void }) {
   const [email, setEmail] = useState('')
@@ -43,7 +44,7 @@ export function LoginPage({ onLogin }: { onLogin: (token: string) => void }) {
     </section>
     <section className="panel login-panel">
       <div className="panel-topline"><span>ACCESO / OPERADOR</span><span className="online-indicator">● SISTEMA LOCAL</span></div>
-      <div className="login-panel-body"><span className="login-emblem" aria-hidden="true">EL<span>↗</span></span>
+      <div className="login-panel-body"><span className="login-emblem" aria-hidden="true"><ResponsiveImage base="/brand/logo" widths={[52, 104]} sizes="52px" width={52} height={52} alt="" priority /></span>
         <h2>Bienvenido de nuevo<span className="heading-dot">.</span></h2><p>Ingresa con tu cuenta de operador para continuar.</p>
         <form onSubmit={submit} className="form-grid">
           <Field label="Correo electrónico"><input type="email" autoComplete="username" required placeholder="operador@empresa.com" value={email} onChange={event => setEmail(event.target.value)} /></Field>

@@ -66,7 +66,7 @@ export async function api<T>(path: string, token: string, init: RequestInit = {}
   const response = await fetch(`/api/v1${path}`, {
     ...init,
     // Green IT: permite revalidar con ETag (304 sin cuerpo) en lugar de descargar siempre.
-    cache: 'no-cache',
+    cache: !init.method || init.method === 'GET' ? 'no-cache' : 'no-store',
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),

@@ -1,0 +1,77 @@
+{
+  "date_client": "2026-11-10",
+  "branch": "sprint-4",
+  "source_sha256": "20c66d2869dbbed552de06ce8f141b289c5f4a885d96f65a19b48e8f78b21904",
+  "backend": {
+    "sqlite_tests": 59,
+    "postgresql_tests": 59,
+    "coverage_percent": 94.5273631840796,
+    "migrations": "upgrade head y alembic check aprobados",
+    "test_database": "sprint4_regression_test"
+  },
+  "frontend": {
+    "tests": 32,
+    "line_coverage_percent": 93.68,
+    "build": "aprobado en host y Docker Node 22"
+  },
+  "tools": {
+    "green_python_tests": 3,
+    "image_tests": 1,
+    "statistics_tests": 1,
+    "redaction_tests": 1,
+    "existing_python_tests_passed": 11,
+    "windows_dpapi_tests_skipped": 4
+  },
+  "browser": {
+    "checks": 33,
+    "console_errors": [],
+    "axe_states": 8,
+    "axe_violations": 0
+  },
+  "performance": {
+    "before_bytes": 1011683,
+    "after_bytes": 87589,
+    "reduction_percent": 91.34224851065007,
+    "desktop": {
+      "score": 100,
+      "fcp_ms": 206.29070000000002,
+      "lcp_ms": 206.29070000000002,
+      "tbt_ms": 0,
+      "cls": 0,
+      "si_ms": 211.94153208308057,
+      "bytes": 69893,
+      "requests": 4,
+      "accessibility": 100,
+      "best_practices": 100
+    },
+    "mobile": {
+      "score": 100,
+      "fcp_ms": 753.9773,
+      "lcp_ms": 753.9773,
+      "tbt_ms": 0,
+      "cls": 0,
+      "si_ms": 753.9773,
+      "bytes": 69841,
+      "requests": 4,
+      "accessibility": 100,
+      "best_practices": 100
+    },
+    "budgets": "aprobados",
+    "lhci": "3 corridas aprobadas; prueba negativa rechazada"
+  },
+  "dependency_audit": {
+    "python": "sin vulnerabilidades conocidas",
+    "frontend_npm": 0,
+    "tools_npm": 0
+  },
+  "https": "CA y hostname verificados; health 200",
+  "secrets": "escaneo posterior a redacci\u00f3n sin JWT ni credenciales operativas detectados",
+  "pending": [
+    "autorizaci\u00f3n de push",
+    "ejecuci\u00f3n de workflows en GitHub sobre la revisi\u00f3n final",
+    "revisi\u00f3n independiente y aceptaci\u00f3n acad\u00e9mica",
+    "confirmar fecha oficial acad\u00e9mica"
+  ],
+  "publication_performed": false,
+  "local_commit_authorized": true
+}
