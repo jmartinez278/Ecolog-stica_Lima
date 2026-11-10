@@ -183,6 +183,8 @@ class VercelTests(unittest.TestCase):
         def complete(command, **kwargs):
             Path(command[command.index('--output') + 1]).write_bytes(b'{"status":"ok"}')
             self.assertNotIn('--token', command)
+            self.assertNotIn('--cwd', command)
+            self.assertEqual(kwargs['cwd'], '/tmp/release')
             return subprocess.CompletedProcess(command, 0, '200', '')
         with patch.dict(os.environ, {'VERCEL_RELEASE_WORKSPACE':'/tmp/release'}), patch('cd.subprocess.run', side_effect=complete):
             status, body, _ = cd.vercel_request('https://ecolog-deployment.vercel.app/health')
