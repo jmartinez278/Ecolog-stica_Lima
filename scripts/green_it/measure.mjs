@@ -1,5 +1,6 @@
 // Medición Green IT: Lighthouse (navegación + flujo autenticado) y benchmark de API.
 // Uso: node measure.mjs <etiqueta> <dir_salida>
+import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import os from 'node:os'
@@ -111,8 +112,7 @@ async function apiBench() {
       const body = JSON.parse(buf.toString())
       count = Array.isArray(body) ? body.length : (body.items?.length ?? 0)
     }
-    // bytes en el cable: petición sin decodificar automática
-    const { execFileSync } = await import('node:child_process')
+    // Medir bytes sin decodificar y pasar token/URL como argumentos, sin shell.
     const query = process.env.AUDIT_PAGINATED === '1' ? '?page=1&limit=12' : ''
     wire = Number(execFileSync('curl', ['--fail', '-s', '-o', '/dev/null', '-w', '%{size_download}', '-H', `Authorization: Bearer ${access_token}`, '-H', 'Accept-Encoding: br, gzip', `${BASE}/api/v1/${res}${query}`]).toString())
     out[res] = { samples_ms: times, media_ms: Number(mean(times).toFixed(1)), registros_devueltos: count, bytes_json: raw, bytes_transferidos: wire, content_encoding: encoding, mediana_ms: Number(median(times).toFixed(1)), p95_ms: Number([...times].sort((a, b) => a - b)[Math.floor(times.length * 0.95)].toFixed(1)) }
