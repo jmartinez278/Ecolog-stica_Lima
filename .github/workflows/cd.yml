@@ -55,10 +55,11 @@ jobs:
     timeout-minutes: 35
     environment:
       name: production
-      url: ${{ steps.stage.outputs.url }}
+      url: ${{ vars.FRONTEND_URL }}
     env:
       TARGET_SHA: ${{ needs.gate.outputs.revision }}
       BACKEND_URL: ${{ vars.BACKEND_URL }}
+      FRONTEND_URL: ${{ vars.FRONTEND_URL }}
       VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
       VERCEL_CLI_VERSION: '65.14.0'
@@ -108,7 +109,7 @@ jobs:
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           DEPLOYMENT_URL: ${{ steps.stage.outputs.url }}
-        run: vercel promote "$DEPLOYMENT_URL" --yes --cwd "$RUNNER_TEMP/vercel-release"
+        run: python3 scripts/cd.py promote --url "$DEPLOYMENT_URL"
       - name: Registrar resultado sin credenciales
         env:
           DEPLOYMENT_URL: ${{ steps.stage.outputs.url }}
@@ -118,5 +119,5 @@ jobs:
             echo '### Liberación completada'
             echo "Commit: $TARGET_SHA"
             echo "Render: $RENDER_DEPLOY_ID"
-            echo "Frontend: $DEPLOYMENT_URL"
+            echo "Frontend: $FRONTEND_URL"
           } >> "$GITHUB_STEP_SUMMARY"

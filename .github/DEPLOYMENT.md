@@ -1,6 +1,6 @@
 # CI/CD de EcoLogística Lima
 
-**Versión:** 1.0.1 · **Fecha:** 10/11/2026 · [Volver al README](../README.md)
+**Versión:** 1.0.2 · **Fecha:** 10/11/2026 · [Volver al README](../README.md)
 
 ## Distribución acordada
 
@@ -17,18 +17,24 @@ un cambio de stack ni una segunda implementación de autenticación.
 
 ## Estado de la configuración
 
-El CI existente está publicado. Los cuatro controles del commit `6e96807` de
-`sprint-4` terminaron correctamente, incluida la evidencia Green IT.
-El CD de esta guía está preparado en el repositorio para esa distribución.
-**No se ha ejecutado una liberación externa:** faltan crear o confirmar los servicios,
-configurar sus variables y secretos e integrar estos cambios en `main` mediante PR.
-El proyecto Vercel `ecologistica-lima` ya se creó en el equipo `ynsm8s-projects`;
-esto todavía no acredita un deployment funcional. El conector Render devolvió
-`Unknown tool`; la CLI oficial sí quedó autenticada en el workspace confirmado
-`ynsm8's projects`. `render blueprints validate render.yaml` aprobó dos recursos nuevos.
-La cuenta GitHub `YnsM8` tiene escritura, pero no administración: se usan variables y
-secretos del repositorio para Actions; las protecciones del entorno requieren al propietario.
-No activar `CD_ENABLED` hasta completar los pasos siguientes.
+La aplicación está disponible en [ecologistica-lima.vercel.app](https://ecologistica-lima.vercel.app)
+y la API en [Render /docs](https://ecologistica-lima-api-ktea.onrender.com/docs).
+Se verificaron externamente la página de acceso y `/health`, incluida la conexión real
+con PostgreSQL. El pipeline y sus pruebas se encuentran en GitHub; consultar la
+[última ejecución de Actions](https://github.com/jmartinez278/Ecolog-stica_Lima/actions)
+para conocer el resultado de cada entrega automática, sin atribuirle una revisión humana.
+
+- Vercel: proyecto `ecologistica-lima`, equipo `ynsm8s-projects`.
+- Render: workspace confirmado `ynsm8's projects`, API `srv-dbpo44mc6qcc73e3nsf0`,
+  PostgreSQL `dpg-dbpo3p6c6qcc73e3mh20-a`, región Oregon.
+- La base gratuita caduca el **10/12/2026**. La nube tiene una base nueva con el cliente
+  inicial; los registros locales no se importan automáticamente.
+- `CD_ENABLED=true`; variables públicas y secretos configurados a nivel repositorio.
+- El usuario inicial es `operador@example.test`; consultar su contraseña generada
+  únicamente en Render → Environment → `BOOTSTRAP_OPERATOR_PASSWORD`.
+- El MCP Render devolvió `Unknown tool`; el aprovisionamiento se hizo con la CLI oficial
+  autenticada. GitHub `YnsM8` tiene escritura, pero no administración; las protecciones
+  adicionales del entorno corresponden al propietario del repositorio.
 
 ## 1. Preparar GitHub
 
@@ -141,6 +147,7 @@ un administrador puede trasladarlos a `production` si habilita restricciones adi
 | Nombre | Valor |
 |---|---|
 | `BACKEND_URL` | URL HTTPS asignada al servicio Render, sin ruta ni query |
+| `FRONTEND_URL` | Dominio público de producción: `https://ecologistica-lima.vercel.app` |
 | `RENDER_SERVICE_ID` | ID `srv-…` del backend |
 | `VERCEL_ORG_ID` | ID del equipo/cuenta de Vercel |
 | `VERCEL_PROJECT_ID` | ID del proyecto frontend |
@@ -193,7 +200,9 @@ flowchart TD
   PostgreSQL realmente, no solo el proceso HTTP.
 - Vercel recibe un deployment **de producción** con `--skip-domain`. El smoke comprueba
   HTML prerenderizado, `/health` y JSON `401` de una consulta sin sesión a través del
-  proxy mediante `vercel curl`; después se promueve exactamente ese deployment.
+  proxy mediante `vercel curl`; después se promueve exactamente ese deployment mediante
+  la API de proyectos de Vercel, con `teamId` explícito y sin consultas a la identidad
+  personal del token. Se confirma que el dominio público resuelve al mismo deployment.
 - Tokens del repositorio solo en los pasos de release que los necesitan. No se suben `.env`, `.vercel`, tokens,
   estado de sesión ni trazas autenticadas como artefactos.
 

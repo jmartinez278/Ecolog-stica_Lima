@@ -12,7 +12,7 @@ import subprocess
 import tempfile
 import time
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlencode, urlsplit
+from urllib.parse import quote, urlencode, urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 WORKFLOWS = ('ci.yml', 'dependency-audit.yml', 'codeql.yml', 'green-audit.yml')
@@ -251,6 +251,40 @@ def smoke(value, via_cli=False):
     print('Smoke aprobado: interfaz, proxy API, autenticación requerida y PostgreSQL.')
 
 
+def promote(value, timeout=120):
+    """Promover dentro del proyecto/equipo explícitos, sin consultas de identidad."""
+    deployment_url = origin(value)
+    frontend = origin(os.environ['FRONTEND_URL'])
+    if not all(urlsplit(url).hostname.endswith('.vercel.app') for url in (deployment_url, frontend)):
+        raise ValueError('La promoción requiere dominios de Vercel')
+    project = os.environ['VERCEL_PROJECT_ID']
+    team = os.environ['VERCEL_ORG_ID']
+    token = os.environ['VERCEL_TOKEN']
+    root = 'https://api.vercel.com'
+    query = '?' + urlencode({'teamId': team})
+    deployment = api(root + '/v13/deployments/' + quote(urlsplit(deployment_url).hostname, safe='') + query, token)
+    identifier = deployment.get('id', '')
+    if (not re.fullmatch(r'dpl_[A-Za-z0-9]+', identifier)
+            or deployment.get('projectId') != project or deployment.get('ownerId') != team
+            or deployment.get('readyState') != 'READY' or deployment.get('target') != 'production'):
+        raise RuntimeError('El deployment no pertenece al destino de producción aprobado')
+    path = '/v10/projects/' + quote(project, safe='') + '/promote/' + identifier
+    request(root + path + query, token=token, payload={})
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        try:
+            current = api(root + '/v13/deployments/' + quote(urlsplit(frontend).hostname, safe='') + query, token)
+            if current.get('id') == identifier:
+                output(frontend_url=frontend)
+                print('Promoción completada: el dominio público apunta al deployment verificado.')
+                return
+        except RuntimeError as error:
+            if not str(error).startswith('HTTP 404 '):
+                raise
+        time.sleep(2)
+    raise RuntimeError('Vercel no confirmó la asignación del dominio al deployment verificado')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest='command', required=True)
@@ -265,6 +299,8 @@ def main():
     check = sub.add_parser('smoke')
     check.add_argument('--url', required=True)
     check.add_argument('--via-vercel-cli', action='store_true')
+    promotion = sub.add_parser('promote')
+    promotion.add_argument('--url', required=True)
     args = parser.parse_args()
     if args.command in ('gate', 'guard'):
         gate(required=args.command == 'guard')
@@ -274,6 +310,8 @@ def main():
         package(args.dist, args.workspace)
     elif args.command == 'url':
         deployment_url(args.file)
+    elif args.command == 'promote':
+        promote(args.url)
     else:
         smoke(args.url, args.via_vercel_cli)
 
