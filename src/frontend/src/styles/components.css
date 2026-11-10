@@ -76,3 +76,8 @@
 .login-submit span { font-size: 1.35rem; line-height: 1; }.login-panel .notice { margin: 1rem 0 0; }
 .login-footer { border-top: 1px solid var(--line); padding: .75rem 1.2rem; color: #91a8a0; font: 700 .62rem ui-monospace, monospace; letter-spacing: .14em; }
 
+.pagination { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin-top: 1rem; flex-wrap: wrap; }
+.pagination span { color: var(--muted); font: 600 .8rem ui-monospace, monospace; }
+.pagination button { min-height: 44px; padding: .55rem 1rem; font-family: inherit; font-size: .9rem; font-weight: 800; color: #edf8f1; background: #2b3535; border: 1px solid #637473; cursor: pointer; }
+.pagination button:hover:not(:disabled) { background: #3a4847; }
+.pagination button:disabled { opacity: .45; cursor: not-allowed; }

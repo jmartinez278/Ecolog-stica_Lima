@@ -1,7 +1,9 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { api, type Driver } from '../api'
 import type { Notice } from '../types'
 import { NoticeBox } from '../components/common/StatusMessage'
+import { Pagination } from '../components/common/Pagination'
+import { usePagedList } from '../hooks/usePagedList'
 import { PageIntro } from '../components/common/PageIntro'
 import { DriverFormView } from '../forms/DriverForm'
 
@@ -12,17 +14,13 @@ const emptyDriver: DriverForm = {
 }
 
 export function DriversPage({ token }: { token: string }) {
-  const [items, setItems] = useState<Driver[]>([])
   const [form, setForm] = useState<DriverForm>(emptyDriver)
   const [editing, setEditing] = useState<string | null>(null)
   const [onlyAvailable, setOnlyAvailable] = useState(false)
   const [notice, setNotice] = useState<Notice>(null)
   const [busy, setBusy] = useState(false)
-  async function load() {
-    try { setItems(await api<Driver[]>(`/conductores${onlyAvailable ? '?disponible=true' : ''}`, token)) }
-    catch (error) { setNotice({ text: (error as Error).message, error: true }) }
-  }
-  useEffect(() => { void load() }, [token, onlyAvailable])
+  const list = usePagedList<Driver>(`/conductores${onlyAvailable ? '?disponible=true' : ''}`, token, text => setNotice({ text, error: true }))
+  const { items, reload: load } = list
   function set<K extends keyof DriverForm>(key: K, value: DriverForm[K]) { setForm(current => ({ ...current, [key]: value })) }
   async function submit(event: FormEvent) {
     event.preventDefault(); setBusy(true); setNotice(null)
@@ -43,7 +41,7 @@ export function DriversPage({ token }: { token: string }) {
     } catch (error) { setNotice({ text: (error as Error).message, error: true }) }
   }
   return <section><PageIntro number="03" title="Conductores" description="Registra, consulta y mantén actualizada la disponibilidad del equipo." /><NoticeBox notice={notice} />
-    <div className="split"><div className="panel"><p className="panel-label">EQUIPO / FORMULARIO</p><h2>{editing ? 'Editar conductor' : 'Registrar conductor'}</h2><p className="panel-description">Mantén la información de licencia y disponibilidad en un solo lugar.</p><DriverFormView form={form} editing={editing} busy={busy} set={set} submit={submit} onCancel={() => { setEditing(null); setForm(emptyDriver) }} /></div><div className="panel"><p className="panel-label">EQUIPO / REGISTROS</p><div className="panel-heading"><h2>Conductores registrados</h2><span className="count-pill">{items.length}</span></div>
+    <div className="split"><div className="panel"><p className="panel-label">EQUIPO / FORMULARIO</p><h2>{editing ? 'Editar conductor' : 'Registrar conductor'}</h2><p className="panel-description">Mantén la información de licencia y disponibilidad en un solo lugar.</p><DriverFormView form={form} editing={editing} busy={busy} set={set} submit={submit} onCancel={() => { setEditing(null); setForm(emptyDriver) }} /></div><div className="panel"><p className="panel-label">EQUIPO / REGISTROS</p><div className="panel-heading"><h2>Conductores registrados</h2><span className="count-pill">{list.total}</span></div>
       <label className="check"><input type="checkbox" checked={onlyAvailable} onChange={e => setOnlyAvailable(e.target.checked)} /> Solo disponibles</label>
       {items.length === 0 ? <p className="empty-state">{onlyAvailable ? 'No hay conductores disponibles.' : 'No existen conductores registrados.'}</p> : <ul className="cards">
         {items.map(item => <li key={item.conductor_id}><div className="card-heading"><strong>{item.nombres} {item.apellidos}</strong><span className="badge" data-state={item.estado}>{item.estado}</span></div><p className="card-subtitle">Licencia {item.numero_licencia} · {item.categoria_licencia}</p>
@@ -53,5 +51,6 @@ export function DriversPage({ token }: { token: string }) {
           </div>}
         </li>)}
       </ul>}
+      <Pagination page={list.page} pages={list.pages} total={list.total} label="conductores" onChange={list.setPage} />
     </div></div></section>
 }

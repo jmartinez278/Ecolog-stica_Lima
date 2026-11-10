@@ -2,6 +2,8 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { api, orderListPath, type Order, type Client } from '../api'
 import type { Notice } from '../types'
 import { NoticeBox } from '../components/common/StatusMessage'
+import { Pagination } from '../components/common/Pagination'
+import { usePagedList } from '../hooks/usePagedList'
 import { PageIntro } from '../components/common/PageIntro'
 import { OrderFormView } from '../forms/OrderForm'
 import { Field } from '../components/common/FormField'
@@ -19,18 +21,14 @@ function localDate(iso: string) {
 }
 
 export function OrdersPage({ token }: { token: string }) {
-  const [items, setItems] = useState<Order[]>([])
   const [clients, setClients] = useState<Client[]>([])
   const [form, setForm] = useState<OrderForm>(emptyOrder)
   const [editing, setEditing] = useState<string | null>(null)
   const [filter, setFilter] = useState('')
   const [notice, setNotice] = useState<Notice>(null)
   const [busy, setBusy] = useState(false)
-  async function load() {
-    try { setItems(await api<Order[]>(orderListPath(filter), token)) }
-    catch (error) { setNotice({ text: (error as Error).message, error: true }) }
-  }
-  useEffect(() => { void load() }, [token, filter])
+  const list = usePagedList<Order>(orderListPath(filter), token, text => setNotice({ text, error: true }))
+  const { items, reload: load } = list
   useEffect(() => {
     void api<Client[]>('/clientes?activo=true', token).then(setClients).catch(error => setNotice({ text: error.message, error: true }))
   }, [token])
@@ -61,7 +59,7 @@ export function OrdersPage({ token }: { token: string }) {
   return <section><PageIntro number="02" title="Pedidos" description="Registra entregas, revisa su estado y actualiza las solicitudes pendientes." /><NoticeBox notice={notice} />
     <div className="split"><div className="panel"><p className="panel-label">ENTREGAS / FORMULARIO</p><h2>{editing ? 'Editar pedido' : 'Registrar pedido'}</h2><p className="panel-description">Define destino, carga y una ventana de tiempo válida.</p>
       <OrderFormView form={form} editing={editing} busy={busy} set={set} submit={submit} onCancel={() => { setEditing(null); setForm(emptyOrder) }} clients={clients} />{clients.length === 0 && <p>No hay clientes activos para registrar pedidos.</p>}
-    </div><div className="panel"><p className="panel-label">ENTREGAS / REGISTROS</p><div className="panel-heading"><h2>Pedidos registrados</h2><span className="count-pill">{items.length}</span></div>
+    </div><div className="panel"><p className="panel-label">ENTREGAS / REGISTROS</p><div className="panel-heading"><h2>Pedidos registrados</h2><span className="count-pill">{list.total}</span></div>
       <Field label="Filtrar por estado"><select value={filter} onChange={e => setFilter(e.target.value)}>
         <option value="">Todos</option>{['PENDIENTE', 'PLANIFICADO', 'EN_RUTA', 'ENTREGADO', 'CANCELADO', 'NO_ASIGNADO'].map(state => <option key={state}>{state}</option>)}
       </select></Field>
@@ -76,5 +74,6 @@ export function OrdersPage({ token }: { token: string }) {
           </div>}
         </li>)}
       </ul>}
+      <Pagination page={list.page} pages={list.pages} total={list.total} label="pedidos" onChange={list.setPage} />
     </div></div></section>
 }

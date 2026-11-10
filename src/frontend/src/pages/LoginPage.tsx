@@ -32,7 +32,7 @@ export function LoginPage({ onLogin }: { onLogin: (token: string) => void }) {
       <h1 id="login-title">La operación,<br /><span>en orden.</span></h1>
       <p className="login-lead">Vehículos, pedidos y conductores en un mismo lugar. Una base clara para cada entrega.</p>
       <div className="preview-window" aria-hidden="true">
-        <div className="window-bar"><span className="window-controls"><i /><i /><i /></span><span>OPERACIÓN / 1.3.0</span><span>● ACTIVO</span></div>
+        <div className="window-bar"><span className="window-controls"><i /><i /><i /></span><span>OPERACIÓN / 1.4.0</span><span>● ACTIVO</span></div>
         <div className="preview-body"><span className="preview-kicker">PANEL OPERATIVO</span><strong>Todo listo para avanzar<span className="heading-dot">.</span></strong>
           <div className="preview-row"><span className="preview-icon">01</span><span>Vehículos</span><span>↗</span></div>
           <div className="preview-row"><span className="preview-icon">02</span><span>Pedidos</span><span>↗</span></div>

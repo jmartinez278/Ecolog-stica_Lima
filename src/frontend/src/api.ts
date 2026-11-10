@@ -65,7 +65,8 @@ export function orderListPath(state: string): string {
 export async function api<T>(path: string, token: string, init: RequestInit = {}): Promise<T> {
   const response = await fetch(`/api/v1${path}`, {
     ...init,
-    cache: 'no-store',
+    // Green IT: permite revalidar con ETag (304 sin cuerpo) en lugar de descargar siempre.
+    cache: 'no-cache',
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
