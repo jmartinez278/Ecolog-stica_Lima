@@ -19,10 +19,15 @@ SESIONES_POR_ANIO = 60_000  # supuesto declarado en el informe
 
 def bytes_por_sesion(metricas: dict) -> int:
     """Carga de la página de acceso + recorrido autenticado por los cuatro listados."""
-    return round(metricas["lighthouse_desktop"]["median"]["bytes"]) + metricas["flujo_autenticado"]["timespan_bytes"]
+    flow = metricas["flujo_autenticado"]
+    if "session_bytes" in flow:
+        return round(flow["session_bytes"])
+    return round(metricas["lighthouse_desktop"]["median"]["bytes"]) + flow["timespan_bytes"]
 
 
 def emisiones(bytes_: float) -> tuple[float, float, float]:
+    if bytes_ < 0:
+        raise ValueError("Los bytes no pueden ser negativos")
     gb = bytes_ / 1e9
     kwh = gb * KWH_POR_GB
     return gb, kwh, kwh * G_CO2E_POR_KWH

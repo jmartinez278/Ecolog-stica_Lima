@@ -1,6 +1,6 @@
 # EcoLogística Lima
 
-**Versión del proyecto y de este README:** 1.4.0 · **Actualizado:** 10/11/2026
+**Versión del proyecto:** 1.4.0 · **Revisión del README:** 1.4.2 · **Actualizado:** 10/11/2026
 
 **EcoLogística Lima** es un proyecto de software orientado a la optimización sostenible de rutas de distribución de última milla para el escenario empresarial de **DistriRápido S.A.C.**
 
@@ -56,7 +56,7 @@ El sistema contempla los siguientes módulos:
 | Pruebas Backend | Pytest |
 | Pruebas Frontend | Vitest / React Testing Library |
 | Contenedores | Docker |
-| CI/CD previsto | GitHub Actions |
+| CI/CD | GitHub Actions: CI activo; CD Vercel/Render preparado, pendiente de configuración |
 
 ---
 
@@ -204,7 +204,6 @@ La revisión documenta el estado **antes** de la presentación del 29/09/2026. L
 | Registro de impedimentos | [02 Registro de Impedimentos V_1_0_0](<docs/03 Implementación/Sprint 2/02 Registro de Impedimentos V_1_0_0.md>) |
 | Revisión del Sprint | [03 Revisión del Sprint V_1_0_0](<docs/03 Implementación/Sprint 2/03 Revisión del Sprint V_1_0_0.md>) |
 | Retrospectiva del Sprint | [04 Retrospectiva del Sprint V_1_0_0](<docs/03 Implementación/Sprint 2/04 Retrospectiva del Sprint V_1_0_0.md>) |
-| Informe de implementación | [05 Informe de implementación del Sprint 2 V_1_0_0](<docs/03 Implementación/Sprint 2/05 Informe de implementación del Sprint 2 V_1_0_0.md>) |
 
 El [seguimiento Jira del Sprint 2](<docs/02 Planificación/Anexos/Seguimiento Jira Sprint 2 V_1_0_3.md>) recoge las cinco historias, Story Points y estado del tablero consultado el 06/10/2026. La documentación distingue funcionalidades implementadas de historias formalmente aceptadas; la demostración y retrospectiva del equipo siguen sin evidencia de realización.
 
@@ -214,7 +213,7 @@ Para ejecutar el proyecto, consultar las instrucciones técnicas del [backend](s
 
 La verificación técnica del 29/09/2026 pasó con Docker Compose, PostgreSQL aislado, API y frontend: 9 pruebas backend (91,35 % de cobertura), 4 pruebas frontend, build y un recorrido HTTP de US-001 a US-010. La interfaz cargó y navegó sin desbordamiento horizontal a 360 px en el navegador probado. A las 15:04 (hora de Lima) se repitieron el arranque, las pruebas y el build en otro proyecto Compose aislado. La demostración ante interesados y la reunión de retrospectiva del equipo siguen sin evidencia de realización.
 
-Para Sprint 2, la revisión del 06/10/2026 ejecutó 14 pruebas backend con 92,41 % de cobertura total sobre SQLite y PostgreSQL aislado, 5 pruebas frontend, build y arranque de Compose. Los módulos backend afectados por conductores y clientes obtuvieron 96–100 % de cobertura. API, OpenAPI, inicio de sesión, listas y proxy respondieron en `localhost`; los detalles están en el [informe técnico de implementación](<docs/03 Implementación/Sprint 2/05 Informe de implementación del Sprint 2 V_1_0_0.md>). En el corte histórico del 06/10/2026, ECO-17 a ECO-21 estaban en `In Review / QA` y sin responsable; ese estado no representa el corte actual del tablero.
+Para Sprint 2, la revisión del 06/10/2026 ejecutó 14 pruebas backend con 92,41 % de cobertura total sobre SQLite y PostgreSQL aislado, 5 pruebas frontend, build y arranque de Compose. Los módulos backend afectados por conductores y clientes obtuvieron 96–100 % de cobertura. API, OpenAPI, inicio de sesión, listas y proxy respondieron en `localhost`; los detalles están en el [informe de estado y detalle técnico](<docs/03 Implementación/Sprint 2/01 Informe de estado del proyecto V_1_0_0.md>). En el corte histórico del 06/10/2026, ECO-17 a ECO-21 estaban en `In Review / QA` y sin responsable; ese estado no representa el corte actual del tablero.
 
 ---
 
@@ -333,11 +332,23 @@ La carpeta de Sprint 3 contiene únicamente los cinco documentos solicitados por
 | Estándares de ingeniería de software | [02 Estandares Ingeniería de software V_1_0_0](<docs/03 Implementación/reduccion del impacto ambiental/02 Estandares Ingeniería de software V_1_0_0.md>) |
 | Auditoría continua | [`.github/workflows/green-audit.yml`](.github/workflows/green-audit.yml) y [`lighthouserc.json`](lighthouserc.json) |
 
-Las mediciones son reales y reproducibles con `scripts/green_it/`. La sesión de operador baja de 1 053,9 KB a 93,8 KB (−91,1 %) y de 0,1562 a 0,0139 g CO2e según SWDM v4.
+Las mediciones locales vigentes están en `evidencias/validacion-20261110/` de los informes. La sesión completa pasa de 1.011.683 a 87.589 bytes (−91,34 %), con Lighthouse 100 en móvil y escritorio y todos los presupuestos aprobados. SWDM v4 estima 0,149931 → 0,012981 g CO2e/sesión bajo los supuestos declarados. Se validaron 59 pruebas backend por motor (94,53 % de cobertura), 32 frontend, build y 33 comprobaciones de navegador. La rama `sprint-4` está publicada. Los cuatro workflows del commit `6e96807` terminaron correctamente en GitHub, incluidos los reportes Green IT; esto no acredita aceptación formal ni un despliegue externo.
 
 **Fase del incremento técnico al 06/10/2026:** incremento técnico del Sprint 2 publicado en `sprint-2` e integrado en `main`. Incorpora US-011 a US-015 sobre la base técnica del Sprint 1; la aceptación formal y el estado de Jira siguen pendientes de conciliación.
 
 Los documentos de definición inicial se encuentran en `docs/01 Inicio/`, la planificación en `docs/02 Planificación/` y los entregables de esta iteración en `docs/03 Implementación/`.
+
+## Despliegue y CI/CD
+
+La distribución acordada es **frontend en Vercel, backend FastAPI y PostgreSQL en Render**.
+GitHub Actions comprueba calidad, integración PostgreSQL, seguridad y Green IT antes de
+publicar. El CD recupera el frontend compilado por CI, despliega el mismo commit en
+Render y promueve Vercel después del smoke de interfaz/API/base de datos.
+
+La [guía de configuración y operación](.github/DEPLOYMENT.md) explica los servicios,
+variables, secretos, migraciones y reintentos. El [workflow CD](.github/workflows/cd.yml)
+está preparado y desactivado hasta configurar los destinos y `CD_ENABLED=true`.
+Las comprobaciones externas quedan pendientes hasta su primera ejecución real.
 
 ## Historial de control de cambios del README
 
@@ -356,6 +367,8 @@ Los documentos de definición inicial se encuentran en `docs/01 Inicio/`, la pla
 | 1.2.4 | 24/10/2026 | Base técnica 1.2.4: planificación completa, evidencias y arquitectura técnica, pruebas de integridad, CI, accesibilidad y modularización de interfaz. |
 | 1.3.0 | 25/10/2026 | Sprint 3: cinco informes, evidencia de calidad/seguridad/accesibilidad, alcance localhost, versiones unificadas y revisión previa. |
 | 1.4.0 | 10/11/2026 | Inspección 04: optimizaciones Green IT en backend, frontend y Caddy; informes de impacto ambiental y estándares; workflow LHCI. |
+| 1.4.1 | 10/11/2026 | Limpieza documental: contenido técnico de Sprint 2 consolidado en su informe de estado; retirada de evidencias Green IT superadas y presentaciones HTML repetidas, conservando todas las muestras JSON. |
+| 1.4.2 | 10/11/2026 | Estado remoto de Sprint 4 actualizado; CD GitHub Actions preparado para Vercel/Render, guía de activación y artefacto frontend del mismo CI. |
 
 ---
 

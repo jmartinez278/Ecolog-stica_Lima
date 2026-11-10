@@ -52,7 +52,7 @@ export function VehiclesPage({ token }: { token: string }) {
       <p className="panel-label">FLOTA / FORMULARIO</p><h2>{editing ? 'Editar vehículo' : 'Registrar vehículo'}</h2><p className="panel-description">Datos que identifican y describen la capacidad de cada unidad.</p>
       <VehicleFormView form={form} editing={editing} busy={busy} set={set} submit={submit} onCancel={() => { setEditing(null); setForm(emptyVehicle) }} />
     </div><div className="panel"><p className="panel-label">FLOTA / REGISTROS</p><div className="panel-heading"><h2>Flota registrada</h2><span className="count-pill">{list.total}</span></div>
-      {items.length === 0 ? <p className="empty-state">No existen vehículos registrados.</p> : <ul className="cards">
+      {list.loading ? <p role="status">Cargando registros…</p> : items.length === 0 ? <p className="empty-state">No existen vehículos registrados.</p> : <ul className="cards">
         {items.map(item => <li key={item.vehiculo_id}><div className="card-heading"><strong>{item.placa}</strong><span className="badge" data-state={item.estado}>{item.estado}</span></div>
           <p className="card-subtitle">{item.marca} · {item.modelo}</p><p className="card-detail"><span>{item.capacidad_kg} kg</span><span>{item.capacidad_m3} m³</span></p>
           <div className="actions"><button type="button" className="secondary" onClick={() => { setEditing(item.vehiculo_id); setForm({ ...item }); window.scrollTo(0, 0) }}>Editar</button>

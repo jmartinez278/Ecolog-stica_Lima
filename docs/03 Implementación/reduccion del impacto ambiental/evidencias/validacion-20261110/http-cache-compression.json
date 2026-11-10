@@ -1,0 +1,59 @@
+{
+  "api_gzip": {
+    "status": 200,
+    "headers": {
+      "Cache-Control": "private, no-cache",
+      "Content-Encoding": "gzip",
+      "Content-Length": "1526",
+      "Content-Type": "application/json",
+      "Date": "Tue, 10 Nov 2026 07:23:11 GMT",
+      "Etag": "W/\"64a69413014f80f7331254cfada3b431\"",
+      "Referrer-Policy": "no-referrer",
+      "Server": "uvicorn",
+      "Vary": "Authorization, Accept-Encoding",
+      "Via": "1.1 Caddy",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "Connection": "close"
+    },
+    "wire_bytes": 1526
+  },
+  "api_revalidated": {
+    "status": 304,
+    "wire_bytes": 0,
+    "headers": {
+      "Cache-Control": "private, no-cache",
+      "Date": "Tue, 10 Nov 2026 07:23:11 GMT",
+      "Etag": "W/\"64a69413014f80f7331254cfada3b431\"",
+      "Referrer-Policy": "no-referrer",
+      "Server": "uvicorn",
+      "Vary": "Authorization",
+      "Via": "1.1 Caddy",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "Connection": "close"
+    }
+  },
+  "static_brotli": {
+    "status": 200,
+    "headers": {
+      "Accept-Ranges": "bytes",
+      "Cache-Control": "public, max-age=31536000, immutable",
+      "Content-Encoding": "br",
+      "Content-Length": "62962",
+      "Content-Type": "text/javascript; charset=utf-8",
+      "Etag": "\"dmrbwonptfcw-1cky\"",
+      "Last-Modified": "Tue, 10 Nov 2026 06:49:07 GMT",
+      "Referrer-Policy": "no-referrer",
+      "Server": "Caddy",
+      "Vary": "Accept-Encoding",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "Date": "Tue, 10 Nov 2026 07:23:11 GMT",
+      "Connection": "close"
+    },
+    "wire_bytes": 62962
+  },
+  "login_and_errors": "no-store",
+  "html": "no-cache"
+}

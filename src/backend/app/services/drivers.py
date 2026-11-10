@@ -1,3 +1,5 @@
+from app.core.pagination import PageParams
+from app.repositories.pagination import fetch
 from uuid import UUID, uuid4
 
 from fastapi import HTTPException
@@ -51,3 +53,7 @@ def deactivate(db: Session, user: User, driver_id: UUID) -> Driver:
     driver.estado = "INACTIVO"
     commit_change(db, user, driver, "CONDUCTOR", "DESACTIVAR", driver_id)
     return driver
+
+
+def list_all(db: Session, params: PageParams, value: bool | None = None) -> list[dict] | dict:
+    return fetch(db, repo.list_query(value), params)

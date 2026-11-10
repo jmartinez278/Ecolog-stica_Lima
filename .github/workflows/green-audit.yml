@@ -1,47 +1,64 @@
-# Green IT & Performance Audit — Inspección 04 (v1.0.0)
-# Construye el frontend de producción y ejecuta Lighthouse CI (LHCI) con los umbrales
-# de lighthouserc.json. Si una métrica supera su presupuesto, el job falla.
 name: ECO - Green IT & Performance Audit
-
 on:
   push:
-    branches: [main, inspeccion-04-green-it]
+    branches: [main, sprint-4, inspeccion-04-green-it, respaldo-frontend]
   pull_request:
     branches: [main]
   workflow_dispatch:
-
 permissions:
   contents: read
-
+concurrency:
+  group: green-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   lighthouse:
-    name: Lighthouse CI (presupuesto de rendimiento)
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
+    env:
+      CHROME_PATH: /usr/bin/google-chrome
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '22'
           cache: npm
-          cache-dependency-path: src/frontend/package-lock.json
-
-      - name: Instalar dependencias del frontend
-        working-directory: src/frontend
-        run: npm ci --ignore-scripts
-
-      - name: Build de producción con precompresión Brotli/Gzip
-        working-directory: src/frontend
-        run: npm run build
-
-      - name: Ejecutar Lighthouse CI
-        run: npx --yes @lhci/cli@0.15.1 autorun --config=./lighthouserc.json
-
-      - name: Conservar reportes de Lighthouse
+          cache-dependency-path: |
+            src/frontend/package-lock.json
+            scripts/green_it/package-lock.json
+      - name: Instalar herramientas fijadas y auditar dependencias
+        run: |
+          npm ci --ignore-scripts --prefix src/frontend
+          npm ci --ignore-scripts --prefix scripts/green_it
+          npm audit --audit-level=high --prefix scripts/green_it
+      - name: Verificar cálculos, presupuestos e imágenes
+        run: |
+          python3 -m unittest discover -s scripts/green_it -p 'test_*.py'
+          node --test src/frontend/scripts/check-images.test.mjs
+          node --test scripts/green_it/math.test.mjs
+          node --test scripts/green_it/redact.test.mjs
+      - name: Preparar entorno temporal aislado y build de producción
+        run: |
+          python3 scripts/green_it/prepare_env.py --output .env.green-audit
+          docker compose --env-file .env.green-audit -f docker-compose.staging.yml -p ecolog-green-ci up -d --build --wait
+          docker cp scripts/green_it/seed_carga.py ecolog-green-ci-backend-1:/tmp/seed_carga.py
+          docker exec -e GREEN_AUDIT_SEED=1 ecolog-green-ci-backend-1 python /tmp/seed_carga.py
+      - name: Ejecutar Lighthouse CI y sus aserciones
+        run: scripts/green_it/node_modules/.bin/lhci autorun --config=./lighthouserc.json
+      - name: Medir móvil, escritorio y recorrido autenticado
+        run: |
+          python3 scripts/green_it/run_measure.py despues .green-results --env-file .env.green-audit --revision "$GITHUB_SHA"
+          python3 scripts/green_it/check_budgets.py .green-results/metricas-despues.json
+          python3 scripts/green_it/run_measure.py despues .green-results --env-file .env.green-audit --verify-flow
+      - name: Conservar reportes sin credenciales
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: lighthouse-reports
-          path: .lighthouseci/
-          if-no-files-found: warn
+          name: green-audit-${{ github.sha }}
+          path: |
+            .lighthouseci/
+            .green-results/
+          include-hidden-files: true
+          if-no-files-found: error
+      - name: Retirar solo el entorno temporal de CI
+        if: ${{ always() && hashFiles('.env.green-audit') != '' }}
+        run: docker compose --env-file .env.green-audit -f docker-compose.staging.yml -p ecolog-green-ci down --volumes

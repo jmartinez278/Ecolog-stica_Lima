@@ -1,0 +1,7 @@
+{
+  "url": "https://localhost:8445/health",
+  "status": 200,
+  "certificate_verified": true,
+  "trust": "CA local de Caddy, usada solo por el cliente de comprobaci\u00f3n; no instalada globalmente",
+  "scope": "localhost"
+}

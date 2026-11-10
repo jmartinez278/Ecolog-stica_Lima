@@ -1,0 +1,122 @@
+name: ECO - CD Vercel y Render
+
+on:
+  workflow_run:
+    workflows:
+      - ECO - CI de calidad
+      - ECO - Dependency audit
+      - ECO - CodeQL security analysis
+      - ECO - Green IT & Performance Audit
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  deployments: read
+
+# Serializar las liberaciones: no cancelar un proceso de migración en curso.
+concurrency:
+  group: production-vercel-render
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    if: >-
+      vars.CD_ENABLED == 'true' &&
+      github.repository == 'jmartinez278/Ecolog-stica_Lima' &&
+      ((github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository))
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      deploy: ${{ steps.check.outputs.deploy }}
+      revision: ${{ steps.check.outputs.revision }}
+      ci_run_id: ${{ steps.check.outputs.ci_run_id }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          persist-credentials: false
+      - name: Exigir los cuatro controles aprobados para el mismo SHA actual de main
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+        run: python3 scripts/cd.py gate
+
+  release:
+    needs: gate
+    if: needs.gate.outputs.deploy == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    environment:
+      name: production
+      url: ${{ steps.stage.outputs.url }}
+    env:
+      TARGET_SHA: ${{ needs.gate.outputs.revision }}
+      BACKEND_URL: ${{ vars.BACKEND_URL }}
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+      VERCEL_CLI_VERSION: '65.14.0'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.gate.outputs.revision }}
+          persist-credentials: false
+      - name: Revalidar el commit tras la espera del entorno production
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/cd.py guard
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - name: Recuperar el frontend compilado por CI de este commit
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: frontend-dist-${{ needs.gate.outputs.revision }}
+          path: ${{ runner.temp }}/frontend-dist
+          github-token: ${{ github.token }}
+          run-id: ${{ needs.gate.outputs.ci_run_id }}
+      - name: Instalar CLI fijada y preparar el artefacto sin credenciales
+        run: |
+          npm install --global "vercel@$VERCEL_CLI_VERSION" --ignore-scripts
+          python3 scripts/cd.py package --dist "$RUNNER_TEMP/frontend-dist" --workspace "$RUNNER_TEMP/vercel-release"
+      - name: Desplegar el commit exacto en Render y comprobar la base de datos
+        id: render
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ vars.RENDER_SERVICE_ID }}
+        run: python3 scripts/cd.py render
+      - name: Crear deployment de producción en Vercel sin cambiar el dominio activo
+        id: stage
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          vercel deploy --json --prebuilt --prod --skip-domain --yes --cwd "$RUNNER_TEMP/vercel-release" > "$RUNNER_TEMP/vercel-deployment.json"
+          python3 scripts/cd.py url --file "$RUNNER_TEMP/vercel-deployment.json"
+      - name: Verificar interfaz, proxy, autenticación y PostgreSQL antes de promover
+        env:
+          DEPLOYMENT_URL: ${{ steps.stage.outputs.url }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_RELEASE_WORKSPACE: ${{ runner.temp }}/vercel-release
+        run: python3 scripts/cd.py smoke --url "$DEPLOYMENT_URL" --via-vercel-cli
+      - name: Promover el mismo deployment comprobado
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          DEPLOYMENT_URL: ${{ steps.stage.outputs.url }}
+        run: vercel promote "$DEPLOYMENT_URL" --yes --cwd "$RUNNER_TEMP/vercel-release"
+      - name: Registrar resultado sin credenciales
+        env:
+          DEPLOYMENT_URL: ${{ steps.stage.outputs.url }}
+          RENDER_DEPLOY_ID: ${{ steps.render.outputs.render_deploy_id }}
+        run: |
+          {
+            echo '### Liberación completada'
+            echo "Commit: $TARGET_SHA"
+            echo "Render: $RENDER_DEPLOY_ID"
+            echo "Frontend: $DEPLOYMENT_URL"
+          } >> "$GITHUB_STEP_SUMMARY"

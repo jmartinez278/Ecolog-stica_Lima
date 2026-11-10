@@ -1,4 +1,4 @@
-# Backend Sprints 1 y 2
+# Backend — Sprint 4, versión 1.4.0
 
 API FastAPI con capas `api → services → repositories → PostgreSQL`. Implementa US-001 a US-015. La documentación interactiva está en `/docs`, el contrato JSON en `/openapi.json` y la comprobación de base de datos en `/health`.
 
@@ -12,7 +12,7 @@ Si Pylance muestra `reportMissingImports` para `fastapi` o `sqlalchemy.orm`, el 
 
 ```bash
 python3 -m venv src/backend/.venv
-src/backend/.venv/bin/python -m pip install -r src/backend/requirements.txt
+src/backend/.venv/bin/python -m pip install --only-binary=:all: --require-hashes -r src/backend/requirements-dev.lock
 ```
 
 En VS Code conectado a WSL, ejecutar **Python: Select Interpreter** y elegir `src/backend/.venv/bin/python`; después ejecutar **Developer: Reload Window**. La versión `3.12.3` de la barra de estado no distingue el Python global del virtual: comprobar la **ruta completa** del intérprete. `pyrightconfig.json` indica a Pylance dónde están el entorno `.venv` y el paquete `app`. El entorno y los ajustes personales de `.vscode` están excluidos de Git. Si se abre el repositorio desde Windows en vez de WSL, crear un entorno virtual con Python de Windows y seleccionar su `python.exe`.
@@ -20,6 +20,12 @@ En VS Code conectado a WSL, ejecutar **Python: Select Interpreter** y elegir `sr
 Iniciar el conjunto con `docker compose up --build`. La migración se aplica al iniciar el backend y el proceso de carga inicial crea los roles, un operador y un cliente de ejemplo de forma idempotente. La API estará en `http://localhost:8000`, la interfaz en `http://localhost:5173` y PostgreSQL en el puerto `5432`. Los puertos publicados por Compose (`5432`, `8000`, `5173`) están limitados a `127.0.0.1` del equipo anfitrión. Son únicamente para desarrollo local: el proxy interno de Vite sigue accediendo al backend a través de `backend:8000`, y el backend a PostgreSQL a través de la red interna de Docker. No abrir ni publicar estos puertos directamente en una red externa. Un despliegue externo requiere HTTPS/TLS, secretos administrados, aislamiento de PostgreSQL y un procedimiento de staging independiente; este Compose NO los acredita.
 
 Para arrancar el backend sin Compose, instalar `requirements.txt`, configurar `DATABASE_URL` apuntando a PostgreSQL, ejecutar `python -m alembic upgrade head`, `python -m app.db.seed_demo` y `python -m uvicorn app.main:app --reload` desde `src/backend`.
+
+Docker instala únicamente `requirements.lock`; las pruebas y el desarrollo usan `requirements-dev.lock`. Las migraciones vigentes son `0001_sprint1`, `0002_clients_email_unique` y `0003_green_list_indexes`. Respaldar bases utilizadas antes de migrar; no se borran datos para resolver conflictos.
+
+Los cuatro listados aceptan `?page=1&limit=12` y devuelven `{items,total,page,limit,pages}`. El límite máximo es 50 y el orden incluye UUID para desempatar. Omitir `page` conserva la lista anterior por compatibilidad; la interfaz nueva siempre solicita páginas. Los filtros de estado/disponibilidad/actividad se aplican también al total. El router valida parámetros, el servicio coordina y el repositorio ejecuta proyección y límite SQL.
+
+Las lecturas autenticadas revalidan con ETag y `Cache-Control: private, no-cache`; un 304 sigue exigiendo permisos vigentes. Errores, autenticación y escrituras usan `no-store`. Gzip comprime JSON elegible y Caddy sirve assets precomprimidos Brotli/Gzip. El procedimiento y sus mediciones están en el [informe Green IT](<../../docs/03 Implementación/reduccion del impacto ambiental/01 Informe de reduccion del impacto ambiental V_1_0_0.md>).
 
 ## Contrato y reglas
 

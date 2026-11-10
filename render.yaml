@@ -1,0 +1,36 @@
+# Infraestructura inicial de demostración. Los despliegues posteriores los controla Actions.
+# PostgreSQL free caduca a los 30 días; no usar como almacenamiento permanente.
+services:
+  - type: web
+    name: ecologistica-lima-api
+    runtime: docker
+    repo: https://github.com/jmartinez278/Ecolog-stica_Lima
+    branch: main
+    region: oregon
+    plan: free
+    numInstances: 1
+    dockerfilePath: ./src/backend/Dockerfile
+    dockerContext: ./src/backend
+    dockerCommand: sh /app/start_render.sh
+    healthCheckPath: /health
+    autoDeployTrigger: 'off'
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ecologistica-lima-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: BOOTSTRAP_OPERATOR_EMAIL
+        value: operador@example.test
+      - key: BOOTSTRAP_OPERATOR_PASSWORD
+        generateValue: true
+
+databases:
+  - name: ecologistica-lima-db
+    databaseName: ecologistica
+    user: ecologistica
+    postgresMajorVersion: '16'
+    region: oregon
+    plan: free
+    ipAllowList: []

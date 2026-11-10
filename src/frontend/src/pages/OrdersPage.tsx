@@ -1,5 +1,5 @@
-import { useEffect, useState, type FormEvent } from 'react'
-import { api, orderListPath, type Order, type Client } from '../api'
+import { useCallback, useState, type FormEvent } from 'react'
+import { api, orderListPath, type Order } from '../api'
 import type { Notice } from '../types'
 import { NoticeBox } from '../components/common/StatusMessage'
 import { Pagination } from '../components/common/Pagination'
@@ -21,7 +21,6 @@ function localDate(iso: string) {
 }
 
 export function OrdersPage({ token }: { token: string }) {
-  const [clients, setClients] = useState<Client[]>([])
   const [form, setForm] = useState<OrderForm>(emptyOrder)
   const [editing, setEditing] = useState<string | null>(null)
   const [filter, setFilter] = useState('')
@@ -29,9 +28,7 @@ export function OrdersPage({ token }: { token: string }) {
   const [busy, setBusy] = useState(false)
   const list = usePagedList<Order>(orderListPath(filter), token, text => setNotice({ text, error: true }))
   const { items, reload: load } = list
-  useEffect(() => {
-    void api<Client[]>('/clientes?activo=true', token).then(setClients).catch(error => setNotice({ text: error.message, error: true }))
-  }, [token])
+  const clientError = useCallback((text: string) => setNotice({ text, error: true }), [])
   function set<K extends keyof OrderForm>(key: K, value: OrderForm[K]) { setForm(current => ({ ...current, [key]: value })) }
   async function submit(event: FormEvent) {
     event.preventDefault(); setBusy(true); setNotice(null)
@@ -58,12 +55,12 @@ export function OrdersPage({ token }: { token: string }) {
   }
   return <section><PageIntro number="02" title="Pedidos" description="Registra entregas, revisa su estado y actualiza las solicitudes pendientes." /><NoticeBox notice={notice} />
     <div className="split"><div className="panel"><p className="panel-label">ENTREGAS / FORMULARIO</p><h2>{editing ? 'Editar pedido' : 'Registrar pedido'}</h2><p className="panel-description">Define destino, carga y una ventana de tiempo válida.</p>
-      <OrderFormView form={form} editing={editing} busy={busy} set={set} submit={submit} onCancel={() => { setEditing(null); setForm(emptyOrder) }} clients={clients} />{clients.length === 0 && <p>No hay clientes activos para registrar pedidos.</p>}
+      <OrderFormView form={form} editing={editing} busy={busy} set={set} submit={submit} onCancel={() => { setEditing(null); setForm(emptyOrder) }} token={token} onError={clientError} />
     </div><div className="panel"><p className="panel-label">ENTREGAS / REGISTROS</p><div className="panel-heading"><h2>Pedidos registrados</h2><span className="count-pill">{list.total}</span></div>
       <Field label="Filtrar por estado"><select value={filter} onChange={e => setFilter(e.target.value)}>
         <option value="">Todos</option>{['PENDIENTE', 'PLANIFICADO', 'EN_RUTA', 'ENTREGADO', 'CANCELADO', 'NO_ASIGNADO'].map(state => <option key={state}>{state}</option>)}
       </select></Field>
-      {items.length === 0 ? <p className="empty-state">No hay pedidos para el filtro seleccionado.</p> : <ul className="cards">
+      {list.loading ? <p role="status">Cargando registros…</p> : items.length === 0 ? <p className="empty-state">No hay pedidos para el filtro seleccionado.</p> : <ul className="cards">
         {items.map(item => <li key={item.pedido_id}><div className="card-heading"><strong>{item.codigo_pedido}</strong><span className="badge" data-state={item.estado}>{item.estado}</span></div>
           <p className="card-subtitle">{item.direccion_entrega}</p><p className="card-detail"><span>{item.peso_kg} kg</span><span>{item.volumen_m3} m³</span><span>Prioridad {item.prioridad}</span></p>
           {item.estado === 'PENDIENTE' && <div className="actions">

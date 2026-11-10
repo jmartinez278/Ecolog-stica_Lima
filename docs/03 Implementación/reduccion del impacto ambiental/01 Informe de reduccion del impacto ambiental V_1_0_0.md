@@ -1,99 +1,40 @@
-[← Volver al README](../../../README.md) · [Estándares de ingeniería de software](<02 Estandares Ingeniería de software V_1_0_0.md>)
+[← Volver al README](../../../README.md) · [Estándares y guía verde](<02 Estandares Ingeniería de software V_1_0_0.md>)
 
-# Informe de Reducción del Impacto Ambiental y Optimización del Stack
+# Informe de reducción del impacto ambiental
 
-**Nombre del Proyecto:** EcoLogística Lima<br>
-**Líder del Proyecto:** Marco Jhair Martinez Llanos<br>
-**Entrega:** Inspección 04 — Reducción del impacto ambiental y estándares de ingeniería de software<br>
-**Versión del documento:** V_1_0_0 · **Versión semántica de la entrega:** v1.0.0<br>
-**Rama:** `inspeccion-04-green-it` · **Línea base medida:** `main` en `cfcd53f`<br>
-**Fecha de actualización:** 10/11/2026
+**Proyecto:** EcoLogística Lima · **Líder:** Marco Jhair Martinez Llanos<br>
+**Entrega:** Sprint 4 / Inspección 04 · **Versión semántica de entrega:** v1.0.0<br>
+**Revisión documental:** V_1_0_2 (se conserva el nombre de archivo V_1_0_0 exigido)<br>
+**Versión de aplicación:** 1.4.0 · **Corte de validación:** 10/11/2026
 
-## 1.1 Introducción y propósito
+## 1. Introducción y propósito
 
-Este informe documenta la auditoría, la refactorización y la medición del impacto ambiental de EcoLogística Lima. En una aplicación web, cada byte que viaja por la red y cada ciclo de CPU en el servidor o en el equipo del operador consume energía, y esa energía tiene una intensidad de carbono. El objetivo es reducir esa huella **sin cambiar el comportamiento funcional** de las historias US-001 a US-015.
+Evaluar el coste de recursos del software y reducir los datos transferidos y el trabajo innecesario conservando US-001–US-015. Se implementan las ocho áreas de la consigna con React/TypeScript/Vite, FastAPI/SQLAlchemy, PostgreSQL y Caddy. El usuario confirmó el 10/11/2026 que el docente acepta este stack; los ejemplos MERN se adaptan sin migrar la arquitectura.
 
-Propósitos:
+La huella digital aquí estimada corresponde al acceso y consulta del sistema. No representa emisiones de vehículos, ahorro de combustible ni rutas optimizadas: esas funciones pertenecen a otras historias.
 
-1. Identificar dónde se desperdician datos y cómputo en el estado integrado de `main`.
-2. Aplicar ocho optimizaciones en backend, frontend e infraestructura local.
-3. Medir el resultado con Google Lighthouse, con un recorrido autenticado y con un *benchmark* de la API, usando la misma carga de datos antes y después.
-4. Calcular energía y emisiones con el **Sustainable Web Design Model v4 (SWDM v4)** y proyectar el ahorro anual.
+## 2. Diagnóstico y protocolo ANTES/DESPUÉS
 
-> **Criterio de honestidad.** Todas las cifras de este informe provienen de mediciones reproducibles con los scripts de `scripts/green_it/`. No se copiaron valores del ejemplo de la consigna. Los JSON y reportes HTML originales están en [`evidencias/`](evidencias/).
+- ANTES: commit `cfcd53ffe62a94fcc4e227cf9ca1cd9086914b45`, extraído con `git archive` en una carpeta temporal, sin introducir ineficiencias artificiales.
+- DESPUÉS: rama local `sprint-4`, basada en `e7ac3ff`, identificada como árbol de trabajo en el momento de medir. El [manifiesto SHA-256](evidencias/validacion-20261110/source-snapshot.json) identifica el código y la configuración auditados.
+- Dos proyectos Compose independientes, `ecolog-green-before` y `ecolog-green-final`; build de producción servido por Caddy, FastAPI y PostgreSQL 16. No se usa el servidor Vite para puntuar rendimiento.
+- Semilla 2026: exactamente 50 vehículos, 60 conductores, 200 clientes y 1.000 pedidos antes de medir. UUID y fechas de los registros generados son deterministas. Los [planes ANTES](evidencias/validacion-20261110/postgres-before.json) y [DESPUÉS](evidencias/validacion-20261110/postgres-after.json) conservan conteos, versión SQL y paquetes.
+- Lighthouse 13.6.0; Chrome for Testing 156.0.8078.4; tres corridas independientes en frío por preset escritorio/móvil y tres recorridos autenticados. Cada JSON Lighthouse conserva su `configSettings`, versión y fecha UTC. La regla de aceptación usa medianas; se publican todas las corridas, no solo la mejor.
+- El recorrido comprende login, Pedidos, Vehículos, Conductores y Clientes. Los bytes de cada sesión se suman dentro de ese mismo recorrido antes de tomar la mediana, evitando combinar medianas de sesiones distintas.
+- Latencia API: 30 peticiones por recurso, mismas condiciones locales, con mediana y P95. ANTES se pide la lista que utilizaba la interfaz; DESPUÉS la primera página de 12. Es una comparación de la misma necesidad de consulta, no una prueba de igual cantidad de registros devueltos.
+- GB y MB decimales: 1 GB = 10^9 bytes, 1 MB = 10^6 bytes; el presupuesto de 1,1 MB equivale a 1.100.000 bytes. Se distinguen JSON descomprimido, transferencia y almacenamiento instalado.
 
-## 1.2 Entorno y metodología de medición
+Las corridas iniciales de este trabajo que apuntaban a un host sin el virtual host de Caddy se descartaron; una página vacía no se consideró resultado válido. La comparación vigente usa exclusivamente `validacion-20261110/`; los archivos de evidencia anteriores que quedaron superados se retiraron en la limpieza documental y permanecen recuperables en el historial Git.
 
-| Elemento | Valor |
-|---|---|
-| Servidor web | Caddy 2.10.2 sirviendo el build de producción de Vite (configuración `Caddyfile.staging`, sin TLS, puerto 8080) |
-| API y base de datos | FastAPI con uvicorn (1 worker) y PostgreSQL 16, en localhost |
-| Datos de carga | `seed_carga.py` con semilla 2026: 50 vehículos, 60 conductores, 200 clientes y 1 000 pedidos (volumen de RNF-004) |
-| Lighthouse | 12.8.2, Chromium *headless*, 5 corridas por modo (mediana), preset de escritorio y móvil por defecto (4G simulado con CPU ×4) |
-| Recorrido autenticado | *User flow* de Lighthouse: inicio de sesión y apertura de Pedidos, Vehículos, Conductores y Clientes |
-| API | 30 peticiones por recurso; mediana y p95 del tiempo de respuesta y bytes transferidos con `Accept-Encoding: br, gzip` |
+Para evitar presentaciones duplicadas, se conservan los JSON de todas las corridas y un HTML de consulta por escenario (primera corrida de cada preset o flujo). En LHCI se conserva el HTML marcado por la propia herramienta como representativo y los tres JSON con sus resultados. Las medianas se calculan con todas las muestras; el HTML de consulta no sustituye esos cálculos. Los logs que repetían los valores de `metricas-antes.json` y `metricas-despues.json` se retiraron.
 
-**Unidad funcional (sesión de operador):** cargar la pantalla de acceso, iniciar sesión y consultar los cuatro listados. Los bytes de la sesión son la suma del peso de la página y de los bytes transferidos durante el recorrido.
+## 3. Las ocho optimizaciones con código comparativo
 
-Reproducción:
+### 3.1 Consultas ligeras e índices
 
-```bash
-# Desde src/backend, con la base local migrada y el operador de prueba creado
-python ../../scripts/green_it/seed_carga.py
-# Con el backend en :8000 y Caddy en :8080
-cd scripts/green_it && npm install && node measure.mjs despues "../../docs/03 Implementación/reduccion del impacto ambiental/evidencias"
-python swdm.py ../../docs/.../evidencias/metricas-antes.json ../../docs/.../evidencias/metricas-despues.json
-```
+La lectura anterior materializaba entidades ORM. La lectura actual proyecta columnas del DTO y usa `.mappings()`; la migración incremental `0003_green_list_indexes` añade índices para ordenar/filtrar sin borrar datos.
 
-## 1.3 Diagnóstico inicial (estado ANTES, `cfcd53f`)
-
-| Indicador | Escritorio | Móvil |
-|---|---:|---:|
-| Score de rendimiento Lighthouse | 100 / 100 | 96 / 100 |
-| First Contentful Paint (FCP) | 0,50 s | 2,17 s |
-| Largest Contentful Paint (LCP) | 0,50 s | 2,32 s |
-| Total Blocking Time (TBT) | 0 ms | 0 ms |
-| Cumulative Layout Shift (CLS) | 0 | 0 |
-| Peso de la página de acceso | 267,9 KB (4 peticiones) | 267,9 KB |
-
-| Recorrido autenticado y API | ANTES |
-|---|---:|
-| Bytes transferidos en el recorrido | 785,9 KB (7 peticiones) |
-| `GET /pedidos` | 1 000 registros, 592,0 KB, sin compresión, mediana 30,7 ms |
-| `GET /clientes` | 201 registros, 77,9 KB, sin compresión |
-| `GET /vehiculos` / `GET /conductores` | 16,8 KB / 19,7 KB, sin compresión |
-| TBT del recorrido | 88 ms |
-
-**Hallazgos.**
-
-1. La pantalla de acceso ya era liviana en escritorio. El problema no estaba en el *render* inicial.
-2. El desperdicio estaba en los **datos**. Cada visita a Pedidos descargaba los 1 000 registros (592 KB) aunque la vista muestra unos pocos, sin compresión y sin posibilidad de reutilizar la respuesta (`cache: 'no-store'`).
-3. PostgreSQL resolvía el listado con *Seq Scan + Sort* de toda la tabla.
-4. El JavaScript (252 KB) y el CSS se servían sin comprimir y sin política de caché, lo que explica el FCP de 2,17 s en móvil.
-5. La imagen Docker del backend instalaba pytest, coverage, httpx y sus dependencias, que no se usan en ejecución.
-
-## 1.4 Correspondencia MERN → EcoLogística Lima
-
-| # | Área de la consigna (MERN) | Equivalente implementado en el stack real | Capa |
-|---|---|---|---|
-| 1 | `.select()`, `.lean()` e índices en MongoDB | `select(*columnas)` según el esquema de salida, filas `.mappings()` sin hidratación ORM e índices compuestos (Alembic `0003`) | Backend |
-| 2 | Paginación `page`/`limit` de 12 registros | `?page=&limit=` en FastAPI (12 por defecto, máximo 50) y paginador en las listas React | Backend y frontend |
-| 3 | Imágenes WebP/AVIF con `<picture>` | Componente `ResponsiveImage` (AVIF → WebP → JPG) y un guardián de build que rechaza imágenes ráster de más de 200 KB o sin variantes | Frontend |
-| 4 | `React.lazy` y `Suspense` | Carga diferida de las pantallas autenticadas | Frontend |
-| 5 | Sustituir librerías por APIs nativas | Imagen de ejecución sin dependencias de prueba; revisión del bundle | Backend y frontend |
-| 6 | Inlining de SVG | Ícono de la aplicación como SVG inline (`data:` URI) que elimina la petición a `/favicon.ico` | Frontend |
-| 7 | Cache-Control, ETag y React Query | ETag + 304 en la API, `immutable` en assets, `no-cache` en `index.html` y revalidación en el cliente | Backend, Caddy y frontend |
-| 8 | Middleware `compression` (Brotli/Gzip) | `GZipMiddleware` en FastAPI, `encode zstd gzip` en Caddy y Brotli precomprimido en el build | Backend y Caddy |
-
-## 1.5 Detalle técnico de las ocho optimizaciones
-
-### 1. Consultas magras e índices compuestos
-
-**Diagnóstico.** `select(Order)` cargaba entidades ORM completas en el *identity map* de la sesión y PostgreSQL ordenaba la tabla entera para cada listado.
-
-**Implementación.** La consulta proyecta solo las columnas del esquema `OrderOut` y devuelve diccionarios. La migración `0003_green_list_indexes` crea cinco índices que coinciden con el `ORDER BY` de cada listado.
-
-ANTES (`app/repositories/orders.py`):
+ANTES — repositorio de pedidos:
 
 ```python
 def list_all(db: Session, state: str | None = None) -> list[Order]:
@@ -103,208 +44,170 @@ def list_all(db: Session, state: str | None = None) -> list[Order]:
     return list(db.scalars(query))
 ```
 
-DESPUÉS:
+DESPUÉS — repositorio de pedidos:
 
 ```python
-# app/repositories/orders.py
 def list_query(state: str | None = None) -> Select:
     query = select(*projected_columns(Order, OrderOut)).order_by(Order.creado_en, Order.pedido_id)
     if state:
         query = query.where(Order.estado == state)
     return query
-
-# app/models/entities.py — índices alineados con el orden del listado
-Index("idx_pedidos_listado", "creado_en", "pedido_id"),
-Index("idx_pedidos_estado_listado", "estado", "creado_en", "pedido_id"),
 ```
 
-**Evidencia (`EXPLAIN ANALYZE`, primera página de 12 pedidos):**
+El SQL comparativo `SELECT * FROM pedidos ORDER BY creado_en, pedido_id LIMIT 12` registra 0,269 ms ANTES y 0,042 ms DESPUÉS, con sus planes completos enlazados. Se trata de una ejecución de diagnóstico por estado; no se interpreta como una garantía estadística de latencia. La estructura del plan y el volumen leído justifican el índice.
 
-| Estado | Plan | Tiempo de ejecución |
-|---|---|---:|
-| ANTES | `Seq Scan` + `Sort` (top-N heapsort sobre 1 000 filas) | 0,609 ms |
-| DESPUÉS | `Index Scan using idx_pedidos_listado` (lee 12 filas) | 0,028 ms |
+### 3.2 Paginación en API e interfaz
 
-### 2. Paginación en backend y frontend
+El router valida HTTP, el servicio coordina y el repositorio limita SQL. `?page=1&limit=12` devuelve `{items,total,page,limit,pages}`; admite de 1 a 50 elementos por página. Sin `page` se conserva deliberadamente la lista anterior para compatibilidad. Todos los listados de la interfaz, incluido el selector de clientes en pedidos, solicitan páginas.
 
-**Diagnóstico.** `GET /api/v1/pedidos` devolvía los 1 000 pedidos (592 KB) en cada visita.
-
-**Implementación (backend).** El módulo `app/api/pagination.py` aplica la paginación a los cuatro listados. Con `?page=` responde `{ items, total, page, limit, pages }`. Sin `page`, conserva la lista anterior por compatibilidad. Los parámetros se validan (`page ≥ 1`, `1 ≤ limit ≤ 50`).
-
-ANTES:
+ANTES — listado sin límite en el endpoint:
 
 ```python
-@router.get("", response_model=list[OrderOut])
 def list_all(estado: OrderState | None = None, db: Session = Depends(get_db), user: User = Depends(require_read)):
     return repo.list_all(db, estado)
 ```
 
-DESPUÉS:
+DESPUÉS — endpoint y servicio:
 
 ```python
-@router.get("", response_model=list[OrderOut] | Page[OrderOut])
-def list_all(estado: OrderState | None = None, params: PageParams = Depends(page_params),
-             db: Session = Depends(get_db), user: User = Depends(require_read)):
-    return fetch(db, repo.list_query(estado), params)
+def list_all(estado: OrderState | None = None, params: PageParams = Depends(page_params), db: Session = Depends(get_db), user: User = Depends(require_read)):
+    return service.list_all(db, params, estado)
 
-# app/api/pagination.py
-total = db.scalar(select(func.count()).select_from(query.order_by(None).subquery())) or 0
-rows = db.execute(query.offset((params.page - 1) * params.limit).limit(params.limit)).mappings()
+def list_all(db: Session, params: PageParams, value: str | None = None) -> list[dict] | dict:
+    return fetch(db, repo.list_query(value), params)
 ```
 
-**Implementación (frontend).** El hook `usePagedList` (en `src/hooks/usePagedList.ts`) solicita bloques de 12 registros. El componente accesible `Pagination` (`<nav>` con *Anterior/Siguiente* y anuncio `aria-live`) se usa en los cuatro listados. El contador muestra el total real del servidor.
+El repositorio ejecuta la página mediante `query.offset(offset).limit(params.limit)`. El orden incluye UUID como desempate. Los filtros se aplican a filas y conteo. En React, el estado de página pertenece a filtro/sesión; `AbortController` y una marca de actividad impiden sobrescribir con respuestas antiguas. Se ajusta la página cuando queda vacía y se conserva el cliente seleccionado aunque esté fuera de la página actual.
 
-ANTES (`src/pages/VehiclesPage.tsx`):
+ANTES — descarga completa de clientes del formulario:
+
+```typescript
+api<Client[]>('/clientes?activo=true', token)
+```
+
+DESPUÉS — consulta paginada y selección por identificador:
+
+```typescript
+usePagedList<Client>('/clientes?activo=true', token, onError)
+api<Client>(`/clientes/${encodeURIComponent(value)}`, token, { signal: controller.signal })
+```
+
+Los pedidos pasan de 1000 registros / 557975 bytes a 12 registros / 1526 bytes transferidos. Las pruebas cubren parámetros inválidos, vacío, fuera de rango, filtros, cambios rápidos y actualización posterior a mutaciones.
+
+### 3.3 Imágenes AVIF/WebP adaptativas
+
+El estado histórico no tenía imágenes ráster; la marca era texto/CSS. Se incorporan variantes de la misma marca vectorial del proyecto a 52 y 104 px, usadas de forma real en el acceso. No se inventa un ahorro de imágenes en la línea base que no las tenía. El tamaño adicional queda incluido en la medición global.
+
+ANTES — marca sin recurso adaptativo:
 
 ```tsx
-const [items, setItems] = useState<Vehicle[]>([])
-async function load() {
-  try { setItems(await api<Vehicle[]>('/vehiculos', token)) }
-  catch (error) { setNotice({ text: (error as Error).message, error: true }) }
-}
-useEffect(() => { void load() }, [token])
-// ...
-<span className="count-pill">{items.length}</span>
+<span className="login-emblem" aria-hidden="true">EL<span>↗</span></span>
 ```
 
-DESPUÉS:
+DESPUÉS — uso de `<picture>` con `srcset`/`sizes`:
 
 ```tsx
-const list = usePagedList<Vehicle>('/vehiculos', token, text => setNotice({ text, error: true }))
-const { items, reload: load } = list
-// ...
-<span className="count-pill">{list.total}</span>
-<Pagination page={list.page} pages={list.pages} total={list.total} label="vehículos" onChange={list.setPage} />
-
-// src/hooks/usePagedList.ts
-export const PAGE_SIZE = 12
-export function pagedPath(path: string, page: number, limit = PAGE_SIZE): string {
-  return `${path}${path.includes('?') ? '&' : '?'}page=${page}&limit=${limit}`
-}
+<ResponsiveImage base="/brand/logo" widths={[52, 104]} sizes="52px"
+  width={52} height={52} alt="" priority />
 ```
 
-**Resultado.** Una página de 12 pedidos pesa **1 557 bytes** comprimida (7,1 KB de JSON), frente a los 592,0 KB de la lista completa (−99,7 %). Responde con una mediana de 7,2 ms, medida con `curl` en 30 peticiones.
+`ResponsiveImage` ofrece fuentes AVIF/WebP, fallback JPG y dimensiones estables; las imágenes no prioritarias usan `loading="lazy"`. La marca visible inicialmente usa carga inmediata. Los archivos de 52 px pesan 1.253 bytes JPG, 442 WebP y 654 AVIF; los de 104 px, 2.148, 658 y 602 bytes. La selección depende del soporte y densidad del dispositivo.
 
-### 3. Imágenes en formatos de nueva generación
+`check-images.mjs` se ejecuta en el build y rechaza recursos de más de 200 kB decimales (200.000 bytes) o JPG/PNG sin ambas alternativas. Su prueba crea casos válidos e inválidos en un directorio temporal y comprueba que la regla falla cuando corresponde. La variante pequeña no es necesariamente menor en AVIF que en WebP: los formatos también tienen sobrecostes de cabecera.
 
-**Diagnóstico.** La auditoría no encontró imágenes ráster en el proyecto: la marca y la ilustración de acceso se construyen con texto y CSS. Por eso no hay bytes que recortar hoy. El riesgo está en el futuro, cuando se incorporen mapas, fotos de vehículos o logotipos de clientes (US-018).
+### 3.4 Carga diferida y acceso prerenderizado
 
-**Implementación.** Se aplica la optimización como **mecanismo obligatorio y verificable**, no como una imagen añadida solo para optimizarla:
-
-- `src/components/common/ResponsiveImage.tsx` es la única vía permitida para mostrar imágenes. Entrega AVIF → WebP → JPG mediante `<picture>`, declara `width`/`height` (sin CLS) y aplica `loading="lazy"` y `decoding="async"` fuera de la vista inicial.
-- `scripts/check-images.mjs` se ejecuta al inicio de `npm run build` y **hace fallar el build** si una imagen supera 200 KB o si un JPG/PNG no tiene sus variantes AVIF y WebP.
-
-ANTES: no existía regla. Cualquier imagen podía integrarse sin comprimir con `<img src="foto.png">`.
-
-DESPUÉS:
+ANTES — pantallas importadas al inicio:
 
 ```tsx
-<picture>
-  <source srcSet={`${base}.avif`} type="image/avif" />
-  <source srcSet={`${base}.webp`} type="image/webp" />
-  <img src={`${base}.jpg`} alt={alt} width={width} height={height}
-    loading={priority ? 'eager' : 'lazy'} decoding="async" fetchPriority={priority ? 'high' : 'auto'} />
-</picture>
-```
-
-```json
-"build": "node scripts/check-images.mjs && tsc -b && vite build && node scripts/precompress.mjs"
-```
-
-**Resultado.** 0 bytes de imágenes ráster en el estado actual, y una garantía automática de que no se integrarán imágenes que incumplan la guía.
-
-### 4. Carga diferida y *code splitting*
-
-**Diagnóstico.** `App.tsx` importaba de forma estática las cinco pantallas autenticadas, así que la pantalla de acceso descargaba código que el usuario aún no podía usar.
-
-**Implementación.** Las pantallas autenticadas se cargan con `React.lazy` dentro de un `Suspense`, con un mensaje accesible (`role="status"`). Vite genera un fragmento por pantalla.
-
-ANTES (`src/App.tsx`):
-
-```tsx
+import { LoginPage } from './pages/LoginPage'
 import { HomePage } from './pages/HomePage'
 import { VehiclesPage } from './pages/VehiclesPage'
 import { OrdersPage } from './pages/OrdersPage'
-// ...
-{page === 'Vehículos' && <VehiclesPage token={token} />}
+import { DriversPage } from './pages/DriversPage'
+import { ClientsPage } from './pages/ClientsPage'
 ```
 
-DESPUÉS:
+DESPUÉS — ejemplo de módulo bajo demanda:
 
 ```tsx
 const VehiclesPage = lazy(() => import('./pages/VehiclesPage').then(m => ({ default: m.VehiclesPage })))
-const OrdersPage = lazy(() => import('./pages/OrdersPage').then(m => ({ default: m.OrdersPage })))
-// ...
-<Suspense fallback={<p className="loading" role="status">Cargando…</p>}>
-  {page === 'Vehículos' && <VehiclesPage token={token} />}
-</Suspense>
 ```
 
-**Resultado.** El JavaScript inicial pasa de 252,2 KB a 232,7 KB sin comprimir (−7,7 %). Las pantallas se separan en seis fragmentos de 0,7 a 1,9 KB con Brotli que solo se descargan al abrirlas. La mayor parte del bundle inicial es React 19, que es imprescindible.
+Las cinco páginas autenticadas están dentro de `Suspense` con estado de carga y `PageErrorBoundary`, que permite recargar si falla un módulo. Vite produce chunks separados. El build prerenderiza únicamente el acceso público con React y después lo hidrata; no incorpora tokens ni datos de usuarios. La comprobación de navegador verifica que el acceso es visible sin JavaScript y que la hidratación funciona sin errores. Esta mejora permite presentar contenido antes de descargar y ejecutar React, sin ocultar controles o aplazar la funcionalidad para alterar el score.
 
-### 5. Depuración de dependencias
+### 3.5 Dependencias necesarias y APIs nativas
 
-**Diagnóstico.** `requirements.lock` mezclaba dependencias de ejecución y de prueba, y la imagen del backend instalaba 38 paquetes.
-
-**Implementación.** `requirements.txt` y `requirements.lock` contienen solo lo que se ejecuta. `requirements-dev.txt` y `requirements-dev.lock` añaden pytest, pytest-cov y httpx para CI. Los workflows `ci.yml` y `dependency-audit.yml` usan el lock de desarrollo, así que la auditoría de vulnerabilidades sigue cubriendo todas las dependencias.
-
-ANTES (`requirements.txt`):
+ANTES — dependencias de ejecución y pruebas en el mismo archivo:
 
 ```text
 fastapi>=0.115,<1
-...
+uvicorn[standard]>=0.30,<1
+sqlalchemy>=2.0,<3
+psycopg[binary]>=3.2,<4
+pydantic-settings>=2.5,<3
+PyJWT>=2.9,<3
 alembic>=1.13,<2
 pytest>=9.0.3,<10
 pytest-cov>=5,<7
 httpx>=0.27,<1
 ```
 
-DESPUÉS:
+DESPUÉS — ejecución y desarrollo separados:
 
 ```text
-# requirements.txt (imagen Docker)        # requirements-dev.txt (CI)
-fastapi>=0.115,<1                          -r requirements.txt
-...                                        pytest>=9.0.3,<10
-alembic>=1.13,<2                           pytest-cov>=5,<7
-                                           httpx>=0.27,<1
+fastapi>=0.115,<1
+uvicorn[standard]>=0.30,<1
+sqlalchemy>=2.0,<3
+psycopg[binary]>=3.2,<4
+pydantic-settings>=2.5,<3
+PyJWT>=2.9,<3
+alembic>=1.13,<2
+
+# requirements-dev.txt
+-r requirements.txt
+pytest>=9.0.3,<10
+pytest-cov>=5,<7
+httpx>=0.27,<1
 ```
 
-**Resultado (instalación limpia en Python 3.12):** de 38 a 28 paquetes y de **83,1 MB a 74,8 MB** en `site-packages` (−8,3 MB, −10,0 %). Se retiraron certifi, coverage, httpcore, httpx, iniconfig, packaging, pluggy, pygments, pytest y pytest-cov.
+Los inventarios reales registran 39 distribuciones ANTES y 29 DESPUÉS (incluyen pip). El almacenamiento de `site-packages` pasa de 115,83 a 99,89 MB. Los locks con hashes preservan la instalación reproducible; CI usa el lock de desarrollo y la imagen de ejecución solo el de producción.
 
-**Frontend.** El bundle de producción solo contiene `react` y `react-dom`; el resto son dependencias de desarrollo que no llegan al navegador. Para la caché del cliente **se decidió no añadir TanStack Query**: la revalidación HTTP nativa (`fetch` con `cache: 'no-cache'` + ETag) cubre la necesidad sin sumar una librería al bundle. Es la sustitución por APIs nativas que plantea la consigna.
+El frontend mantiene React y ReactDOM como dependencias de producción; se usa `fetch` nativo para revalidar, sin añadir una librería de caché. Las herramientas de auditoría tienen su propio lock. Se actualizaron Lighthouse/Puppeteer/LHCI y se fijó `basic-ftp` 6.2.6 mediante override por una vulnerabilidad transitiva; la auditoría npm final no registra vulnerabilidades. La compatibilidad del override se comprobó ejecutando LHCI y los recorridos, no mediante un downgrade automático.
 
-### 6. Reducción de solicitudes HTTP
+### 3.6 Solicitudes HTTP e iconos inline
 
-**Diagnóstico.** `index.html` no declaraba ícono, así que el navegador pedía `/favicon.ico`. Caddy resolvía esa ruta con `try_files` y devolvía de nuevo `index.html`: una petición y unos bytes inútiles en cada carga.
-
-**Implementación.** El ícono de la marca se incrusta como SVG inline (`data:` URI, 0,3 KB) en `index.html`. La aplicación no usa fuentes ni sprites de íconos externos.
-
-ANTES:
+ANTES — sin favicon declarado:
 
 ```html
 <title>EcoLogística Lima</title>
 ```
 
-DESPUÉS:
+DESPUÉS — ícono SVG en la propia página:
 
 ```html
-<title>EcoLogística Lima</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E...%3C/svg%3E" />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23141a1a'/%3E%3Cpath d='M9 22 22 9m-8 0h8v8' stroke='%239df8bf' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
 ```
 
-**Resultado.** La pantalla de acceso pasa de **4 a 3 peticiones**. El recorrido autenticado suma peticiones pequeñas por los fragmentos de `React.lazy` (de 7 a 13), pero transfiere **96,7 % menos bytes**.
+El SVG inline evita la solicitud adicional a `/favicon.ico`. En la versión final, la marca adaptativa introduce una petición de imagen: el total de acceso queda en 4 peticiones en ambos estados. El recorrido pasa de 7 a 13 solicitudes por los chunks bajo demanda, pero transfiere muchos menos bytes. No se afirma una reducción neta de peticiones que la medición no respalda; se documenta la optimización específica y su compensación en el resultado global.
 
-### 7. Estrategia de caché
+### 3.7 Caché y validación condicional
 
-**Diagnóstico.** Las respuestas de la API no tenían validadores y el cliente usaba `cache: 'no-store'`, así que cada visita repetía la descarga completa. Los assets con hash no declaraban vigencia.
+ANTES — cliente sin almacenamiento:
 
-**Implementación.**
+```typescript
+cache: 'no-store'
+```
 
-- `app/core/http_cache.py`: `ETagMiddleware` calcula un ETag débil (SHA-256) del cuerpo de cada GET 200 de la API y responde **304 sin cuerpo** si coincide con `If-None-Match`. Añade `Cache-Control: private, no-cache` (siempre revalida, nunca muestra datos operativos vencidos) y `Vary: Authorization`. Los errores no se cachean.
-- `Caddyfile.staging`: `/assets/*` con `Cache-Control: public, max-age=31536000, immutable`; `index.html` y las rutas de la SPA con `no-cache`.
-- Frontend (`src/api.ts`): `cache: 'no-store'` pasa a `cache: 'no-cache'`. El navegador conserva la respuesta y la revalida con `If-None-Match`; si no cambió, recibe 304 y reutiliza su copia. Es el equivalente nativo de la caché de React Query, sin dependencias.
+DESPUÉS — GET revalidable; escrituras y autenticación sin almacenamiento:
 
-ANTES (`Caddyfile.staging`):
+```typescript
+cache: !init.method || init.method === 'GET' ? 'no-cache' : 'no-store'
+```
+
+El middleware calcula ETag sobre contenido autorizado, devuelve 304 sin cuerpo si no cambió y añade `Cache-Control: private, no-cache` y `Vary: Authorization`. La autorización se evalúa antes de responder 304. Errores, escrituras y login usan `no-store`; el token queda en memoria y no se cachea en un almacén compartido. Mutaciones cambian el contenido/validador y la interfaz recarga el listado.
+
+ANTES — estáticos sin política explícita:
 
 ```caddyfile
 handle {
@@ -314,7 +217,7 @@ handle {
 }
 ```
 
-DESPUÉS:
+DESPUÉS — assets con hash:
 
 ```caddyfile
 @assets path /assets/*
@@ -325,29 +228,13 @@ handle @assets {
         precompressed br gzip
     }
 }
-handle {
-    root * /srv
-    header Cache-Control "no-cache"
-    try_files {path} /index.html
-    file_server {
-        precompressed br gzip
-    }
-}
 ```
 
-**Resultado.** Una consulta repetida sin cambios devuelve `304 Not Modified` con **0 bytes** de cuerpo (prueba `test_etag_returns_304_when_content_is_unchanged` y verificación con `curl` sobre Caddy).
+El HTML permanece revalidable para recibir versiones nuevas. Las pruebas comprueban que retirar permisos invalida el acceso incluso con un ETag conocido y que actualizar/desactivar produce un 200 con contenido actualizado.
 
-### 8. Compresión de respuestas
+### 3.8 Compresión HTTP
 
-**Diagnóstico.** Ni FastAPI ni Caddy comprimían. El JSON de pedidos (592 KB) y el JavaScript (252 KB) viajaban en texto plano.
-
-**Implementación.** Caddy estándar no incluye Brotli dinámico, así que se combinan tres mecanismos:
-
-- **Recursos estáticos:** `src/frontend/scripts/precompress.mjs` (solo `zlib` nativo, sin dependencias) genera `.br` (calidad 11) y `.gz` en el build, y Caddy los sirve con `precompressed br gzip`.
-- **API:** `GZipMiddleware` de FastAPI comprime las respuestas de 1 KB o más.
-- **Pasarela:** Caddy aplica `encode zstd gzip` a lo que llegue sin comprimir.
-
-ANTES (`app/main.py`): sin middleware de compresión.
+ANTES — API sin middleware de compresión; Caddy sin codificación.
 
 DESPUÉS:
 
@@ -356,130 +243,151 @@ app.add_middleware(ETagMiddleware)
 app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=6)
 ```
 
-**Resultado.**
+```caddyfile
+encode zstd gzip
+# En los manejadores de estáticos:
+file_server {
+    precompressed br gzip
+}
+```
 
-- JavaScript inicial: 252,2 KB → **62,5 KB** con Brotli.
-- `GET /pedidos` completo: 592,0 KB → **87,5 KB** con gzip.
-- Página de acceso: 267,9 KB → **68,1 KB** (incluye el efecto de `React.lazy` y del ícono inline).
+Node `zlib` genera `.br` y `.gz` durante el build; Brotli se aplica una vez a recursos estáticos, no en cada petición. FastAPI comprime JSON de al menos 1 KB. Caddy negocia formatos y evita recomprimir contenido que ya llega codificado. Se mantienen respuestas sin compresión para clientes que no la solicitan. Los JSON de API y las métricas permiten distinguir tamaño lógico de transferencia real; la compresión añade CPU y no debe confundirse con una medición eléctrica.
 
-## 1.6 Tabla comparativa ANTES vs DESPUÉS
+## 4. Comparación consolidada
 
-Fuente: [`metricas-antes.json`](evidencias/metricas-antes.json) y [`metricas-despues.json`](evidencias/metricas-despues.json), con la mediana de 5 corridas por modo.
+Una variación positiva significa aumento; la columna de reducción puede ser negativa cuando una métrica empeora. No se atribuyen mejoras a variaciones pequeñas de tiempos.
 
-| Métrica / indicador | ANTES (`cfcd53f`) | DESPUÉS | Variación absoluta | Mejora |
+| Indicador | ANTES | DESPUÉS | Variación absoluta | Reducción |
 |---|---:|---:|---:|---:|
-| Score de rendimiento, escritorio | 100 / 100 | 100 / 100 | 0 | — |
-| Score de rendimiento, móvil | 96 / 100 | 100 / 100 | +4 pts | +4,2 % |
-| FCP escritorio | 0,50 s | 0,34 s | −0,17 s | −33,1 % |
-| LCP escritorio | 0,50 s | 0,34 s | −0,17 s | −33,1 % |
-| FCP móvil (4G simulado) | 2,17 s | 1,27 s | −0,90 s | −41,3 % |
-| LCP móvil (4G simulado) | 2,32 s | 1,27 s | −1,05 s | −45,1 % |
-| TBT de la pantalla de acceso | 0 ms | 0 ms | 0 | — |
-| TBT del recorrido autenticado | 88 ms | 0 ms | −88 ms | −100 % |
-| CLS | 0 | 0 | 0 | — |
-| Peso de la pantalla de acceso | 267,9 KB (4 peticiones) | 68,1 KB (3 peticiones) | −199,8 KB | −74,6 % |
-| Bytes del recorrido autenticado | 785,9 KB | 25,7 KB | −760,2 KB | −96,7 % |
-| **Bytes por sesión (acceso + recorrido)** | **1 053,9 KB** | **93,8 KB** | **−960,0 KB** | **−91,1 %** |
-| Respuesta de pedidos que pide la interfaz | 592,0 KB (1 000 registros) | 1,6 KB (12 registros) | −590,4 KB | −99,7 % |
-| Primera página de pedidos en PostgreSQL | 0,609 ms | 0,028 ms | −0,581 ms | −95,4 % |
-| JavaScript inicial (transferido) | 252,2 KB | 62,5 KB (Brotli) | −189,7 KB | −75,2 % |
-| Paquetes Python en la imagen | 38 (83,1 MB) | 28 (74,8 MB) | −10 (−8,3 MB) | −10,0 % |
+| Escritorio: Score | 100,00 /100 | 100,00 /100 | 0,00 | 0,00 % |
+| Escritorio: FCP | 203,61 ms | 206,29 ms | 2,68 | -1,32 % |
+| Escritorio: LCP | 203,61 ms | 206,29 ms | 2,68 | -1,32 % |
+| Escritorio: TBT | 0,00 ms | 0,00 ms | 0,00 | — |
+| Escritorio: CLS | 0,00  | 0,00  | 0,00 | — |
+| Escritorio: Transferencia | 267 922,00 bytes | 69 893,00 bytes | -198 029,00 | 73,91 % |
+| Escritorio: Peticiones | 4,00  | 4,00  | 0,00 | 0,00 % |
+| Móvil: Score | 100,00 /100 | 100,00 /100 | 0,00 | 0,00 % |
+| Móvil: FCP | 751,77 ms | 753,98 ms | 2,20 | -0,29 % |
+| Móvil: LCP | 751,77 ms | 753,98 ms | 2,20 | -0,29 % |
+| Móvil: TBT | 0,00 ms | 0,00 ms | 0,00 | — |
+| Móvil: CLS | 0,00  | 0,00  | 0,00 | — |
+| Móvil: Transferencia | 267 922,00 bytes | 69 841,00 bytes | -198 081,00 | 73,93 % |
+| Móvil: Peticiones | 4,00  | 4,00  | 0,00 | 0,00 % |
+| Sesión completa (bytes) | 1 011 683,00 | 87 589,00 | -924 094,00 | 91,34 % |
+| Recorrido autenticado (bytes) | 743 761,00 | 17 696,00 | -726 065,00 | 97,62 % |
+| Peticiones del recorrido | 7,00 | 13,00 | 6,00 | -85,71 % |
+| TBT del recorrido (ms) | 64,47 | 0,00 | -64,47 | 100,00 % |
 
-**Cumplimiento de los umbrales de la rúbrica** (escritorio, preset de Lighthouse CI):
+### 4.1 Respuesta API: media, mediana y P95
 
-| Umbral | Valor DESPUÉS | Estado |
+| Recurso | Transferencia ANTES → DESPUÉS (bytes) | Media ANTES → DESPUÉS (ms) | Mediana ANTES → DESPUÉS (ms) | P95 ANTES → DESPUÉS (ms) |
+|---|---:|---:|---:|---:|
+| pedidos | 557975 → 1526 | 40.1 → 12.0 | 35.3 → 11.6 | 78.7 → 16.7 |
+| vehiculos | 15611 → 716 | 9.9 → 10.5 | 8.2 → 10.1 | 16.7 → 13.3 |
+| conductores | 18278 → 841 | 8.0 → 10.0 | 7.9 → 9.9 | 9.1 → 11.7 |
+| clientes | 75142 → 790 | 11.0 → 10.3 | 10.8 → 10.1 | 12.7 → 12 |
+
+Las estadísticas provienen de las 30 muestras `samples_ms` de cada recurso, conservadas en los JSON; la media aritmética se deriva de esas mismas muestras. No es una nueva medición ni se combina con otra carga.
+
+Las medianas de ambos presets y del recorrido cumplen score ≥90, FCP ≤1.000 ms, LCP ≤1.400 ms, TBT ≤85 ms, CLS ≤0,02 y transferencia ≤1.100.000 bytes. El script `check_budgets.py` falla si falta una métrica, no hay tres corridas o se rebasa algún umbral. LHCI ejecutó además tres auditorías y pasó todas las aserciones. Una [prueba negativa intencional](evidencias/validacion-20261110/lhci/presupuesto-negativo.json) con FCP máximo de 1 ms devolvió error sobre los mismos reportes; al restaurar el presupuesto real volvió a aprobar, sin repetir auditorías. Son resultados locales del código identificado, no métricas de producción ni una promesa de igualdad en cualquier equipo.
+
+## 5. Impacto ambiental y energía atribuida
+
+Se emplea [SWDM v4, fuente oficial](https://sustainablewebdesign.org/estimating-digital-emissions/): datos en GB decimales; intensidades operativas 0,055 + 0,059 + 0,080 = 0,194 kWh/GB y energía incorporada 0,012 + 0,013 + 0,081 = 0,106 kWh/GB. Se aplica intensidad mundial de 494 g CO2e/kWh, sin descuento por hosting verde ni por visitas recurrentes. El total es 0,300 kWh/GB. Es energía atribuida por un modelo, no consumo eléctrico medido del servidor.
+
+La fórmula del HTML de referencia usa otros coeficientes y emisiones “ajustadas” sin detallar sus factores. Se reemplaza por el modelo v4 verificable; no se copian sus resultados de ejemplo.
+
+```text
+GB = bytes / 1.000.000.000
+kWh_operativos = GB × 0,194
+kWh_incorporados = GB × 0,106
+kWh_atribuidos = GB × 0,300
+g_CO2e = kWh_atribuidos × 494
+reducción_% = (ANTES − DESPUÉS) / ANTES × 100
+```
+
+| Estado | Bytes/sesión | GB/sesión | kWh atribuidos/sesión | g CO2e/sesión | kWh/año | kg CO2e/año |
+|---|---:|---:|---:|---:|---:|---:|
+| ANTES | 1011683 | 0,001011683 | 0,000303505 | 0,149931 | 18,210294 | 8,995885 |
+| DESPUÉS | 87589 | 0,000087589 | 0,000026277 | 0,012981 | 1,576602 | 0,778841 |
+
+La proyección es un escenario hipotético de 60.000 sesiones/año (10 operadores × 20 sesiones/día × 300 días), no tráfico real confirmado. El ahorro estimado es 16,633692 kWh atribuidos y 8,217044 kg CO2e/año (91,34 %). Se conserva precisión completa hasta presentar el resultado. No se convierten estos valores en árboles o kilómetros sin una fuente específica.
+
+El cálculo puede reproducirse con `python3 scripts/green_it/swdm.py <antes.json> <despues.json> 60000`. Sus pruebas verifican GB decimal, factores, negativos y el uso de bytes de sesiones emparejadas. El modelo no demuestra una reducción física de CPU, consumo eléctrico o emisiones medidas; usar otro factor local alteraría el valor absoluto.
+
+## 6. Evidencias, pruebas y estado de la rúbrica
+
+| Comprobación | Resultado local | Evidencia |
+|---|---|---|
+| Backend SQLite | 59 pruebas, 94,53 % de cobertura | `tests/test_green_it.py`, `tests/test_green_contracts.py` y regresión US-001–US-015 |
+| Backend PostgreSQL 16 aislado | 59 pruebas, 94,53 %; upgrade Alembic y check sin diferencias | Base separada `sprint4_regression_test` |
+| Frontend | 32 pruebas; 93,68 % de líneas y build correcto | Vitest/RTL; hook 100 % de líneas |
+| Herramientas | 3 pruebas de cálculos/presupuestos y 1 de imágenes, 1 de estadística y 1 de redacción de secretos | Unit tests; verifican el fallo de presupuestos y guardián |
+| Navegador | 33 comprobaciones, 360/1440 px, sin errores | [Registro del flujo](evidencias/validacion-20261110/verificacion-flujo.json) |
+| Lighthouse | Tres corridas por preset/estado y tres flujos por estado | [ANTES](evidencias/validacion-20261110/metricas-antes.json), [DESPUÉS](evidencias/validacion-20261110/metricas-despues.json) y reportes individuales en esa carpeta |
+| Lighthouse CI | Tres corridas, sin aserciones fallidas | [Aserciones](evidencias/validacion-20261110/lhci/assertion-results.json), [manifiesto](evidencias/validacion-20261110/lhci/manifest.json) |
+| Fuente auditada | Captura del árbol de trabajo antes de publicar | [Manifiesto SHA-256](evidencias/validacion-20261110/source-snapshot.json) |
+
+Axe revisó los cuatro módulos a 360 y 1440 px sin infracciones A/AA detectadas; el [registro](evidencias/validacion-20261110/accesibilidad-axe.json) conserva también comprobaciones incompletas que requieren revisión humana. No acredita conformidad universal. Python y npm no registran vulnerabilidades conocidas en el alcance auditado. Los [headers HTTP reales](evidencias/validacion-20261110/http-cache-compression.json) verifican 304 sin cuerpo, gzip, Brotli, caché privada y assets immutable a través de Caddy.
+
+La prueba de navegador se ejecutó en `ecolog-green-after` después de la medición inicial y añadió vehículos `E04-*`. La medición final usa la carga nueva de `ecolog-green-final`, sin esas escrituras. La [comparación por hash](evidencias/validacion-20261110/build-equality.json) demuestra igualdad de los assets servidos y del código backend en ambos entornos. Las capturas de interfaz reflejan ese entorno de comprobación; los conteos usados para rendimiento son los guardados antes de las escrituras. La advertencia de deprecación de TestClient/httpx no impidió las pruebas y no se declara como fallo funcional.
+
+| Criterio de evaluación | Peso | Estado verificable |
 |---|---:|---|
-| Score ≥ 90 | 100 | Cumple |
-| FCP ≤ 1,0 s | 0,34 s | Cumple |
-| LCP ≤ 1,4 s | 0,34 s | Cumple |
-| TBT ≤ 85 ms | 0 ms | Cumple |
-| CLS ≤ 0,02 | 0 | Cumple |
-| Peso ≤ 1,1 MB | 68,1 KB (página) / 93,8 KB (sesión completa) | Cumple |
+| Ocho áreas, diagnóstico, métricas y cálculo | 11 | Implementación y validación local disponibles; imágenes usadas realmente y sus límites descritos |
+| Estándares, arquitectura y matriz | 4 | [Segundo informe](<02 Estandares Ingeniería de software V_1_0_0.md>), ocho filas y reglas verificables |
+| CI/CD, estructura y Git | 3 | YAML y LHCI comprobados localmente; ejecución de este cambio en GitHub y su publicación pendientes |
+| Documento y comunicación | 2 | Dos informes, código delimitado, tablas y navegación relativa; revisión académica final pendiente |
 
-En móvil con 4G simulado, el LCP (1,27 s) cumple el umbral de 1,4 s y el FCP (1,27 s) queda por encima de 1,0 s, condicionado por la latencia de red simulada. Se reporta tal cual.
+No se adjudica una nota ni se declara completado el DoD por estas pruebas. La revisión independiente, la ejecución en GitHub del cambio final y su publicación requieren evidencia propia.
 
-## 1.7 Análisis de impacto ambiental (SWDM v4)
+El [HTTPS local](evidencias/validacion-20261110/https-local.json) respondió 200 con certificado y hostname verificados mediante la CA local de Caddy, sin desactivar la verificación TLS ni instalar confianza global.
 
-**Modelo.** Se usa el [Sustainable Web Design Model v4](https://sustainablewebdesign.org/estimating-digital-emissions/). Este modelo reemplaza al v3 del ejemplo de la consigna, que usaba 0,81 kWh/GB y 442 g/kWh. Sus constantes son:
+## 7. Ejecución reproducible y gestión de versiones
 
-| Segmento | Operativa (kWh/GB) | Incorporada (kWh/GB) |
-|---|---:|---:|
-| Centros de datos | 0,055 | 0,012 |
-| Redes | 0,059 | 0,013 |
-| Dispositivos de usuario | 0,080 | 0,081 |
-| **Total** | **0,194** | **0,106** |
+Desde la raíz, con Python 3.12, Node 22 y Docker:
 
-**Fórmula aplicada.**
+```bash
+python3 scripts/green_it/prepare_env.py --output /tmp/ecolog-green.env
+# El archivo temporal conserva las credenciales; no se agrega a Git.
+docker compose --env-file /tmp/ecolog-green.env -f docker-compose.staging.yml -p ecolog-green up -d --build --wait
+docker cp scripts/green_it/seed_carga.py ecolog-green-backend-1:/tmp/seed_carga.py
+docker exec -e GREEN_AUDIT_SEED=1 ecolog-green-backend-1 python /tmp/seed_carga.py
+npm ci --ignore-scripts --prefix scripts/green_it
+# CHROME_PATH debe señalar al Chrome instalado en el equipo.
+python3 scripts/green_it/run_measure.py despues /tmp/ecolog-green-resultados --env-file /tmp/ecolog-green.env
+python3 scripts/green_it/check_budgets.py /tmp/ecolog-green-resultados/metricas-despues.json
+scripts/green_it/node_modules/.bin/lhci autorun --config=lighthouserc.json
+# Ejecutar la comprobación con escrituras después de medir:
+python3 scripts/green_it/run_measure.py despues /tmp/ecolog-green-resultados --env-file /tmp/ecolog-green.env --verify-flow
+```
 
-E (g CO2e) = datos (GB) × 0,300 kWh/GB × 494 g CO2e/kWh
+Para recuperar ANTES, ejecutar `git archive cfcd53f` en una carpeta separada, crear otro proyecto Compose y otro archivo de entorno con puertos distintos. Copiar allí la misma semilla y medir con la etiqueta `antes`. No sustituir el código ni la base operativa del desarrollador para generar el contraste. Para repetir un ensayo con la misma semilla después de escrituras, crear un entorno de auditoría nuevo: la semilla rechaza cargas parciales y bases ajenas; no borra registros.
 
-Se asumen las siguientes condiciones:
+El workflow [green-audit.yml](../../../.github/workflows/green-audit.yml) reproduce build, semilla, LHCI, presupuestos, recorrido y artefactos privados, con dependencias fijadas y permisos mínimos. No usa `|| true` para convertir fallos en éxito ni publica reportes en almacenamiento público temporal.
 
-- Factor de hosting verde igual a 0, porque no hay proveedor verificado.
-- Se considera visitante nuevo, sin descontar caché. Es el escenario conservador.
-- La intensidad de la red eléctrica es el promedio mundial del modelo.
-- 1 GB equivale a 10⁹ bytes.
-
-**Cálculo por sesión de operador:**
-
-| Escenario | Bytes/sesión | GB/sesión | kWh/sesión | g CO2e/sesión |
-|---|---:|---:|---:|---:|
-| ANTES | 1 053 854 | 0,001054 | 0,0003162 | 0,1562 |
-| DESPUÉS | 93 830 | 0,000094 | 0,0000281 | 0,0139 |
-
-Verificación:
-
-- ANTES: 0,001054 GB × 0,300 = 0,0003162 kWh; 0,0003162 kWh × 494 = 0,1562 g CO2e.
-- DESPUÉS: 0,0000938 GB × 0,300 = 0,0000281 kWh; 0,0000281 kWh × 494 = 0,0139 g CO2e.
-- Reducción: 0,1423 g CO2e por sesión (−91,1 %).
-
-**Proyección anual.** Supuesto declarado: 10 operadores × 20 sesiones/día × 300 días = **60 000 sesiones/año**.
-
-| Escenario | kWh/año | kg CO2e/año |
-|---|---:|---:|
-| ANTES | 18,969 | 9,371 |
-| DESPUÉS | 1,689 | 0,834 |
-| **Ahorro** | **17,280 kWh** | **8,537 kg CO2e (−91,1 %)** |
-
-El valor absoluto es pequeño porque EcoLogística es una aplicación interna con pocos usuarios. Lo relevante es que la reducción es proporcional: el ahorro por sesión se mantiene si crecen los operadores o el volumen de pedidos. Además, con paginación el tamaño de cada respuesta ya no depende del número de pedidos almacenados.
-
-## 1.8 Evidencias de validación
-
-| Evidencia | Archivo |
-|---|---|
-| Métricas ANTES (JSON) | [`evidencias/metricas-antes.json`](evidencias/metricas-antes.json) |
-| Métricas DESPUÉS (JSON) | [`evidencias/metricas-despues.json`](evidencias/metricas-despues.json) |
-| Reportes Lighthouse ANTES (escritorio, móvil y recorrido) | [`lighthouse-antes-desktop.html`](evidencias/lighthouse-antes-desktop.html), [`lighthouse-antes-mobile.html`](evidencias/lighthouse-antes-mobile.html), [`flow-antes.html`](evidencias/flow-antes.html) |
-| Reportes Lighthouse DESPUÉS | [`lighthouse-despues-desktop.html`](evidencias/lighthouse-despues-desktop.html), [`lighthouse-despues-mobile.html`](evidencias/lighthouse-despues-mobile.html), [`flow-despues.html`](evidencias/flow-despues.html) |
-| Pruebas automatizadas | `src/backend/tests/test_green_it.py` (13 pruebas), `src/frontend/src/hooks/usePagedList.test.ts` y la prueba de paginación en `App.test.tsx` |
-| Auditoría continua | [`.github/workflows/green-audit.yml`](../../../.github/workflows/green-audit.yml) y [`lighthouserc.json`](../../../lighthouserc.json) |
-
-## 1.9 Limitaciones
-
-- Las mediciones son locales (localhost, sin latencia real de red). Lighthouse móvil simula 4G, pero no reemplaza una medición de campo.
-- La pantalla de acceso ya cumplía los umbrales de escritorio en el estado ANTES. Por eso la mejora principal está en los datos del recorrido autenticado, no en el score.
-- El recorrido mide la primera visita a cada listado. Las visitas repetidas se benefician además del 304 y de la caché inmutable de assets, que este cálculo conservador no descuenta.
-- La compresión gzip añade CPU en el servidor cuando alguien pide la lista completa sin `page`: la mediana de `GET /pedidos` completo sube de 30,7 a 46,1 ms. La interfaz ya no hace esa petición; pide páginas de 12 registros, que responden en 7,2 ms (`curl`, mediana de 30).
-- Las emisiones usan la intensidad mundial de SWDM v4. Con datos de la red peruana el valor absoluto cambiaría, pero no el porcentaje.
-
-## 3. Gestión de versiones con Git
-
-Secuencia aplicada para publicar la entrega (v1.0.0):
+La rama local `sprint-4` se creó desde los avances existentes. Las mediciones se capturaron antes del commit. El usuario autorizó posteriormente registrar los cambios localmente; `git log -1` identifica ese registro. La publicación remota, tags y merge siguen pendientes de autorización. La secuencia siguiente documenta el procedimiento de registro y publicación; no acredita un push ya ejecutado:
 
 ```bash
 git status
-git checkout -b inspeccion-04-green-it
-mkdir -p "docs/03 Implementación/reduccion del impacto ambiental/evidencias"
-git add "docs/03 Implementación/reduccion del impacto ambiental/" .github/workflows/green-audit.yml lighthouserc.json scripts/green_it/
-git commit -m "docs(green-it): add environmental impact report and software engineering standards v1.0.0"
-git tag -a v1.0.0-green-it -m "Inspección 04: reducción del impacto ambiental"
-git push -u origin inspeccion-04-green-it --follow-tags
+mkdir -p "docs/03 Implementación/reduccion del impacto ambiental"
+git add src scripts .github .gitignore docker-compose.staging.yml lighthouserc.json README.md AGENTS.md "docs/03 Implementación/reduccion del impacto ambiental"
+git diff --cached --check
+git commit -m "feat(green-it): validar Sprint 4 y documentar entrega v1.0.0"
+git push -u origin sprint-4
+# Revisar el PR y sus controles antes de autorizar integración a main.
 ```
 
-## Control documental
+Se conserva el fin planificado de Jira del 23/11/2026; la fecha oficial académica todavía no fue confirmada. La revisión formal y aceptación se registrarán cuando ocurran.
 
-| Versión | Fecha | Cambio |
+Los fragmentos DOM que conservaban credenciales temporales se redactaron antes de entregar los artefactos; [el registro de redacción](evidencias/validacion-20261110/redaccion-secretos.json) identifica los archivos afectados. El exportador aplica ahora esa redacción automáticamente, con una prueba que comprueba que las métricas numéricas permanecen intactas.
+
+## 8. Control documental
+
+| Revisión | Fecha | Cambio |
 |---|---|---|
-| V_1_0_0 | 10/11/2026 | Versión inicial: diagnóstico, ocho optimizaciones, comparativa medida y cálculo SWDM v4. |
+| V_1_0_0 | 10/11/2026 | Documento heredado de la rama `respaldo-frontend`, commit `e7ac3ff`. |
+| V_1_0_1 | 10/11/2026 | Validación sobre código corregido, nuevas mediciones, matemática reproducible y distinción de resultados locales/publicación. Nombre de archivo conservado por consigna. |
+| V_1_0_2 | 10/11/2026 | Retirada de evidencias superadas y HTML/logs redundantes; todas las muestras y métricas vigentes se mantienen sin cambios. |
 
 [← Volver al README](../../../README.md)

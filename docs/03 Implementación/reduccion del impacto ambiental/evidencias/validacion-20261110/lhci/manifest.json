@@ -1,0 +1,39 @@
+[
+  {
+    "url": "http://localhost:8180/",
+    "isRepresentativeRun": false,
+    "jsonPath": "localhost--2026_11_10_06_57_08.report.json",
+    "summary": {
+      "performance": 1,
+      "accessibility": 1,
+      "best-practices": 1,
+      "seo": 0.82,
+      "agentic-browsing": 0.5
+    }
+  },
+  {
+    "url": "http://localhost:8180/",
+    "isRepresentativeRun": false,
+    "jsonPath": "localhost--2026_11_10_06_57_29.report.json",
+    "summary": {
+      "performance": 1,
+      "accessibility": 1,
+      "best-practices": 1,
+      "seo": 0.82,
+      "agentic-browsing": 0.5
+    }
+  },
+  {
+    "url": "http://localhost:8180/",
+    "isRepresentativeRun": true,
+    "htmlPath": "localhost--2026_11_10_06_57_18.report.html",
+    "jsonPath": "localhost--2026_11_10_06_57_18.report.json",
+    "summary": {
+      "performance": 1,
+      "accessibility": 1,
+      "best-practices": 1,
+      "seo": 0.82,
+      "agentic-browsing": 0.5
+    }
+  }
+]

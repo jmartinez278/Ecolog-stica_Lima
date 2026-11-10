@@ -3,7 +3,7 @@ from uuid import UUID
 from sqlalchemy import Select, select
 from sqlalchemy.orm import Session
 
-from app.api.pagination import projected_columns
+from app.repositories.pagination import projected_columns
 from app.models import Client, Order
 from app.schemas.operations import OrderOut
 

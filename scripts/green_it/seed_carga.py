@@ -6,11 +6,14 @@ carga para medir el estado ANTES y DESPUÉS. Solo para entornos locales.
 
 Uso, desde src/backend:  python ../../scripts/green_it/seed_carga.py
 """
+import os
 import random
 import sys
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
+from uuid import NAMESPACE_URL, uuid5
+from sqlalchemy.engine import make_url
 
 sys.path.insert(0, str(Path.cwd()))
 
@@ -28,27 +31,34 @@ APELLIDOS = ["Quispe", "Flores", "Ramos", "Torres", "Huamán", "Rojas", "Mendoza
 
 
 def main() -> None:
+    from app.core.config import settings
+    database = make_url(settings.database_url).database or ""
+    if os.getenv("GREEN_AUDIT_SEED") != "1" or not database.endswith("_test"):
+        raise RuntimeError("La carga requiere GREEN_AUDIT_SEED=1 y una base aislada *_test")
     rng = random.Random(2026)
     base = datetime(2026, 11, 2, 8, 0, tzinfo=timezone.utc)
     with SessionLocal() as db:
-        if db.scalar(select(func.count()).select_from(Order)) >= PEDIDOS:
+        counts = [db.scalar(select(func.count()).select_from(model)) for model in (Vehicle, Driver, Client, Order)]
+        if counts == [VEHICULOS, CONDUCTORES, CLIENTES, PEDIDOS]:
             print("La carga ya existe; no se duplica.")
             return
+        if counts != [0, 0, 1, 0]:
+            raise RuntimeError(f"Base no vacía o carga parcial: {counts}; no se modifica")
         for i in range(VEHICULOS):
             marca, modelo = MARCAS[i % len(MARCAS)]
-            db.add(Vehicle(placa=f"GRN-{i:03d}", marca=marca, modelo=modelo,
+            db.add(Vehicle(vehiculo_id=uuid5(NAMESPACE_URL, f"green/vehicle/{i}"), creado_en=base, actualizado_en=base, placa=f"GRN-{i:03d}", marca=marca, modelo=modelo,
                            capacidad_kg=Decimal(rng.choice([1500, 2500, 3500, 5000])),
                            capacidad_m3=Decimal(rng.choice([8, 12, 18, 25])),
                            consumo_km_l=Decimal("8.5"), factor_emision_kg_co2_km=Decimal("0.310000"),
                            estado=rng.choice(["DISPONIBLE", "DISPONIBLE", "EN_RUTA", "MANTENIMIENTO"])))
         for i in range(CONDUCTORES):
-            db.add(Driver(nombres=rng.choice(NOMBRES), apellidos=f"{rng.choice(APELLIDOS)} {rng.choice(APELLIDOS)}",
+            db.add(Driver(conductor_id=uuid5(NAMESPACE_URL, f"green/driver/{i}"), creado_en=base, actualizado_en=base, nombres=rng.choice(NOMBRES), apellidos=f"{rng.choice(APELLIDOS)} {rng.choice(APELLIDOS)}",
                           numero_licencia=f"Q{40000000 + i}", categoria_licencia=rng.choice(["A-IIb", "A-IIIa", "A-IIIb"]),
                           telefono=f"9{rng.randint(10000000, 99999999)}", experiencia_anios=rng.randint(1, 25)))
         clientes = []
-        for i in range(CLIENTES):
+        for i in range(CLIENTES - 1):
             distrito = rng.choice(DISTRITOS)
-            c = Client(nombre=f"Bodega {distrito} {i:03d}", telefono=f"01{rng.randint(4000000, 7999999)}",
+            c = Client(cliente_id=uuid5(NAMESPACE_URL, f"green/client/{i}"), creado_en=base, nombre=f"Bodega {distrito} {i:03d}", telefono=f"01{rng.randint(4000000, 7999999)}",
                        email=f"cliente{i:03d}@carga.example.test",
                        preferencia_entrega="Entrega por la mañana, coordinar con encargado de almacén.",
                        restriccion_acceso=f"Calle angosta en {distrito}; solo vehículos menores a 5 toneladas.")
@@ -58,7 +68,7 @@ def main() -> None:
         for i in range(PEDIDOS):
             inicio = base + timedelta(hours=rng.randint(0, 24 * 14))
             distrito = rng.choice(DISTRITOS)
-            db.add(Order(cliente_id=rng.choice(clientes).cliente_id, codigo_pedido=f"PED-GRN-{i:05d}",
+            db.add(Order(pedido_id=uuid5(NAMESPACE_URL, f"green/order/{i}"), creado_en=base, actualizado_en=base, cliente_id=rng.choice(clientes).cliente_id, codigo_pedido=f"PED-GRN-{i:05d}",
                          direccion_entrega=f"Av. Principal {rng.randint(100, 3999)}, {distrito}, Lima",
                          referencia_entrega="Frente al parque, portón verde.",
                          latitud=Decimal(f"{-12.2 + rng.random() * 0.3:.6f}"),

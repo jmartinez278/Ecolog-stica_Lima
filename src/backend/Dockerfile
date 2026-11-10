@@ -7,7 +7,7 @@ COPY requirements.lock .
 RUN pip install --no-cache-dir --only-binary=:all: --require-hashes -r requirements.lock
 COPY app/ ./app/
 COPY alembic/ ./alembic/
-COPY alembic.ini ./
+COPY alembic.ini start_render.sh ./
 USER app
 EXPOSE 8000
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -3,11 +3,10 @@ from uuid import UUID
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.api.pagination import Page, PageParams, fetch, page_params
+from app.api.pagination import Page, PageParams, page_params
 from app.core.security import require_read, require_write
 from app.db.session import get_db
 from app.models import User
-from app.repositories import drivers as repo
 from app.schemas.operations import DriverInput, DriverOut
 from app.services import drivers as service
 
@@ -21,7 +20,7 @@ def create(data: DriverInput, db: Session = Depends(get_db), user: User = Depend
 
 @router.get("", response_model=list[DriverOut] | Page[DriverOut])
 def list_all(disponible: bool | None = None, params: PageParams = Depends(page_params), db: Session = Depends(get_db), user: User = Depends(require_read)):
-    return fetch(db, repo.list_query(disponible), params)
+    return service.list_all(db, params, disponible)
 
 
 @router.get("/{driver_id}", response_model=DriverOut)

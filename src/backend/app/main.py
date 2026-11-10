@@ -17,6 +17,16 @@ for router in (auth.router, vehicles.router, drivers.router, orders.router, clie
     app.include_router(router)
 
 
+@app.middleware("http")
+async def sensitive_responses(request: Request, call_next):
+    response = await call_next(request)
+    if request.url.path.startswith("/api/") and (
+        request.method != "GET" or response.status_code >= 400
+    ):
+        response.headers["Cache-Control"] = "no-store"
+    return response
+
+
 @app.get("/health", tags=["Sistema"])
 def health():
     with SessionLocal() as db:

@@ -2,7 +2,7 @@ name: ECO - Dependency audit
 
 on:
   push:
-    branches: [main, Sprint-3]
+    branches: [main, Sprint-3, sprint-4, inspeccion-04-green-it, respaldo-frontend]
   pull_request:
     branches: [main]
   workflow_dispatch:

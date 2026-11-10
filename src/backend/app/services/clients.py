@@ -1,3 +1,5 @@
+from app.core.pagination import PageParams
+from app.repositories.pagination import fetch
 from uuid import UUID, uuid4
 
 from fastapi import HTTPException
@@ -36,3 +38,7 @@ def update(db: Session, user: User, client_id: UUID, data: ClientInput) -> Clien
         {"estado_anterior": previous_state, "estado_nuevo": client.estado},
     )
     return client
+
+
+def list_all(db: Session, params: PageParams, value: bool | None = None) -> list[dict] | dict:
+    return fetch(db, repo.list_query(value), params)

@@ -1,0 +1,5 @@
+{
+  "purpose": "Prueba negativa intencional; m\u00e1ximo FCP de 1 ms sobre los mismos reportes, sin nueva auditor\u00eda",
+  "expected": "exit != 0",
+  "actual_exit_code": 1
+}
