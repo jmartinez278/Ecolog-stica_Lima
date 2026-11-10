@@ -4,7 +4,7 @@
 
 **Proyecto:** EcoLogística Lima · **Líder:** Marco Jhair Martinez Llanos<br>
 **Entrega:** Sprint 4 / Inspección 04 · **Versión semántica de entrega:** v1.0.0<br>
-**Revisión documental:** V_1_0_2 (se conserva el nombre de archivo V_1_0_0 exigido)<br>
+**Revisión documental:** V_1_0_3 (se conserva el nombre de archivo V_1_0_0 exigido)<br>
 **Versión de aplicación:** 1.4.0 · **Corte de validación:** 10/11/2026
 
 ## 1. Introducción y propósito
@@ -382,12 +382,41 @@ Se conserva el fin planificado de Jira del 23/11/2026; la fecha oficial académi
 
 Los fragmentos DOM que conservaban credenciales temporales se redactaron antes de entregar los artefactos; [el registro de redacción](evidencias/validacion-20261110/redaccion-secretos.json) identifica los archivos afectados. El exportador aplica ahora esa redacción automáticamente, con una prueba que comprueba que las métricas numéricas permanecen intactas.
 
-## 8. Control documental
+## 8. Evidencias visuales de validación (Lighthouse)
+
+Capturas tomadas de los reportes HTML de la primera corrida de cada escenario. Las medianas de las tres corridas son las de la sección 4. El score ya era 100 en la línea base; la reducción está en los bytes transferidos (sección 4: −73,9 % en el acceso y −91,3 % por sesión), no en la puntuación.
+
+### 8.1 Escritorio
+
+| ANTES (`cfcd53f`) | DESPUÉS |
+|---|---|
+| ![Lighthouse escritorio ANTES](evidencias/validacion-20261110/capturas/lighthouse-antes-desktop.png) | ![Lighthouse escritorio DESPUÉS](evidencias/validacion-20261110/capturas/lighthouse-despues-desktop.png) |
+
+Reportes completos: [ANTES](evidencias/validacion-20261110/lighthouse-antes-desktop-1.html) · [DESPUÉS](evidencias/validacion-20261110/lighthouse-despues-desktop-1.html).
+
+### 8.2 Móvil (4G simulado)
+
+| ANTES (`cfcd53f`) | DESPUÉS |
+|---|---|
+| ![Lighthouse móvil ANTES](evidencias/validacion-20261110/capturas/lighthouse-antes-mobile.png) | ![Lighthouse móvil DESPUÉS](evidencias/validacion-20261110/capturas/lighthouse-despues-mobile.png) |
+
+Reportes completos: [ANTES](evidencias/validacion-20261110/lighthouse-antes-mobile-1.html) · [DESPUÉS](evidencias/validacion-20261110/lighthouse-despues-mobile-1.html) · Recorrido autenticado: [ANTES](evidencias/validacion-20261110/flow-antes-1.html) · [DESPUÉS](evidencias/validacion-20261110/flow-despues-1.html).
+
+### 8.3 Interfaz paginada (DESPUÉS)
+
+| Escritorio, 1440 px | Móvil, 360 px |
+|---|---|
+| ![Pedidos paginados a 1440 px](evidencias/validacion-20261110/pedidos-1440.png) | ![Pedidos paginados a 360 px](evidencias/validacion-20261110/pedidos-360.png) |
+
+Capturas del entorno de comprobación con datos sintéticos (sección 6). El resto de módulos está en la misma carpeta: [clientes](evidencias/validacion-20261110/clientes-1440.png), [conductores](evidencias/validacion-20261110/conductores-1440.png).
+
+## 9. Control documental
 
 | Revisión | Fecha | Cambio |
 |---|---|---|
 | V_1_0_0 | 10/11/2026 | Documento heredado de la rama `respaldo-frontend`, commit `e7ac3ff`. |
 | V_1_0_1 | 10/11/2026 | Validación sobre código corregido, nuevas mediciones, matemática reproducible y distinción de resultados locales/publicación. Nombre de archivo conservado por consigna. |
 | V_1_0_2 | 10/11/2026 | Retirada de evidencias superadas y HTML/logs redundantes; todas las muestras y métricas vigentes se mantienen sin cambios. |
+| V_1_0_3 | 10/11/2026 | Sección 8 de evidencias visuales: capturas de Lighthouse ANTES/DESPUÉS (escritorio y móvil) e interfaz paginada. Sin cambios en métricas ni en el resto del contenido. |
 
 [← Volver al README](../../../README.md)
