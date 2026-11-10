@@ -1,6 +1,6 @@
 # EcoLogística Lima
 
-**Versión del proyecto:** 1.4.0 · **Revisión del README:** 1.4.1 · **Actualizado:** 10/11/2026
+**Versión del proyecto:** 1.4.0 · **Revisión del README:** 1.4.2 · **Actualizado:** 10/11/2026
 
 **EcoLogística Lima** es un proyecto de software orientado a la optimización sostenible de rutas de distribución de última milla para el escenario empresarial de **DistriRápido S.A.C.**
 
@@ -56,7 +56,7 @@ El sistema contempla los siguientes módulos:
 | Pruebas Backend | Pytest |
 | Pruebas Frontend | Vitest / React Testing Library |
 | Contenedores | Docker |
-| CI/CD previsto | GitHub Actions |
+| CI/CD | GitHub Actions: CI activo; CD Vercel/Render preparado, pendiente de configuración |
 
 ---
 
@@ -332,11 +332,23 @@ La carpeta de Sprint 3 contiene únicamente los cinco documentos solicitados por
 | Estándares de ingeniería de software | [02 Estandares Ingeniería de software V_1_0_0](<docs/03 Implementación/reduccion del impacto ambiental/02 Estandares Ingeniería de software V_1_0_0.md>) |
 | Auditoría continua | [`.github/workflows/green-audit.yml`](.github/workflows/green-audit.yml) y [`lighthouserc.json`](lighthouserc.json) |
 
-Las mediciones locales vigentes están en `evidencias/validacion-20261110/` de los informes. La sesión completa pasa de 1.011.683 a 87.589 bytes (−91,34 %), con Lighthouse 100 en móvil y escritorio y todos los presupuestos aprobados. SWDM v4 estima 0,149931 → 0,012981 g CO2e/sesión bajo los supuestos declarados. Se validaron 59 pruebas backend por motor (94,53 % de cobertura), 32 frontend, build y 33 comprobaciones de navegador. El código de esta revisión permanece en la rama local `sprint-4`, con publicación remota y ejecución de sus controles en GitHub pendientes; no acredita aceptación formal.
+Las mediciones locales vigentes están en `evidencias/validacion-20261110/` de los informes. La sesión completa pasa de 1.011.683 a 87.589 bytes (−91,34 %), con Lighthouse 100 en móvil y escritorio y todos los presupuestos aprobados. SWDM v4 estima 0,149931 → 0,012981 g CO2e/sesión bajo los supuestos declarados. Se validaron 59 pruebas backend por motor (94,53 % de cobertura), 32 frontend, build y 33 comprobaciones de navegador. La rama `sprint-4` está publicada. Los cuatro workflows del commit `6e96807` terminaron correctamente en GitHub, incluidos los reportes Green IT; esto no acredita aceptación formal ni un despliegue externo.
 
 **Fase del incremento técnico al 06/10/2026:** incremento técnico del Sprint 2 publicado en `sprint-2` e integrado en `main`. Incorpora US-011 a US-015 sobre la base técnica del Sprint 1; la aceptación formal y el estado de Jira siguen pendientes de conciliación.
 
 Los documentos de definición inicial se encuentran en `docs/01 Inicio/`, la planificación en `docs/02 Planificación/` y los entregables de esta iteración en `docs/03 Implementación/`.
+
+## Despliegue y CI/CD
+
+La distribución acordada es **frontend en Vercel, backend FastAPI y PostgreSQL en Render**.
+GitHub Actions comprueba calidad, integración PostgreSQL, seguridad y Green IT antes de
+publicar. El CD recupera el frontend compilado por CI, despliega el mismo commit en
+Render y promueve Vercel después del smoke de interfaz/API/base de datos.
+
+La [guía de configuración y operación](.github/DEPLOYMENT.md) explica los servicios,
+variables, secretos, migraciones y reintentos. El [workflow CD](.github/workflows/cd.yml)
+está preparado y desactivado hasta configurar los destinos y `CD_ENABLED=true`.
+Las comprobaciones externas quedan pendientes hasta su primera ejecución real.
 
 ## Historial de control de cambios del README
 
@@ -356,6 +368,7 @@ Los documentos de definición inicial se encuentran en `docs/01 Inicio/`, la pla
 | 1.3.0 | 25/10/2026 | Sprint 3: cinco informes, evidencia de calidad/seguridad/accesibilidad, alcance localhost, versiones unificadas y revisión previa. |
 | 1.4.0 | 10/11/2026 | Inspección 04: optimizaciones Green IT en backend, frontend y Caddy; informes de impacto ambiental y estándares; workflow LHCI. |
 | 1.4.1 | 10/11/2026 | Limpieza documental: contenido técnico de Sprint 2 consolidado en su informe de estado; retirada de evidencias Green IT superadas y presentaciones HTML repetidas, conservando todas las muestras JSON. |
+| 1.4.2 | 10/11/2026 | Estado remoto de Sprint 4 actualizado; CD GitHub Actions preparado para Vercel/Render, guía de activación y artefacto frontend del mismo CI. |
 
 ---
 

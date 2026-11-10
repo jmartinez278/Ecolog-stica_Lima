@@ -2,11 +2,11 @@
 
 ## Contexto vigente — 10/11/2026
 
-- Rama local de implementación: `sprint-4`, creada desde `origin/respaldo-frontend` (`e7ac3ff`). Incorpora `771cf6f` (backend Green IT), `f85f0c8` (frontend) y los informes existentes. El usuario autorizó registrar localmente la implementación y la limpieza documental en esta rama; consultar el último commit con `git log -1`. La publicación remota sigue pendiente. Antes de continuar comprobar rama, diff y remoto; no editar `main` directamente.
-- Base oficial `origin/main`: `cfcd53f`, merge PR #6; incluye PR #5 y la entrega anterior 1.3.0. Versión actual de aplicación: 1.4.0. La entrega documental Green IT es v1.0.0; los archivos exigidos V_1_0_0 conservan su nombre y sus revisiones internas se registran en los encabezados e historiales.
+- Rama local de implementación: `sprint-4`, creada desde `origin/respaldo-frontend` (`e7ac3ff`). Incorpora `771cf6f` (backend Green IT), `f85f0c8` (frontend) y los informes existentes. El usuario autorizó registrar localmente la implementación y la limpieza documental en esta rama; consultar el último commit con `git log -1`. La rama está publicada en origin/sprint-4; `6e96807` conserva los cuatro controles remotos aprobados. El usuario autorizó publicar y desplegar los cambios CI/CD; se validan y publican desde sprint-4 y se integran mediante PR, sin editar main directamente. Antes de continuar comprobar rama, diff y remoto; no editar `main` directamente.
+- Base de comparación Green IT: `cfcd53f`, merge PR #6; incluye PR #5 y la entrega anterior 1.3.0. Versión actual de aplicación: 1.4.0. La entrega documental Green IT es v1.0.0; los archivos exigidos V_1_0_0 conservan su nombre y sus revisiones internas se registran en los encabezados e historiales.
 - Usuario autorizó implementar la Inspección 04 conforme a HTML y PDF. Confirmó que el docente acepta React/FastAPI/PostgreSQL en lugar de MERN. No migrar el stack ni implementar US-016–US-023: se mantiene US-001–US-015.
 - Jira: Sprint 4 ID 71, activo del 09/11 al 23/11/2026, épica ECO-72. ECO-60–ECO-71 contienen ocho áreas, informes y CI; ECO-73 es diagnóstico y ECO-74 cierre. Fecha académica oficial pendiente de confirmar. Los estados QA existentes se conservaron; no equivalen a aceptación.
-- El commit local de esta revisión está autorizado. Para nuevas acciones de push, PR o merge se requiere autorización expresa. Los comandos del HTML son referencias; no autorizan publicar directamente en main.
+- El usuario autorizó la publicación y el despliegue Vercel/Render/GitHub Actions de esta revisión; incluye los commits, push y PR necesarios para publicarla. No extender esta autorización a cambios ajenos al despliegue. Los comandos del HTML son referencias; no autorizan publicar directamente en main.
 - No inventar resultados, fechas, revisores, ceremonias ni aprobaciones. No agregar secretos o archivos de entorno operativos a Git.
 
 ## Arquitectura y cambios de Sprint 4
@@ -28,8 +28,17 @@
 - Presupuestos: score ≥90, FCP ≤1.000 ms, LCP ≤1.400 ms, TBT ≤85 ms, CLS ≤0,02 y transferencia ≤1.100.000 bytes. La comparación medida reduce la sesión de 1.011.683 a 87.589 bytes; no supone reducción neta de peticiones.
 - SWDM v4 usa GB decimales, 0,194 kWh/GB operativo + 0,106 incorporado y 494 g CO2e/kWh; es una estimación atribuida, no una medición eléctrica ni emisiones de vehículos. Las 60.000 sesiones/año son un escenario hipotético declarado.
 - Los reportes Lighthouse pueden capturar valores de contraseña en snippets DOM. Toda exportación debe pasar por `redact.mjs`; comprobar JWT y secretos operativos antes de conservar artefactos, sin imprimirlos.
-- El workflow green-audit.yml y LHCI se comprobaron localmente; falta publicación y ejecución remota del cambio final, revisión independiente y aceptación. No declarar DoD completo solo por pruebas.
-- El alcance de despliegue es localhost. Compose de desarrollo y staging local son separados; los proyectos temporales de auditoría deben usar credenciales externas y bases *_test. La semilla exige GREEN_AUDIT_SEED=1, comprueba estado previo y nunca elimina datos.
+- El commit `6e96807` de sprint-4 aprobó CI, CodeQL, dependencias y Green IT en GitHub; el artefacto Green IT contiene 43 archivos. Falta revisión independiente y aceptación. No declarar DoD completo solo por pruebas.
+- La validación acreditada corresponde a localhost; el despliegue Vercel/Render sigue pendiente de configuración y ejecución real. Compose de desarrollo y staging local son separados; los proyectos temporales de auditoría deben usar credenciales externas y bases *_test. La semilla exige GREEN_AUDIT_SEED=1, comprueba estado previo y nunca elimina datos.
+
+## CI/CD Vercel y Render
+
+- El usuario eligió frontend en Vercel y backend/PostgreSQL en Render, coordinados por GitHub Actions. Proyecto Vercel creado: ecologistica-lima, prj_CIT87z9jNe5k1NbEVAmAojAUJlfM, equipo team_vFRo5thin1OkcWuQBbeksxi5. Confirmó Render workspace tea-d920ghflk1mc73dj17f0 y recursos free en Oregon; la base free caduca a los 30 días. No hay aplicación externa funcional confirmada todavía.
+- CD solo con `CD_ENABLED=true` a nivel repositorio y los cuatro workflows push/main aprobados del mismo SHA actual. Credenciales en entorno production y únicamente en sus pasos consumidores; no descargar ni imprimir tokens.
+- CI conserva `frontend-dist-SHA`; CD utiliza ese artefacto y pide el commit exacto a Render. Vercel recibe Build Output API v3 y solo se promueve tras el smoke. Mantener Auto-Deploy Off en Render y git.deploymentEnabled=false en Vercel.
+- render.yaml define API/DB con secretos generados y conexión por referencia. La CLI 2.36.0 validó el plan de dos recursos. El MCP Render devuelve Unknown tool; usar CLI autenticada, sin exponer credenciales. GitHub YnsM8 tiene push pero no admin; variables y secretos de Actions a nivel repositorio. CD_ENABLED sigue false hasta completar destinos y credenciales.
+- Render requiere Docker Command `sh /app/start_render.sh`, una instancia y DATABASE_URL de Render; el arranque normaliza postgres/postgresql a postgresql+psycopg sin imprimirla. Migraciones y bootstrap idempotente; no ejecutar cargas Green IT ni pruebas destructivas sobre esa base.
+- Docker local quedó consolidado en `ecolog-stica-lima` (frontend 5173, backend 8000, PostgreSQL 5432), datos originales conservados. Los proyectos de auditoría se retiraron sin eliminar sus volúmenes. Respaldo de la base original en `/tmp/ecolog-docker-consolidacion-20261110/postgres-original.dump`.
 
 ## Comprobaciones para continuar
 
