@@ -11,7 +11,7 @@ from app.core.security import user_from_token
 from app.db.session import SessionLocal
 from app.models import Audit
 
-app = FastAPI(title="EcoLogística Lima", version="1.3.0")
+app = FastAPI(title="EcoLogística Lima", version="1.4.0")
 logger = logging.getLogger(__name__)
 for router in (auth.router, vehicles.router, drivers.router, orders.router, clients.router):
     app.include_router(router)

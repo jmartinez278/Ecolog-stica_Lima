@@ -1,6 +1,6 @@
 # EcoLogística Lima
 
-**Versión del proyecto y de este README:** 1.3.0 · **Actualizado:** 25/10/2026
+**Versión del proyecto y de este README:** 1.4.0 · **Actualizado:** 10/11/2026
 
 **EcoLogística Lima** es un proyecto de software orientado a la optimización sostenible de rutas de distribución de última milla para el escenario empresarial de **DistriRápido S.A.C.**
 
@@ -325,6 +325,16 @@ El [informe oficial de calidad](<docs/03 Implementación/Sprint 03/03 Calidad de
 
 La carpeta de Sprint 3 contiene únicamente los cinco documentos solicitados por la consigna y dos capturas de SonarCloud utilizadas dentro de los informes. El informe de calidad distingue las métricas demostradas por SonarCloud de requisitos operativos todavía no comprobados, como disponibilidad mensual, recuperación, CPU y latencia P95.
 
+### Inspección 04 — Reducción del impacto ambiental (Green IT, v1.0.0)
+
+| Entregable | Documento |
+|---|---|
+| Informe de reducción del impacto ambiental | [01 Informe de reduccion del impacto ambiental V_1_0_0](<docs/03 Implementación/reduccion del impacto ambiental/01 Informe de reduccion del impacto ambiental V_1_0_0.md>) |
+| Estándares de ingeniería de software | [02 Estandares Ingeniería de software V_1_0_0](<docs/03 Implementación/reduccion del impacto ambiental/02 Estandares Ingeniería de software V_1_0_0.md>) |
+| Auditoría continua | [`.github/workflows/green-audit.yml`](.github/workflows/green-audit.yml) y [`lighthouserc.json`](lighthouserc.json) |
+
+Las mediciones son reales y reproducibles con `scripts/green_it/`. La sesión de operador baja de 1 053,9 KB a 93,8 KB (−91,1 %) y de 0,1562 a 0,0139 g CO2e según SWDM v4.
+
 **Fase del incremento técnico al 06/10/2026:** incremento técnico del Sprint 2 publicado en `sprint-2` e integrado en `main`. Incorpora US-011 a US-015 sobre la base técnica del Sprint 1; la aceptación formal y el estado de Jira siguen pendientes de conciliación.
 
 Los documentos de definición inicial se encuentran en `docs/01 Inicio/`, la planificación en `docs/02 Planificación/` y los entregables de esta iteración en `docs/03 Implementación/`.
@@ -345,6 +355,7 @@ Los documentos de definición inicial se encuentran en `docs/01 Inicio/`, la pla
 | 1.2.3 | 06/10/2026 | Resultados locales con Docker, PostgreSQL y frontend, y estado de revisión de las cinco historias en Jira. |
 | 1.2.4 | 24/10/2026 | Base técnica 1.2.4: planificación completa, evidencias y arquitectura técnica, pruebas de integridad, CI, accesibilidad y modularización de interfaz. |
 | 1.3.0 | 25/10/2026 | Sprint 3: cinco informes, evidencia de calidad/seguridad/accesibilidad, alcance localhost, versiones unificadas y revisión previa. |
+| 1.4.0 | 10/11/2026 | Inspección 04: optimizaciones Green IT en backend, frontend y Caddy; informes de impacto ambiental y estándares; workflow LHCI. |
 
 ---
 
