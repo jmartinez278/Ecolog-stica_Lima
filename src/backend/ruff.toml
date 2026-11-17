@@ -1,0 +1,9 @@
+# Sprint 4 — análisis estático del backend ejecutado por .github/workflows/ci.yml.
+# Reglas de errores reales (pyflakes, sintaxis y bugbear). B008 se omite porque
+# FastAPI declara dependencias con Depends()/Query() en los valores por defecto.
+target-version = "py312"
+line-length = 120
+
+[lint]
+select = ["E4", "E7", "E9", "F", "B"]
+ignore = ["B008"]

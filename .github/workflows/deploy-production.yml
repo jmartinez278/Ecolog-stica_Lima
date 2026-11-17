@@ -1,14 +1,20 @@
-name: ECO - CD Vercel y Render
+# Sprint 4 — Despliegue continuo a producción: frontend en Vercel, API FastAPI y
+# PostgreSQL en Render. Credenciales solo mediante GitHub Secrets del entorno production.
+# Se dispara cuando CI y Tests terminan para un push a main (o al publicar un tag v*);
+# el gate exige además CodeQL y Green IT aprobados para el mismo SHA actual de main.
+name: ECO - Deploy production
 
 on:
   workflow_run:
     workflows:
-      - ECO - CI de calidad
-      - ECO - Dependency audit
+      - ECO - CI
+      - ECO - Tests
       - ECO - CodeQL security analysis
       - ECO - Green IT & Performance Audit
     types: [completed]
     branches: [main]
+  push:
+    tags: ['v*']
   workflow_dispatch:
 
 permissions:
@@ -27,6 +33,7 @@ jobs:
       vars.CD_ENABLED == 'true' &&
       github.repository == 'jmartinez278/Ecolog-stica_Lima' &&
       ((github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) ||
       (github.event_name == 'workflow_run' && github.event.workflow_run.event == 'push' &&
       github.event.workflow_run.head_branch == 'main' &&
       github.event.workflow_run.head_repository.full_name == github.repository))
@@ -121,3 +128,42 @@ jobs:
             echo "Render: $RENDER_DEPLOY_ID"
             echo "Frontend: $FRONTEND_URL"
           } >> "$GITHUB_STEP_SUMMARY"
+
+  verify:
+    name: Verificación post-despliegue · Playwright @public
+    needs: [gate, release]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      E2E_BASE_URL: ${{ vars.FRONTEND_URL }}
+      E2E_API_URL: ${{ vars.BACKEND_URL }}
+    defaults:
+      run:
+        working-directory: src/frontend
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.gate.outputs.revision }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: src/frontend/package-lock.json
+      - run: npm ci --ignore-scripts
+      - run: npx playwright install --with-deps chromium
+      - name: Ejecutar pruebas de solo lectura contra la URL de producción
+        run: npx playwright test --project=chromium --workers=1
+      - name: Publicar métricas de producción
+        if: always()
+        run: npm run e2e:metrics
+      - name: Conservar reporte de la verificación
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: production-verification-${{ needs.gate.outputs.revision }}
+          path: |
+            src/frontend/playwright-report/
+            src/frontend/test-results/
+          if-no-files-found: warn
+          retention-days: 30

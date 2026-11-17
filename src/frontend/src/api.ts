@@ -62,17 +62,29 @@ export function orderListPath(state: string): string {
   }
 }
 
+// Sprint 4 (resiliencia): mensajes uniformes en los tres motores; Chromium, Firefox y
+// WebKit describen de forma distinta el mismo fallo de red.
+export const NETWORK_ERROR_MESSAGE = 'No se pudo conectar con el servidor. Revisa tu conexión e inténtalo nuevamente.'
+export const UNAVAILABLE_MESSAGE = 'El servicio no está disponible en este momento. Inténtalo nuevamente en unos segundos.'
+
 export async function api<T>(path: string, token: string, init: RequestInit = {}): Promise<T> {
-  const response = await fetch(`/api/v1${path}`, {
-    ...init,
-    // Green IT: permite revalidar con ETag (304 sin cuerpo) en lugar de descargar siempre.
-    cache: !init.method || init.method === 'GET' ? 'no-cache' : 'no-store',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...init.headers,
-    },
-  })
+  let response: Response
+  try {
+    response = await fetch(`/api/v1${path}`, {
+      ...init,
+      // Green IT: permite revalidar con ETag (304 sin cuerpo) en lugar de descargar siempre.
+      cache: !init.method || init.method === 'GET' ? 'no-cache' : 'no-store',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...init.headers,
+      },
+    })
+  } catch (error) {
+    // Una cancelación intencional (AbortController) no es un fallo de red.
+    if ((error as Error).name === 'AbortError') throw error
+    throw new Error(NETWORK_ERROR_MESSAGE)
+  }
   const body = await response.json().catch(() => null)
   if (!response.ok) {
     const detail = body?.detail
@@ -80,7 +92,9 @@ export async function api<T>(path: string, token: string, init: RequestInit = {}
       ? detail
       : Array.isArray(detail)
         ? detail.map((item: { loc?: string[]; msg?: string }) => `${item.loc?.at(-1) || 'Dato'}: ${item.msg || 'inválido'}`).join('; ')
-        : `Error ${response.status}`
+        : [502, 503, 504].includes(response.status)
+          ? `${UNAVAILABLE_MESSAGE} (Error ${response.status})`
+          : `Error ${response.status}`
     throw new Error(message)
   }
   return body as T

@@ -3,9 +3,10 @@
 // Sin dependencias externas: usa zlib nativo de Node.js.
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { brotliCompressSync, constants, gzipSync } from 'node:zlib'
 
-const DIST = new URL('../dist/', import.meta.url).pathname
+const DIST = fileURLToPath(new URL('../dist/', import.meta.url))
 const COMPRESSIBLE = /\.(js|css|html|svg|json|txt|webmanifest)$/
 const MIN_BYTES = 1024
 

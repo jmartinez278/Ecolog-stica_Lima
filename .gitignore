@@ -32,6 +32,18 @@ tmp/
 .DS_Store
 Thumbs.db
 
+# Reportes temporales de Playwright (las evidencias versionadas viven en docs/)
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+*.db
+*.sqlite3
+
+# Auditorías locales de dependencias
+/python-audit.json
+/src/frontend/npm-audit.json
+
 # Reportes locales de Lighthouse CI
 .lighthouseci/
 lighthouse-reports/

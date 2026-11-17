@@ -1,5 +1,6 @@
 import { act, cleanup, renderHook, waitFor } from '@testing-library/react'
 import { afterEach, expect, it, vi } from 'vitest'
+import { NETWORK_ERROR_MESSAGE } from '../api'
 import { usePagedList } from './usePagedList'
 
 afterEach(() => { cleanup(); vi.unstubAllGlobals() })
@@ -35,7 +36,7 @@ it('notifica errores y permite recargar sin bucles de peticiones', async () => {
   const fetchMock = vi.fn().mockRejectedValueOnce(new Error('Sin conexión')).mockResolvedValue(response([]))
   vi.stubGlobal('fetch', fetchMock)
   const { result } = renderHook(() => usePagedList<string>('/clientes', 'token', error))
-  await waitFor(() => expect(error).toHaveBeenCalledWith('Sin conexión'))
+  await waitFor(() => expect(error).toHaveBeenCalledWith(NETWORK_ERROR_MESSAGE))
   act(() => result.current.reload())
   await waitFor(() => expect(result.current.loading).toBe(false))
   expect(fetchMock).toHaveBeenCalledTimes(2)
