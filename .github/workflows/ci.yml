@@ -26,7 +26,8 @@ jobs:
         with:
           python-version: '3.12'
       - name: Instalar linter fijado con hashes
-        run: python -m pip install --only-binary=:all: --require-hashes -r .github/requirements-lint.lock
+        run: >-
+          python -m pip install --only-binary=:all: --require-hashes -r .github/requirements-lint.lock
       - name: Análisis estático (pyflakes, sintaxis, bugbear)
         working-directory: src/backend
         run: ruff check . --output-format github

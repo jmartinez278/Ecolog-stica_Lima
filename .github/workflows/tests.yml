@@ -32,7 +32,8 @@ jobs:
           cache: pip
           cache-dependency-path: src/backend/requirements-dev.lock
       - name: Instalar dependencias con hashes
-        run: python -m pip install --only-binary=:all: --require-hashes -r src/backend/requirements-dev.lock
+        run: >-
+          python -m pip install --only-binary=:all: --require-hashes -r src/backend/requirements-dev.lock
       - name: Pruebas de scripts de soporte (CD, auditorías, enlaces) con cobertura
         run: |
           python -m coverage run --source=scripts -m unittest discover -s scripts -p 'test_*.py'
@@ -79,7 +80,8 @@ jobs:
           python-version: '3.12'
           cache: pip
           cache-dependency-path: src/backend/requirements-dev.lock
-      - run: python -m pip install --only-binary=:all: --require-hashes -r requirements-dev.lock
+      - run: >-
+          python -m pip install --only-binary=:all: --require-hashes -r requirements-dev.lock
       - name: Suite completa contra PostgreSQL aislado
         run: python -m pytest -q --cov=app --cov-report=term-missing --cov-fail-under=80
       - name: Migraciones Alembic sobre base vacía y verificación del head
