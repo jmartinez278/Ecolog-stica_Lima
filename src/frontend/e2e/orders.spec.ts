@@ -14,15 +14,31 @@ test.describe('Clientes y pedidos: flujo principal de negocio (US-005 a US-008, 
     await page.getByRole('button', { name: 'Registrar' }).click()
     await expect(page.getByRole('status').filter({ hasText: 'Cliente registrado.' })).toBeVisible()
 
+    // Capturar la primera respuesta real del selector para diagnosticar datos desactualizados.
+    const pickerAnswer = page.waitForResponse(answer => answer.url().includes('/api/v1/clientes?activo=true') && answer.request().method() === 'GET')
     await openModule(page, 'Pedidos')
+    const answer = await pickerAnswer
+    const pickerBody = await answer.text().catch(() => '')
+    const diagnosis = {
+      status: answer.status(),
+      ifNoneMatch: answer.request().headers()['if-none-match'] ?? null,
+      etag: answer.headers()['etag'] ?? null,
+      clientInBody: pickerBody.includes(clientName),
+      bodyBytes: pickerBody.length,
+    }
     const clientSelect = page.getByLabel('Cliente')
     const pages = page.getByRole('navigation', { name: 'Paginación de clientes disponibles' })
     // El selector pagina clientes de 12 en 12: avanzar hasta encontrar el cliente nuevo,
     // esperando en cada página a que termine la carga (aria-busy) antes de buscar.
     for (let current = 1; ; current++) {
       await expect(clientSelect).toHaveAttribute('aria-busy', 'false')
-      if (await clientSelect.locator('option', { hasText: clientName }).count() > 0) break
-      await pages.getByRole('button', { name: 'Siguiente' }).click()
+      const options = await clientSelect.locator('option').allTextContents()
+      if (options.some(text => text.includes(clientName))) break
+      const next = pages.getByRole('button', { name: 'Siguiente' })
+      const canAdvance = await pages.isVisible() && await next.isEnabled()
+      expect(canAdvance, `Cliente "${clientName}" ausente del selector en la página ${current}. ` +
+        `Opciones: ${JSON.stringify(options)}. Primera respuesta: ${JSON.stringify(diagnosis)}`).toBe(true)
+      await next.click()
       await expect(pages).toContainText(`Página ${current + 1} de`)
     }
     await clientSelect.selectOption({ label: clientName })
