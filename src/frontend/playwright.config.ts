@@ -44,7 +44,8 @@ export default defineConfig({
   expect: { timeout: 10_000 },
   grep: external ? /@public/ : undefined,
   reporter: [
-    ['list'],
+    // En CI cada fallo se publica como anotación del job (prueba, línea y error).
+    process.env.CI ? ['github'] : ['list'],
     ['html', { open: 'never', outputFolder: 'playwright-report' }],
     ['json', { outputFile: 'test-results/results.json' }],
     ['junit', { outputFile: 'test-results/junit.xml' }],
