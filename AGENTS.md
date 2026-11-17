@@ -9,6 +9,15 @@
 - El usuario autorizó la publicación y el despliegue Vercel/Render/GitHub Actions de esta revisión; incluye los commits, push y PR necesarios para publicarla. No extender esta autorización a cambios ajenos al despliegue. Los comandos del HTML son referencias; no autorizan publicar directamente en main.
 - No inventar resultados, fechas, revisores, ceremonias ni aprobaciones. No agregar secretos o archivos de entorno operativos a Git.
 
+## Cierre del Sprint 4 — 17/11/2026
+
+- Entregables en `docs/03 Inplementación/Sprint 4/` (ruta literal de la consigna, con la errata "Inplementación"); los Sprints 1–3 siguen en `docs/03 Implementación/`. Versión de aplicación 1.5.0; stack documentado en `10. Stack tecnológico V_1_1_0.md`.
+- Workflows: `ci.yml` (ruff, ESLint, build, dependencias), `tests.yml` (pytest, PostgreSQL, Vitest, E2E Playwright ×3 navegadores, monitoreo cada 6 h) y `deploy-production.yml` (antes `cd.yml`). `dependency-audit.yml` se integró en `ci.yml`. El gate de `scripts/cd.py` exige ci, tests, codeql y green-audit.
+- E2E: `src/frontend/e2e/`, API real con `scripts/e2e_backend.py` sobre base test_*. En producción solo pruebas `@public` (sin login ni escrituras). Firefox local falla en Windows sin VC++ (msvcp140_1.dll).
+- Auditoría npm con excepciones caducables en `.github/npm-audit-exceptions.json` (GHSA-fc5q-39xc-vjpf hasta 15/12/2026). `opentelemetry-api` 1.45.2 por GHSA-mf5v-w3w3-f6cg.
+- SUS: formulario https://claude.ai/artifact/NWxevHd5zKbeSdd35zTVT9 (respuestas en colección `respuestas`), cálculo con `scripts/sus_score.py`. Review/Retro redactadas como agenda; no registrar actas ni puntajes sin datos reales.
+- Identidad git del repo local: J. Robert PM (elegida por el usuario). PR de `sprint-4` a `main` se abre sin merge.
+
 ## Arquitectura y cambios de Sprint 4
 
 - React/TypeScript/Vite en `src/frontend`; token solo en memoria. App compone páginas lazy, Suspense y PageErrorBoundary. Formularios y controles comunes conservan el diseño de DESIGN.md.

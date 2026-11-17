@@ -1,0 +1,66 @@
+{
+  "test": "registra disponibilidad y latencia de 10 sondeos consecutivos @public",
+  "project": "webkit",
+  "target": "http://127.0.0.1:4173",
+  "measuredAt": "2026-11-17T20:17:43.169Z",
+  "interfaz": {
+    "probes": 10,
+    "ok": 10,
+    "availabilityPct": 100,
+    "p50Ms": 13,
+    "p95Ms": 47,
+    "maxMs": 47,
+    "samplesMs": [
+      38,
+      21,
+      11,
+      13,
+      13,
+      13,
+      12,
+      24,
+      47,
+      40
+    ]
+  },
+  "api-proxy": {
+    "probes": 10,
+    "ok": 10,
+    "availabilityPct": 100,
+    "p50Ms": 21,
+    "p95Ms": 43,
+    "maxMs": 43,
+    "samplesMs": [
+      16,
+      17,
+      18,
+      22,
+      22,
+      31,
+      21,
+      43,
+      27,
+      18
+    ]
+  },
+  "api-health": {
+    "probes": 10,
+    "ok": 10,
+    "availabilityPct": 100,
+    "p50Ms": 15,
+    "p95Ms": 23,
+    "maxMs": 23,
+    "samplesMs": [
+      22,
+      14,
+      11,
+      16,
+      22,
+      19,
+      15,
+      23,
+      13,
+      11
+    ]
+  }
+}

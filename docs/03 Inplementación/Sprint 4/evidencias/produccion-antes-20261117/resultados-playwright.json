@@ -1,0 +1,199 @@
+{
+  "objetivo": "Producción v1.4.0: https://ecologistica-lima.vercel.app + API Render",
+  "ejecutado": "2026-11-17T20:03:57.446Z",
+  "duracionMs": 144670,
+  "aprobadas": 18,
+  "fallidas": 4,
+  "inestables": 0,
+  "omitidas": 0,
+  "porNavegador": {
+    "chromium": {
+      "passed": 9,
+      "failed": 2,
+      "skipped": 0
+    },
+    "webkit": {
+      "passed": 9,
+      "failed": 2,
+      "skipped": 0
+    }
+  },
+  "pruebas": [
+    {
+      "archivo": "auth.spec.ts",
+      "prueba": "Autenticación (US de acceso del operador) › muestra la pantalla pública de acceso @public",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 2035,
+      "error": null
+    },
+    {
+      "archivo": "auth.spec.ts",
+      "prueba": "Autenticación (US de acceso del operador) › rechaza credenciales inválidas sin abrir la sesión @public",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 2558,
+      "error": null
+    },
+    {
+      "archivo": "auth.spec.ts",
+      "prueba": "Autenticación (US de acceso del operador) › valida los campos obligatorios antes de enviar @public",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 3203,
+      "error": null
+    },
+    {
+      "archivo": "auth.spec.ts",
+      "prueba": "Autenticación (US de acceso del operador) › muestra la pantalla pública de acceso @public",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 3124,
+      "error": null
+    },
+    {
+      "archivo": "auth.spec.ts",
+      "prueba": "Autenticación (US de acceso del operador) › rechaza credenciales inválidas sin abrir la sesión @public",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 5507,
+      "error": null
+    },
+    {
+      "archivo": "auth.spec.ts",
+      "prueba": "Autenticación (US de acceso del operador) › valida los campos obligatorios antes de enviar @public",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 5819,
+      "error": null
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Disponibilidad: códigos HTTP del entorno desplegado › la API y PostgreSQL responden en /health @public",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 517,
+      "error": null
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Disponibilidad: códigos HTTP del entorno desplegado › la interfaz y los recursos estáticos responden 200 @public",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 2412,
+      "error": null
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Disponibilidad: códigos HTTP del entorno desplegado › el proxy /api protege los recursos: 401 sin token y 404 en rutas inexistentes @public",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 1052,
+      "error": null
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Disponibilidad: códigos HTTP del entorno desplegado › registra disponibilidad y latencia de 10 sondeos consecutivos @public",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 8629,
+      "error": null
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Disponibilidad: códigos HTTP del entorno desplegado › la API y PostgreSQL responden en /health @public",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 535,
+      "error": null
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Disponibilidad: códigos HTTP del entorno desplegado › la interfaz y los recursos estáticos responden 200 @public",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 2753,
+      "error": null
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Disponibilidad: códigos HTTP del entorno desplegado › el proxy /api protege los recursos: 401 sin token y 404 en rutas inexistentes @public",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 1079,
+      "error": null
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Disponibilidad: códigos HTTP del entorno desplegado › registra disponibilidad y latencia de 10 sondeos consecutivos @public",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 8917,
+      "error": null
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Resiliencia ante fallos de red y del servidor › muestra un mensaje comprensible si se pierde la conexión @public",
+      "navegador": "chromium",
+      "estado": "failed",
+      "duracionMs": 13467,
+      "error": "Error: expect(locator).toHaveText(expected) failed"
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Resiliencia ante fallos de red y del servidor › explica una caída temporal del backend (503) sin bloquear la interfaz @public",
+      "navegador": "chromium",
+      "estado": "failed",
+      "duracionMs": 13816,
+      "error": "Error: expect(locator).toContainText(expected) failed"
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Resiliencia ante fallos de red y del servidor › tolera una respuesta lenta de la API mostrando el estado de envío @public",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 3863,
+      "error": null
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Resiliencia ante fallos de red y del servidor › muestra un mensaje comprensible si se pierde la conexión @public",
+      "navegador": "webkit",
+      "estado": "failed",
+      "duracionMs": 15697,
+      "error": "Error: expect(locator).toHaveText(expected) failed"
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Resiliencia ante fallos de red y del servidor › explica una caída temporal del backend (503) sin bloquear la interfaz @public",
+      "navegador": "webkit",
+      "estado": "failed",
+      "duracionMs": 16723,
+      "error": "Error: expect(locator).toContainText(expected) failed"
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Resiliencia ante fallos de red y del servidor › tolera una respuesta lenta de la API mostrando el estado de envío @public",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 6702,
+      "error": null
+    },
+    {
+      "archivo": "performance.spec.ts",
+      "prueba": "Rendimiento y Web Vitals › la página de acceso cumple los presupuestos de TTFB, FCP y LCP @public",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 3469,
+      "error": null
+    },
+    {
+      "archivo": "performance.spec.ts",
+      "prueba": "Rendimiento y Web Vitals › la página de acceso cumple los presupuestos de TTFB, FCP y LCP @public",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 5182,
+      "error": null
+    }
+  ]
+}
