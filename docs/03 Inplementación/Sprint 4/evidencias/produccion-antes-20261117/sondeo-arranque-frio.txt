@@ -1,0 +1,4 @@
+Sondeo con curl antes de la suite (17/11/2026 20:00 UTC), API de Render en reposo:
+200 ttfb=1.168641s total=1.168982s https://ecologistica-lima.vercel.app/
+200 ttfb=37.605901s total=37.606371s https://ecologistica-lima-api-ktea.onrender.com/health
+401 ttfb=0.936161s total=0.936541s https://ecologistica-lima.vercel.app/api/v1/vehiculos

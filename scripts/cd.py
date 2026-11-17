@@ -15,7 +15,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode, urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
-WORKFLOWS = ('ci.yml', 'dependency-audit.yml', 'codeql.yml', 'green-audit.yml')
+WORKFLOWS = ('ci.yml', 'tests.yml', 'codeql.yml', 'green-audit.yml')
 REPOSITORY = 'jmartinez278/Ecolog-stica_Lima'
 
 

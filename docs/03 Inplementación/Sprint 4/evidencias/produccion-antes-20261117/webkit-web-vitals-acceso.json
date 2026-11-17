@@ -1,0 +1,18 @@
+{
+  "test": "la página de acceso cumple los presupuestos de TTFB, FCP y LCP @public",
+  "project": "webkit",
+  "target": "https://ecologistica-lima.vercel.app",
+  "measuredAt": "2026-11-17T20:06:20.636Z",
+  "budget": {
+    "ttfb": 800,
+    "fcp": 1800,
+    "lcp": 2500,
+    "api": 500
+  },
+  "ttfb": 410,
+  "domContentLoaded": 945,
+  "load": 946,
+  "fcp": 895,
+  "lcp": 895,
+  "transferBytes": 1817
+}

@@ -1,0 +1,12 @@
+{
+  "test": "las APIs autenticadas responden en menos de 500 ms",
+  "project": "chromium",
+  "target": "http://127.0.0.1:4173",
+  "measuredAt": "2026-11-17T20:17:24.088Z",
+  "budgetMs": 500,
+  "/api/v1/auth/login": 196,
+  "/api/v1/vehiculos": 37,
+  "/api/v1/pedidos": 43,
+  "/api/v1/conductores": 103,
+  "/api/v1/clientes": 72
+}

@@ -1,0 +1,343 @@
+{
+  "objetivo": "Local: build de producción 1.5.0 (vite preview) + API FastAPI real sobre SQLite test_e2e",
+  "ejecutado": "2026-11-17T20:16:49.388Z",
+  "duracionMs": 104529,
+  "aprobadas": 40,
+  "fallidas": 0,
+  "inestables": 0,
+  "omitidas": 0,
+  "porNavegador": {
+    "chromium": {
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0
+    },
+    "webkit": {
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "pruebas": [
+    {
+      "archivo": "auth.spec.ts",
+      "prueba": "Autenticación (US de acceso del operador) › muestra la pantalla pública de acceso @public",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 10548,
+      "error": null
+    },
+    {
+      "archivo": "auth.spec.ts",
+      "prueba": "Autenticación (US de acceso del operador) › rechaza credenciales inválidas sin abrir la sesión @public",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 10330,
+      "error": null
+    },
+    {
+      "archivo": "auth.spec.ts",
+      "prueba": "Autenticación (US de acceso del operador) › valida los campos obligatorios antes de enviar @public",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 10660,
+      "error": null
+    },
+    {
+      "archivo": "auth.spec.ts",
+      "prueba": "Autenticación (US de acceso del operador) › inicia sesión, navega por los módulos y cierra sesión",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 2934,
+      "error": null
+    },
+    {
+      "archivo": "auth.spec.ts",
+      "prueba": "Autenticación (US de acceso del operador) › mantiene el token solo en memoria: recargar exige un nuevo acceso",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 3539,
+      "error": null
+    },
+    {
+      "archivo": "auth.spec.ts",
+      "prueba": "Autenticación (US de acceso del operador) › muestra la pantalla pública de acceso @public",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 3386,
+      "error": null
+    },
+    {
+      "archivo": "auth.spec.ts",
+      "prueba": "Autenticación (US de acceso del operador) › rechaza credenciales inválidas sin abrir la sesión @public",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 4425,
+      "error": null
+    },
+    {
+      "archivo": "auth.spec.ts",
+      "prueba": "Autenticación (US de acceso del operador) › valida los campos obligatorios antes de enviar @public",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 5614,
+      "error": null
+    },
+    {
+      "archivo": "auth.spec.ts",
+      "prueba": "Autenticación (US de acceso del operador) › inicia sesión, navega por los módulos y cierra sesión",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 13390,
+      "error": null
+    },
+    {
+      "archivo": "auth.spec.ts",
+      "prueba": "Autenticación (US de acceso del operador) › mantiene el token solo en memoria: recargar exige un nuevo acceso",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 7421,
+      "error": null
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Disponibilidad: códigos HTTP del entorno desplegado › la API y PostgreSQL responden en /health @public",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 1131,
+      "error": null
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Disponibilidad: códigos HTTP del entorno desplegado › la interfaz y los recursos estáticos responden 200 @public",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 1726,
+      "error": null
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Disponibilidad: códigos HTTP del entorno desplegado › el proxy /api protege los recursos: 401 sin token y 404 en rutas inexistentes @public",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 147,
+      "error": null
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Disponibilidad: códigos HTTP del entorno desplegado › registra disponibilidad y latencia de 10 sondeos consecutivos @public",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 344,
+      "error": null
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Disponibilidad: códigos HTTP del entorno desplegado › la API y PostgreSQL responden en /health @public",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 220,
+      "error": null
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Disponibilidad: códigos HTTP del entorno desplegado › la interfaz y los recursos estáticos responden 200 @public",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 3303,
+      "error": null
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Disponibilidad: códigos HTTP del entorno desplegado › el proxy /api protege los recursos: 401 sin token y 404 en rutas inexistentes @public",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 52,
+      "error": null
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Disponibilidad: códigos HTTP del entorno desplegado › registra disponibilidad y latencia de 10 sondeos consecutivos @public",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 734,
+      "error": null
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Resiliencia ante fallos de red y del servidor › muestra un mensaje comprensible si se pierde la conexión @public",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 2035,
+      "error": null
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Resiliencia ante fallos de red y del servidor › explica una caída temporal del backend (503) sin bloquear la interfaz @public",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 1730,
+      "error": null
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Resiliencia ante fallos de red y del servidor › tolera una respuesta lenta de la API mostrando el estado de envío @public",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 5542,
+      "error": null
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Resiliencia ante fallos de red y del servidor › muestra un mensaje comprensible si se pierde la conexión @public",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 7486,
+      "error": null
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Resiliencia ante fallos de red y del servidor › explica una caída temporal del backend (503) sin bloquear la interfaz @public",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 6899,
+      "error": null
+    },
+    {
+      "archivo": "availability.spec.ts",
+      "prueba": "Resiliencia ante fallos de red y del servidor › tolera una respuesta lenta de la API mostrando el estado de envío @public",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 7843,
+      "error": null
+    },
+    {
+      "archivo": "drivers.spec.ts",
+      "prueba": "Conductores (US-009 a US-012) › registra un conductor y rechaza una licencia duplicada",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 7553,
+      "error": null
+    },
+    {
+      "archivo": "drivers.spec.ts",
+      "prueba": "Conductores (US-009 a US-012) › registra un conductor y rechaza una licencia duplicada",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 17646,
+      "error": null
+    },
+    {
+      "archivo": "orders.spec.ts",
+      "prueba": "Clientes y pedidos: flujo principal de negocio (US-005 a US-008, US-013 a US-015) › registra un cliente y le asigna un pedido con ventana de entrega, luego lo cancela",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 8817,
+      "error": null
+    },
+    {
+      "archivo": "orders.spec.ts",
+      "prueba": "Clientes y pedidos: flujo principal de negocio (US-005 a US-008, US-013 a US-015) › rechaza una ventana de entrega que termina antes de empezar",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 4025,
+      "error": null
+    },
+    {
+      "archivo": "orders.spec.ts",
+      "prueba": "Clientes y pedidos: flujo principal de negocio (US-005 a US-008, US-013 a US-015) › registra un cliente y le asigna un pedido con ventana de entrega, luego lo cancela",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 21950,
+      "error": null
+    },
+    {
+      "archivo": "orders.spec.ts",
+      "prueba": "Clientes y pedidos: flujo principal de negocio (US-005 a US-008, US-013 a US-015) › rechaza una ventana de entrega que termina antes de empezar",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 13639,
+      "error": null
+    },
+    {
+      "archivo": "performance.spec.ts",
+      "prueba": "Rendimiento y Web Vitals › la página de acceso cumple los presupuestos de TTFB, FCP y LCP @public",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 4008,
+      "error": null
+    },
+    {
+      "archivo": "performance.spec.ts",
+      "prueba": "Rendimiento y Web Vitals › las APIs autenticadas responden en menos de 500 ms",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 4008,
+      "error": null
+    },
+    {
+      "archivo": "performance.spec.ts",
+      "prueba": "Rendimiento y Web Vitals › la página de acceso cumple los presupuestos de TTFB, FCP y LCP @public",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 5600,
+      "error": null
+    },
+    {
+      "archivo": "performance.spec.ts",
+      "prueba": "Rendimiento y Web Vitals › las APIs autenticadas responden en menos de 500 ms",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 12495,
+      "error": null
+    },
+    {
+      "archivo": "vehicles.spec.ts",
+      "prueba": "Flota: registro, edición y desactivación de vehículos (US-001 a US-004) › registra, edita y desactiva un vehículo de punta a punta",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 4900,
+      "error": null
+    },
+    {
+      "archivo": "vehicles.spec.ts",
+      "prueba": "Flota: registro, edición y desactivación de vehículos (US-001 a US-004) › impide registrar un vehículo con capacidad inválida",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 3805,
+      "error": null
+    },
+    {
+      "archivo": "vehicles.spec.ts",
+      "prueba": "Flota: registro, edición y desactivación de vehículos (US-001 a US-004) › informa la placa duplicada devuelta por la API",
+      "navegador": "chromium",
+      "estado": "passed",
+      "duracionMs": 4208,
+      "error": null
+    },
+    {
+      "archivo": "vehicles.spec.ts",
+      "prueba": "Flota: registro, edición y desactivación de vehículos (US-001 a US-004) › registra, edita y desactiva un vehículo de punta a punta",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 17298,
+      "error": null
+    },
+    {
+      "archivo": "vehicles.spec.ts",
+      "prueba": "Flota: registro, edición y desactivación de vehículos (US-001 a US-004) › impide registrar un vehículo con capacidad inválida",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 14000,
+      "error": null
+    },
+    {
+      "archivo": "vehicles.spec.ts",
+      "prueba": "Flota: registro, edición y desactivación de vehículos (US-001 a US-004) › informa la placa duplicada devuelta por la API",
+      "navegador": "webkit",
+      "estado": "passed",
+      "duracionMs": 9651,
+      "error": null
+    }
+  ]
+}

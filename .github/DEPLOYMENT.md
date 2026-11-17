@@ -187,7 +187,8 @@ flowchart TD
   T -->|No| X
 ```
 
-- `cd.yml` se evalúa al terminar cualquiera de los cuatro controles. Si aún falta
+- `deploy-production.yml` (antes `cd.yml`) se evalúa al terminar cualquiera de los cuatro controles
+  (`ci.yml`, `tests.yml`, `codeql.yml`, `green-audit.yml`). Si aún falta
   alguno, omite la liberación; al terminar el último, vuelve a comprobar todos.
 - Solo admite el repositorio oficial, eventos `push` de `main` y el SHA actual de esa
   rama. Rechaza PR, forks, commits antiguos, pruebas faltantes y controles fallidos,
@@ -253,3 +254,10 @@ los destinos y activar el CD.
 - [Render: solicitar un commit concreto mediante la API](https://api-docs.render.com/reference/create-deploy).
 - [Render Postgres: conexión interna y región](https://render.com/docs/postgresql-creating-connecting).
 - [Render: límites de los servicios gratuitos](https://render.com/docs/free).
+
+## Sprint 4: verificación posterior al despliegue
+
+Después de promover Vercel, el job `verify` de `deploy-production.yml` ejecuta las pruebas
+Playwright de solo lectura (`@public`) contra `FRONTEND_URL` y `BACKEND_URL` y conserva el
+reporte como artifact `production-verification-<SHA>`. `tests.yml` repite esas pruebas cada
+6 horas (`production-monitor`). Las pruebas `@public` no inician sesión ni escriben datos.

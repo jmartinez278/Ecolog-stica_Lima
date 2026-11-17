@@ -1,6 +1,12 @@
 # EcoLogística Lima
 
-**Versión del proyecto:** 1.4.0 · **Revisión del README:** 1.4.3 · **Actualizado:** 10/11/2026
+**Versión del proyecto:** 1.5.0 · **Revisión del README:** 1.5.0 · **Actualizado:** 17/11/2026
+
+[![ECO - CI](https://github.com/jmartinez278/Ecolog-stica_Lima/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jmartinez278/Ecolog-stica_Lima/actions/workflows/ci.yml)
+[![ECO - Tests](https://github.com/jmartinez278/Ecolog-stica_Lima/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/jmartinez278/Ecolog-stica_Lima/actions/workflows/tests.yml)
+[![ECO - Deploy production](https://github.com/jmartinez278/Ecolog-stica_Lima/actions/workflows/deploy-production.yml/badge.svg)](https://github.com/jmartinez278/Ecolog-stica_Lima/actions/workflows/deploy-production.yml)
+[![CodeQL](https://github.com/jmartinez278/Ecolog-stica_Lima/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/jmartinez278/Ecolog-stica_Lima/actions/workflows/codeql.yml)
+[![Green IT](https://github.com/jmartinez278/Ecolog-stica_Lima/actions/workflows/green-audit.yml/badge.svg?branch=main)](https://github.com/jmartinez278/Ecolog-stica_Lima/actions/workflows/green-audit.yml)
 
 **Aplicación:** [Abrir EcoLogística Lima](https://ecologistica-lima.vercel.app) · **API:** [Swagger](https://ecologistica-lima-api-ktea.onrender.com/docs)
 
@@ -57,8 +63,11 @@ El sistema contempla los siguientes módulos:
 | Documentación API | OpenAPI |
 | Pruebas Backend | Pytest |
 | Pruebas Frontend | Vitest / React Testing Library |
+| Pruebas E2E y monitoreo | Playwright (Chromium, Firefox, WebKit) |
+| Análisis estático | ESLint + typescript-eslint, ruff |
 | Contenedores | Docker |
-| CI/CD | GitHub Actions: CI y pipeline CD Vercel/Render |
+| CI/CD | GitHub Actions: `ci.yml`, `tests.yml`, `deploy-production.yml` |
+| Despliegue | Vercel (frontend) y Render (API + PostgreSQL) |
 
 ---
 
@@ -140,18 +149,19 @@ La arquitectura debe contemplar crecimiento hasta:
 ## Estructura del repositorio
 
 ```text
-EcoLog-stica-Lima/
-├── README.md
-├── .gitignore
-├── .env.example
-├── docker-compose.yml
+Ecolog-stica_Lima/
+├── .github/workflows/        ci.yml · tests.yml · deploy-production.yml · codeql.yml · green-audit.yml
 ├── src/
-│   ├── backend/
-│   └── frontend/
-└── docs/
-    ├── 01 Inicio/
-    ├── 02 Planificación/
-    └── 03 Implementación/
+│   ├── backend/              FastAPI: app/ (api → services → repositories), alembic/, tests/
+│   └── frontend/             React + TypeScript: src/, e2e/ (Playwright), playwright.config.ts
+├── scripts/                  CD, auditorías, arranque E2E y comprobación de enlaces
+├── docs/
+│   ├── 01 Inicio/
+│   ├── 02 Planificación/
+│   ├── 03 Implementación/    Sprints 1–3 e Inspección 04 (Green IT)
+│   └── 03 Inplementación/    Sprint 4 (ruta exacta exigida por la consigna)
+├── .gitignore
+└── README.md
 ```
 
 ---
@@ -340,6 +350,25 @@ Las mediciones locales vigentes están en `evidencias/validacion-20261110/` de l
 
 Los documentos de definición inicial se encuentran en `docs/01 Inicio/`, la planificación en `docs/02 Planificación/` y los entregables de esta iteración en `docs/03 Implementación/`.
 
+## Sprint 4 — Implementación, calidad, despliegue y cierre
+
+Los cuatro entregables están en [`docs/03 Inplementación/Sprint 4/`](<docs/03 Inplementación/Sprint 4/>), la ruta exacta que indica la consigna. Cada documento enlaza de vuelta a este README.
+
+| Entregable | Documento |
+|---|---|
+| Revisión del Sprint | [01 Revisión del Sprint V_1_0_0](<docs/03 Inplementación/Sprint 4/01 Revisión del Sprint V_1_0_0.md>) |
+| Retrospectiva del Sprint | [02 Retrospectiva del Sprint V_1_0_0](<docs/03 Inplementación/Sprint 4/02 Retrospectiva del Sprint V_1_0_0.md>) |
+| Pruebas E2E y monitoreo con Playwright | [03 Analisis PlayWrigth V_1_0_0](<docs/03 Inplementación/Sprint 4/03 Analisis PlayWrigth V_1_0_0.md>) |
+| Evaluación cuantitativa de usabilidad (SUS) | [04 Usabilidad V_1_0_0](<docs/03 Inplementación/Sprint 4/04 Usabilidad V_1_0_0.md>) |
+
+| Workflow | Propósito | Disparadores | Estado |
+|---|---|---|---|
+| [`ci.yml`](.github/workflows/ci.yml) | Lint (ruff, ESLint), análisis estático, build de backend y frontend, validación y auditoría de dependencias | `push` y `pull_request` a `main`/`develop` | [![CI](https://github.com/jmartinez278/Ecolog-stica_Lima/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jmartinez278/Ecolog-stica_Lima/actions/workflows/ci.yml) |
+| [`tests.yml`](.github/workflows/tests.yml) | pytest (SQLite y PostgreSQL), Vitest, E2E Playwright en Chromium/Firefox/WebKit con reportes como artifacts; monitoreo de producción cada 6 h | `push`, `pull_request`, `schedule` | [![Tests](https://github.com/jmartinez278/Ecolog-stica_Lima/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/jmartinez278/Ecolog-stica_Lima/actions/workflows/tests.yml) |
+| [`deploy-production.yml`](.github/workflows/deploy-production.yml) | Despliegue a Render y Vercel con GitHub Secrets, smoke, promoción y verificación Playwright sobre producción | Tras CI/Tests de un `push` a `main`, tags `v*` o manual | [![Deploy](https://github.com/jmartinez278/Ecolog-stica_Lima/actions/workflows/deploy-production.yml/badge.svg)](https://github.com/jmartinez278/Ecolog-stica_Lima/actions/workflows/deploy-production.yml) |
+
+Ejecutar la suite E2E localmente (desde `src/frontend`): `npx playwright install` y `npm run e2e`; contra producción, solo pruebas de lectura: `E2E_BASE_URL=https://ecologistica-lima.vercel.app npm run e2e:prod`. Detalles en el [README del frontend](src/frontend/README.md).
+
 ## Despliegue y CI/CD
 
 La distribución acordada es **frontend en Vercel, backend FastAPI y PostgreSQL en Render**.
@@ -348,7 +377,7 @@ publicar. El CD recupera el frontend compilado por CI, despliega el mismo commit
 Render y promueve Vercel después del smoke de interfaz/API/base de datos.
 
 La [guía de configuración y operación](.github/DEPLOYMENT.md) explica los servicios,
-variables, secretos, migraciones y reintentos. El [workflow CD](.github/workflows/cd.yml)
+variables, secretos, migraciones y reintentos. El [workflow de despliegue](.github/workflows/deploy-production.yml)
 está habilitado con `CD_ENABLED=true` y los destinos configurados. La página de acceso
 y la conexión API/PostgreSQL se comprobaron externamente; el resultado de cada
 publicación automática debe verificarse en [GitHub Actions](https://github.com/jmartinez278/Ecolog-stica_Lima/actions).
@@ -373,6 +402,7 @@ publicación automática debe verificarse en [GitHub Actions](https://github.com
 | 1.4.1 | 10/11/2026 | Limpieza documental: contenido técnico de Sprint 2 consolidado en su informe de estado; retirada de evidencias Green IT superadas y presentaciones HTML repetidas, conservando todas las muestras JSON. |
 | 1.4.2 | 10/11/2026 | Estado remoto de Sprint 4 actualizado; CD GitHub Actions preparado para Vercel/Render, guía de activación y artefacto frontend del mismo CI. |
 | 1.4.3 | 10/11/2026 | Enlaces públicos de aplicación y API; infraestructura Vercel/Render configurada, verificación de acceso y promoción por API con equipo/proyecto explícitos. |
+| 1.5.0 | 17/11/2026 | Sprint 4: badges de workflows, índice de los cuatro entregables, suite Playwright, workflows `ci.yml`/`tests.yml`/`deploy-production.yml` (reemplazan `cd.yml` y `dependency-audit.yml`), stack V_1_1_0 y estructura actualizada. |
 
 ---
 

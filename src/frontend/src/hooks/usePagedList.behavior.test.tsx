@@ -1,5 +1,6 @@
 import { act, cleanup, renderHook, waitFor } from '@testing-library/react'
 import { afterEach, expect, it, vi } from 'vitest'
+import { NETWORK_ERROR_MESSAGE } from '../api'
 import { usePagedList } from './usePagedList'
 
 afterEach(() => { cleanup(); vi.unstubAllGlobals() })
@@ -35,8 +36,21 @@ it('notifica errores y permite recargar sin bucles de peticiones', async () => {
   const fetchMock = vi.fn().mockRejectedValueOnce(new Error('Sin conexión')).mockResolvedValue(response([]))
   vi.stubGlobal('fetch', fetchMock)
   const { result } = renderHook(() => usePagedList<string>('/clientes', 'token', error))
-  await waitFor(() => expect(error).toHaveBeenCalledWith('Sin conexión'))
+  await waitFor(() => expect(error).toHaveBeenCalledWith(NETWORK_ERROR_MESSAGE))
   act(() => result.current.reload())
   await waitFor(() => expect(result.current.loading).toBe(false))
   expect(fetchMock).toHaveBeenCalledTimes(2)
+})
+
+it('indica carga desde el primer render y la termina si la petición falla', async () => {
+  let reject: (error: Error) => void = () => {}
+  vi.stubGlobal('fetch', vi.fn(() => new Promise((_, fail) => { reject = fail })))
+  const error = vi.fn()
+  const { result } = renderHook(() => usePagedList<string>('/clientes', 'token', error))
+  // Antes de que llegue cualquier respuesta no debe mostrarse un estado vacío definitivo.
+  expect(result.current.loading).toBe(true)
+  expect(result.current.items).toEqual([])
+  await act(async () => { reject(new TypeError('Failed to fetch')) })
+  await waitFor(() => expect(result.current.loading).toBe(false))
+  expect(error).toHaveBeenCalledWith(NETWORK_ERROR_MESSAGE)
 })

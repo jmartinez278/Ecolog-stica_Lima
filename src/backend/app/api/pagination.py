@@ -3,6 +3,8 @@ from fastapi import Query
 from app.core.pagination import DEFAULT_LIMIT, MAX_LIMIT, PageParams
 from app.schemas.pagination import Page
 
+__all__ = ["Page", "PageParams", "page_params"]
+
 
 def page_params(
     page: int | None = Query(None, ge=1, description="Página; omitir conserva el contrato de lista anterior."),

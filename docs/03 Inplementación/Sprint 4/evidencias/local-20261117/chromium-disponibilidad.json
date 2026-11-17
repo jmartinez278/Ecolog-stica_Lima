@@ -1,0 +1,66 @@
+{
+  "test": "registra disponibilidad y latencia de 10 sondeos consecutivos @public",
+  "project": "chromium",
+  "target": "http://127.0.0.1:4173",
+  "measuredAt": "2026-11-17T20:17:11.149Z",
+  "interfaz": {
+    "probes": 10,
+    "ok": 10,
+    "availabilityPct": 100,
+    "p50Ms": 9,
+    "p95Ms": 17,
+    "maxMs": 17,
+    "samplesMs": [
+      12,
+      9,
+      9,
+      9,
+      8,
+      17,
+      7,
+      9,
+      8,
+      11
+    ]
+  },
+  "api-proxy": {
+    "probes": 10,
+    "ok": 10,
+    "availabilityPct": 100,
+    "p50Ms": 12,
+    "p95Ms": 14,
+    "maxMs": 14,
+    "samplesMs": [
+      14,
+      12,
+      11,
+      12,
+      12,
+      11,
+      11,
+      13,
+      11,
+      12
+    ]
+  },
+  "api-health": {
+    "probes": 10,
+    "ok": 10,
+    "availabilityPct": 100,
+    "p50Ms": 10,
+    "p95Ms": 11,
+    "maxMs": 11,
+    "samplesMs": [
+      10,
+      7,
+      8,
+      11,
+      10,
+      11,
+      10,
+      11,
+      9,
+      10
+    ]
+  }
+}

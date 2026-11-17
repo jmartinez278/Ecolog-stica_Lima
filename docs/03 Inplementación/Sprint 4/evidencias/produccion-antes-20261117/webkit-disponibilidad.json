@@ -1,0 +1,66 @@
+{
+  "test": "registra disponibilidad y latencia de 10 sondeos consecutivos @public",
+  "project": "webkit",
+  "target": "https://ecologistica-lima.vercel.app",
+  "measuredAt": "2026-11-17T20:05:32.649Z",
+  "interfaz": {
+    "probes": 10,
+    "ok": 10,
+    "availabilityPct": 100,
+    "p50Ms": 119,
+    "p95Ms": 464,
+    "maxMs": 464,
+    "samplesMs": [
+      464,
+      117,
+      124,
+      157,
+      119,
+      124,
+      119,
+      111,
+      108,
+      124
+    ]
+  },
+  "api-proxy": {
+    "probes": 10,
+    "ok": 10,
+    "availabilityPct": 100,
+    "p50Ms": 412,
+    "p95Ms": 821,
+    "maxMs": 821,
+    "samplesMs": [
+      416,
+      821,
+      382,
+      436,
+      414,
+      402,
+      443,
+      384,
+      403,
+      412
+    ]
+  },
+  "api-health": {
+    "probes": 10,
+    "ok": 10,
+    "availabilityPct": 100,
+    "p50Ms": 299,
+    "p95Ms": 321,
+    "maxMs": 321,
+    "samplesMs": [
+      313,
+      299,
+      305,
+      212,
+      306,
+      301,
+      282,
+      217,
+      321,
+      194
+    ]
+  }
+}

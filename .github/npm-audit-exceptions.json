@@ -1,0 +1,10 @@
+{
+  "GHSA-fc5q-39xc-vjpf": {
+    "package": "picomatch",
+    "affected": "<=4.0.7 (sin versión corregida publicada al 17/11/2026)",
+    "scope": "Solo herramientas de desarrollo y build: vite, vitest, tinyglobby, typescript-eslint. No se incluye en el bundle servido por Vercel.",
+    "reason": "ReDoS con patrones extglob; los patrones los define el repositorio, no el usuario final. Riesgo aceptado hasta que exista parche.",
+    "owner": "Marco Jhair Martinez Llanos",
+    "review_by": "2026-12-15"
+  }
+}

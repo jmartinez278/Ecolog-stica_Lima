@@ -1,0 +1,18 @@
+{
+  "test": "la página de acceso cumple los presupuestos de TTFB, FCP y LCP @public",
+  "project": "webkit",
+  "target": "http://127.0.0.1:4173",
+  "measuredAt": "2026-11-17T20:18:12.574Z",
+  "budget": {
+    "ttfb": 800,
+    "fcp": 1800,
+    "lcp": 2500,
+    "api": 500
+  },
+  "ttfb": 78,
+  "domContentLoaded": 584,
+  "load": 585,
+  "fcp": 369,
+  "lcp": 369,
+  "transferBytes": 1790
+}
